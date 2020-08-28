@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const fs = require('fs');
+const https = require('https');
 
 const app = express();
 
@@ -17,8 +19,12 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to our IS4103 Node.js Backend." });
 });
 
-// set port, listen for requests
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+https.createServer({
+  key: fs.readFileSync('./key.pem'),
+  cert: fs.readFileSync('./cert.pem'),
+  passphrase: 'node'
+}, app)
+.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
