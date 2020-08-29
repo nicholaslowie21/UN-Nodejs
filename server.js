@@ -10,7 +10,7 @@ const logger = require('morgan'); //for logging in console, the request message
 const fileUpload = require('express-fileupload');
 const moment = require('moment-timezone')
 
-const apiRouter = require('./routes/api.route')
+const apiRouter = require('./app/routes/api.routes')
 const app = express();
 
 moment.tz.setDefault('Asia/Singapore');

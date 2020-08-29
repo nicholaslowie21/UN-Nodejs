@@ -5,7 +5,7 @@ module.exports = mongoose => {
         username: String,
         email: String,
         password: String,
-        roles: String,
+        role: String,
         status: String,
         bio: String,
         occupation: String,

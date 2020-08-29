@@ -20,8 +20,11 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "http-errors": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
     "moment-timezone": "^0.5.31",
     "mongoose": "^5.10.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "randomstring": "^1.1.5",
+    "salted-md5": "^4.0.2"
   }
 }
