@@ -12,7 +12,7 @@ module.exports = mongoose => {
         isVerified: Boolean,
         profilePic: String,
         country: String,
-        points: Number
+        points: Number,
       },
       { timestamps: true }
     );

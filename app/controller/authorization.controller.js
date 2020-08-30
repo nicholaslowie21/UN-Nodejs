@@ -8,7 +8,7 @@ const TokenSign = require('../middleware/tokensign');
 exports.postSignup = async function (req, res, next) {
     let randomString = randomstring.generate({ length: 8 });
     let saltedHashPassword = saltedMd5(randomString, req.body.password);
-
+    
     const user = new Users({
 		name: req.body.name,
 		username: req.body.username,
@@ -16,9 +16,10 @@ exports.postSignup = async function (req, res, next) {
 		password: saltedHashPassword,
         role: 'user',
 		status: 'active',
-		bio: req.body.bio,
-        occupation: req.body.occupation,
+		bio: req.body.bio || '',
+        occupation: req.body.occupation || '',
         isVerified: false,
+        profilePic: '',
         country: req.body.country,
         points: 0,
         salt: randomString
