@@ -7,4 +7,6 @@ const UserValidator = require('../validator/user.validator');
 /* POST register user. */
 router.post('/signup', UserValidator.userSignup, UserValidator.ifErrors, authorizationController.postSignup);
 
+router.post('/login', UserValidator.userLogin, UserValidator.ifErrors, authorizationController.postLogin);
+
 module.exports = router;

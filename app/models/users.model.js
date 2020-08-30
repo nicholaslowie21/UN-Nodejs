@@ -13,6 +13,7 @@ module.exports = mongoose => {
         profilePic: String,
         country: String,
         points: Number,
+        salt: String,
       },
       { timestamps: true }
     );

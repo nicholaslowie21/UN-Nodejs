@@ -1,6 +1,7 @@
 const { body, validationResult, oneOf, check } = require('express-validator');
 const db = require('../models')
 const Users = db.users;
+const Isemail = require('isemail');
 
 exports.userSignup = [
     body('name').exists(),
@@ -22,10 +23,33 @@ exports.userSignup = [
     body('country').exists()
 ]
 
-exports.userLogin = [
-    body('usernameOrEmail').exists(),
-    body('password').exists()
-]
+exports.userLogin = async (req, res, next) => {
+    let field = req.body.usernameOrEmail;
+    let password = req.body.password;
+
+    if(!field)
+        return res.status(400).json({
+            status: 'error',
+            msg: "Username or Email is empty!",
+            data: {}
+         });
+
+    if(!password) {
+        return res.status(400).json({
+            status: 'error',
+            msg: "Password is empty!",
+            data: {}
+         });
+    }
+
+    if(Isemail.validate(field)) {
+        req.body.email = field;
+    } else {
+        req.body.username = field;
+    }
+
+    next();
+}
 
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {
