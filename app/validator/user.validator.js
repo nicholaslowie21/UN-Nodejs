@@ -57,6 +57,19 @@ exports.userLogin = async (req, res, next) => {
     next();
 }
 
+exports.updateProfile = [
+    body('name').exists(),
+    body('email').isEmail(),
+    body('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    }),
+    body('bio').exists(),
+    body('occupation').exists()
+]
+
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions

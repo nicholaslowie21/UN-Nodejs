@@ -10,8 +10,6 @@ router.post('/user/signup', UserValidator.userSignup, UserValidator.ifErrors, au
 
 router.post('/user/login', UserValidator.userLogin, UserValidator.ifErrors, authorizationController.postLogin);
 
-// router.post('/updateUserProfile')
-
 // for testing purpose only
 router.post('/testing', auth, authorizationController.postTest)
 
