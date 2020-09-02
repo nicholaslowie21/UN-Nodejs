@@ -6,10 +6,13 @@ const auth = require('../middleware/auth')
 const UserValidator = require('../validator/user.validator');
 
 /* POST register user. */
-router.post('/signup', UserValidator.userSignup, UserValidator.ifErrors, authorizationController.postSignup);
+router.post('/user/signup', UserValidator.userSignup, UserValidator.ifErrors, authorizationController.postSignup);
 
-router.post('/login', UserValidator.userLogin, UserValidator.ifErrors, authorizationController.postLogin);
+router.post('/user/login', UserValidator.userLogin, UserValidator.ifErrors, authorizationController.postLogin);
 
+// router.post('/updateUserProfile')
+
+// for testing purpose only
 router.post('/testing', auth, authorizationController.postTest)
 
 module.exports = router;
