@@ -24,8 +24,8 @@ exports.postSignup = async function (req, res, next) {
 		password: saltedHashPassword,
         role: 'user',
 		status: 'active',
-		bio: req.body.bio || '',
-        occupation: req.body.occupation || '',
+		bio: '',
+        occupation: '',
         isVerified: false,
         profilePic: '',
         country: req.body.country,
@@ -40,7 +40,7 @@ exports.postSignup = async function (req, res, next) {
         return res.status(200).json({
             status: 'success',
             msg: 'User successfully created',
-            data: { token: token, data: data }
+            data: { token: token, user: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -90,7 +90,7 @@ exports.postLogin = async function (req, res, next) {
     return res.status(200).json({
         status: 'success',
         msg: 'User successfully sign in!',
-        data: { token: token }
+        data: { token: token, user: user }
     });
    } else {
     return res.status(500).json({
