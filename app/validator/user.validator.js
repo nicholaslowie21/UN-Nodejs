@@ -1,7 +1,8 @@
 const { body, validationResult, oneOf, check } = require('express-validator');
-const db = require('../models')
+const db = require('../models');
 const Users = db.users;
 const Isemail = require('isemail');
+const nodeCountries =  require("node-countries");
 
 exports.userSignup = [
     body('name').exists(),
@@ -20,7 +21,12 @@ exports.userSignup = [
             return Promise.reject('email already exists. User cannot be created');
     }),
     body('password').exists(),
-    body('country').exists()
+    body('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    })
 ]
 
 exports.userLogin = async (req, res, next) => {
