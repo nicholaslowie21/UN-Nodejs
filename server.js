@@ -7,8 +7,8 @@ const https = require('https');
 const createError = require('http-errors');
 const path = require('path');
 const logger = require('morgan'); //for logging in console, the request message
-const fileUpload = require('express-fileupload');
 const moment = require('moment-timezone')
+const multer = require('multer');
 
 const apiRouter = require('./app/routes/api.routes')
 const app = express();
@@ -16,9 +16,10 @@ const app = express();
 moment.tz.setDefault('Asia/Singapore');
 
 app.use(cors());
-app.use(fileUpload());
 app.use(logger('dev'));
 app.use(express.json());
+
+app.use('/public', express.static('public'));
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());

@@ -7,4 +7,6 @@ const UserValidator = require('../validator/user.validator');
 
 router.post('/updateProfile', auth, UserValidator.updateProfile, UserValidator.ifErrors, userController.updateUserProfile);
 
+router.post('/profilePicture', auth, userController.multerUpload, userController.profilePicture);
+
 module.exports = router;
