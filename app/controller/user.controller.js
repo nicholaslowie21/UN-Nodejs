@@ -15,7 +15,10 @@ var storage = multer.diskStorage({
         cb(null, dir)
     },
     filename: async function (req, file, cb) {
-        cb(null, 'ProfPic-User-'+req.id)
+        let extentsion = file.originalname.split('.')
+        let thePath = 'ProfPic-User-'+req.id+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
     }
 })
 var upload = multer({ storage: storage })
@@ -23,10 +26,25 @@ var upload = multer({ storage: storage })
 exports.multerUpload = upload.single('profilePic');
 
 exports.profilePicture = async function (req, res){
-    return res.status(200).json({
-        status: 'success',
-        msg: 'User profile image successfully updated',
-        data: { }
+    const user = await Users.findOne({ 'username': req.username }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    user.profilePic = 'https://localhost:8080/public/uploads/profilePicture/'+req.thePath;
+
+    user.save(user)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'User profile picture successfully updated',
+            data: { user: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
     });
 }
 
