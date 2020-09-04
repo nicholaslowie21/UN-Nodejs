@@ -14,6 +14,11 @@ module.exports = mongoose => {
         country: String,
         points: Number,
         salt: String,
+        institutionIds: [Schema.Types.ObjectId],
+        projects: [Schema.Types.ObjectId],
+        badgePath: String,
+        wallet: Number,
+        SDGs: [Number]
       },
       { timestamps: true }
     );
