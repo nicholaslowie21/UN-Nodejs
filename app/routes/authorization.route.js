@@ -4,9 +4,13 @@ const authorizationController = require('../controller/authorization.controller'
 const auth = require('../middleware/auth')
 
 const UserValidator = require('../validator/user.validator');
+const InstitutionValidator = require('../validator/institution.validator');
 
 /* POST register user. */
 router.post('/user/signup', UserValidator.userSignup, UserValidator.ifErrors, authorizationController.postSignup);
+
+/* POST register institution. */
+router.post('/institution/signup', InstitutionValidator.signUp, InstitutionValidator.ifErrors, authorizationController.postInstitutionSignup);
 
 router.post('/login', UserValidator.login, UserValidator.ifErrors, authorizationController.postLogin);
 

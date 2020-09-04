@@ -11,8 +11,8 @@ module.exports = function (req, res, next) {
             req.id = decoded.id
             req.body.username = decoded.username
             req.username = decoded.username
-            req.body.role = decoded.role
-            req.role = decoded.role
+            req.body.role = decoded.role || ''
+            req.role = decoded.role || ''
             req.body.type = decoded.type
             req.type = decoded.type
             next();

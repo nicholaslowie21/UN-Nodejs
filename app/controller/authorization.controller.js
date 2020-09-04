@@ -56,6 +56,45 @@ exports.postSignup = async function (req, res, next) {
     });   
 }
 
+exports.postInstitutionSignup = async function (req, res, next) {
+    let randomString = randomstring.generate({ length: 8 });
+    let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
+    
+    const institution = new Institution({
+		name: req.body.name,
+		username: req.body.username,
+		email: req.body.email.toLowerCase(),
+		password: saltedHashPassword,
+		status: 'active',
+        bio: '',
+        phone: '',
+        address: '',
+        isVerified: false,
+        profilePic: '',
+        country: req.body.country,
+        salt: randomString
+    });
+    
+    let token = TokenSign(institution.id, institution.username, institution.role, 'institution');
+
+    institution.save(institution)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Account successfully created',
+            data: { token: token, user: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+}
+
 exports.postLogin = async function (req, res, next) {
    let email = req.body.email;
    let username = req.body.username;
@@ -99,10 +138,11 @@ exports.postLogin = async function (req, res, next) {
    }
 
    if(user) type='user';
-   
+
    if(institution){ 
        type='institution';
        user=institution;
+       user.role = 'institution';
     }
    let salt = user.salt;
 
