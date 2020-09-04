@@ -153,7 +153,7 @@ exports.postLogin = async function (req, res, next) {
     return res.status(200).json({
         status: 'success',
         msg: 'You have successfully sign in!',
-        data: { token: token, user: user }
+        data: { token: token, user: user, accountType: type }
     });
    } else {
     return res.status(500).json({
@@ -162,4 +162,72 @@ exports.postLogin = async function (req, res, next) {
         data: {}
     });
    }
+}
+
+exports.userChangePassword = async function (req, res, next) {
+    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+
+    let randomString = randomstring.generate({ length: 8 });
+    let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    
+    user.password = saltedHashPassword;
+    user.salt = randomString;
+
+    user.save(user)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'User password successfully updated',
+            data: { user: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+}
+
+exports.institutionChangePassword = async function (req, res, next) {
+    const institution = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+
+    let randomString = randomstring.generate({ length: 8 });
+    let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    
+    institution.password = saltedHashPassword;
+    institution.salt = randomString;
+
+    institution.save(institution)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Account password successfully updated',
+            data: { user: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
 }

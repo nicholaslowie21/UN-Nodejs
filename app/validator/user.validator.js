@@ -36,6 +36,10 @@ exports.userSignup = [
     })
 ]
 
+exports.userChangePassword = [
+    body('password').exists()
+]
+
 exports.login = async (req, res, next) => {
     let field = req.body.usernameOrEmail;
     let password = req.body.password;
