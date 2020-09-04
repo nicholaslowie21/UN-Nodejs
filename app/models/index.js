@@ -8,5 +8,7 @@ db.mongoose = mongoose;
 db.url = dbConfig.url;
 
 db.users = require("./users.model.js")(mongoose);
+db.institution = require("./institution.model")(mongoose);
+db.project = require("./project.model.js")(mongoose);
 
 module.exports = db;

@@ -2,22 +2,18 @@ module.exports = mongoose => {
     var schema = mongoose.Schema(
       {
         name: String,
+        address: String,
         username: String,
         email: String,
-        password: String,
-        role: String,
+        phone: String,
         status: String,
         bio: String,
-        occupation: String,
         isVerified: Boolean,
         profilePic: String,
-        country: String,
-        points: Number,
+        password: String,
         salt: String,
-        institutionIds: [String],
+        members: [String],
         projects: [String],
-        badgePath: String,
-        wallet: Number,
         SDGs: [Number]
       },
       { timestamps: true }
@@ -29,12 +25,8 @@ module.exports = mongoose => {
       return object;
     });
   
-    const User = mongoose.model("User", schema);
-    User.find({username: 'superadmin'}).then(function (docs) {
-      if (docs.length === 0) {
-          User.create({ username: 'superadmin', password: 'SuperAdminPass@123' });
-      }
-  });
+    const Institution  = mongoose.model("Institution", schema);
+    
 
-    return User;
+    return Institution;
   };
