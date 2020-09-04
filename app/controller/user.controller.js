@@ -30,6 +30,14 @@ exports.profilePicture = async function (req, res){
         if (err) return handleError(err);
     });
 
+    if(!user) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'User not found! ',
+            data: {}
+        });
+    }
+
     user.profilePic = 'https://localhost:8080/public/uploads/profilePicture/'+req.thePath;
 
     user.save(user)
