@@ -26,7 +26,7 @@ var upload = multer({ storage: storage })
 exports.multerUpload = upload.single('profilePic');
 
 exports.profilePicture = async function (req, res){
-    const institution = await Institution.findOne({ 'username': req.username }, function (err, person) {
+    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -59,7 +59,7 @@ exports.updateProfile = async function (req, res, next) {
     let theCountry = nodeCountries.getCountryByName(req.body.country);
     req.body.country = theCountry.name;
     
-    const institution = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
         if (err) return handleError(err);
     });
 

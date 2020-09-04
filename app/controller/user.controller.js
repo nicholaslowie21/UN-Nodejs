@@ -26,7 +26,7 @@ var upload = multer({ storage: storage })
 exports.multerUpload = upload.single('profilePic');
 
 exports.profilePicture = async function (req, res){
-    const user = await Users.findOne({ 'username': req.username }, function (err, person) {
+    const user = await Users.findOne({ '_id': req.id }, function (err, person) {
         if (err) return handleError(err);
     });
 

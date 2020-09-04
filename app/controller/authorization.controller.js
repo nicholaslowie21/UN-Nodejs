@@ -38,7 +38,7 @@ exports.postSignup = async function (req, res, next) {
         salt: randomString
     });
     
-    let token = TokenSign(user.id, user.username, user.role, 'user');
+    let token = TokenSign(user.id, user.role, 'user');
 
     user.save(user)
     .then(data => {
@@ -77,7 +77,7 @@ exports.postInstitutionSignup = async function (req, res, next) {
         salt: randomString
     });
     
-    let token = TokenSign(institution.id, institution.username, institution.role, 'institution');
+    let token = TokenSign(institution.id, institution.role, 'institution');
 
     institution.save(institution)
     .then(data => {
@@ -149,7 +149,7 @@ exports.postLogin = async function (req, res, next) {
    let saltedHashPassword = saltedMd5(salt, req.body.password);
 
    if(saltedHashPassword === user.password) {
-    let token = TokenSign(user.id, user.username, user.role, type);
+    let token = TokenSign(user.id, user.role, type);
     return res.status(200).json({
         status: 'success',
         msg: 'You have successfully sign in!',

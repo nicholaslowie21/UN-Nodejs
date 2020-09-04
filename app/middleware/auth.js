@@ -9,8 +9,6 @@ module.exports = function (req, res, next) {
         if (decoded) {
             req.body.id = decoded.id
             req.id = decoded.id
-            req.body.username = decoded.username
-            req.username = decoded.username
             req.body.role = decoded.role || ''
             req.role = decoded.role || ''
             req.body.type = decoded.type
