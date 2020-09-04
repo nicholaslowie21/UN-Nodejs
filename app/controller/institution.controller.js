@@ -71,8 +71,6 @@ exports.updateProfile = async function (req, res, next) {
     });
     
     institution.name = req.body.name;
-    institution.email = req.body.email;
-    institution.username = req.body.username;
     institution.bio = req.body.bio;
     institution.phone = req.body.phone;
     institution.country = req.body.country;
@@ -83,6 +81,66 @@ exports.updateProfile = async function (req, res, next) {
         return res.status(200).json({
             status: 'success',
             msg: 'Account profile successfully updated',
+            data: { institution: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+}
+
+exports.updateUsername = async function (req, res, next) {
+    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    institution.username = req.body.username;
+    
+    institution.save(institution)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Account username successfully updated',
+            data: { institution: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+}
+
+exports.updateEmail = async function (req, res, next) {
+    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    institution.email = req.body.email;
+
+    institution.save(institution)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Account email successfully updated',
             data: { institution: data }
         });
     }).catch(err => {

@@ -206,7 +206,7 @@ exports.institutionChangePassword = async function (req, res, next) {
     if(!institution) 
     return res.status(500).json({
         status: 'error',
-        msg: 'User not found!',
+        msg: 'Account not found!',
         data: {}
     });
 

@@ -38,26 +38,6 @@ exports.signUp = [
 
 exports.updateProfile = [
     body('name').exists(),
-    body('username').exists().custom(async value => {
-        let user = await Users.findOne({ 'username': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        let institution = await Institution.findOne({ 'username': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (user || institution)
-            return Promise.reject('username already exists. User profile cannot be updated');
-    }),
-    body('email').isEmail().custom(async value => {
-        let user = await Users.findOne({ 'email': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        let institution = await Institution.findOne({ 'email': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (user || institution)
-            return Promise.reject('email already exists. User cannot be created');
-    }),
     body('country').exists().custom(async value => {
         let theCountry = nodeCountries.getCountryByName(value);
 
@@ -67,6 +47,32 @@ exports.updateProfile = [
     body('bio').exists(),
     body('phone').exists(),
     body('address').exists()
+]
+
+exports.updateUsername = [
+    body('username').exists().custom(async value => {
+        let user = await Users.findOne({ 'username': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        let institution = await Institution.findOne({ 'username': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        if (user || institution)
+            return Promise.reject('username already exists.');
+    })
+]
+
+exports.updateEmail = [
+    body('email').isEmail().custom(async value => {
+        let user = await Users.findOne({ 'email': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        let institution = await Institution.findOne({ 'email': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        if (user || institution)
+            return Promise.reject('email already exists.');
+    })
 ]
 
 // to process error from built-in express check

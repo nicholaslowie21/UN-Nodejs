@@ -72,8 +72,6 @@ exports.updateUserProfile = async function (req, res, next) {
     });
     
     user.name = req.body.name;
-    user.email = req.body.email;
-    user.username = req.body.username;
     user.bio = req.body.bio;
     user.occupation = req.body.occupation;
     user.country = req.body.country;
@@ -83,6 +81,66 @@ exports.updateUserProfile = async function (req, res, next) {
         return res.status(200).json({
             status: 'success',
             msg: 'User profile successfully updated',
+            data: { user: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+}
+
+exports.updateUsername = async function (req, res, next) {
+    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+    
+    user.username = req.body.username;
+
+    user.save(user)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'User username successfully updated',
+            data: { user: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+}
+
+exports.updateEmail = async function (req, res, next) {
+    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+    
+    user.email = req.body.email;
+
+    user.save(user)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'User email successfully updated',
             data: { user: data }
         });
     }).catch(err => {
