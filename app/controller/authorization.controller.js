@@ -1,10 +1,12 @@
 const moment = require('moment-timezone')
 const db = require('../models')
 const Users = db.users;
+const Institution = db.institution;
 const saltedMd5 = require('salted-md5');
 const randomstring = require("randomstring");
 const TokenSign = require('../middleware/tokensign');
 const nodeCountries = require('node-countries');
+const { institution } = require('../models');
 
 exports.postTest = async function (req, res, next) {
     return res.status(200).json({
@@ -36,7 +38,7 @@ exports.postSignup = async function (req, res, next) {
         salt: randomString
     });
     
-    let token = TokenSign(user.id, user.username, user.role);
+    let token = TokenSign(user.id, user.username, user.role, 'user');
 
     user.save(user)
     .then(data => {
@@ -57,42 +59,57 @@ exports.postSignup = async function (req, res, next) {
 exports.postLogin = async function (req, res, next) {
    let email = req.body.email;
    let username = req.body.username;
-   
+   let type = '';
+
    var user;
+   var institution;
    
    //if not email not null/undefined
    if (email) {
+        
         user = await Users.findOne({ 'email': email }, function (err, person) {
             if (err) return handleError(err);
         });
-        if (!user)
+
+        institution = await Institution.findOne({ 'email': email }, function (err, person) {
+            if (err) return handleError(err);
+        });
+
+        if (!user && !institution)
             return res.status(500).json({
                 status: 'error',
-                msg: 'User with such email is not found!',
+                msg: 'Account with such email is not found!',
                 data: {}
             });
    } else if (username) {
         user = await Users.findOne({ 'username': username }, function (err, person) {
             if (err) return handleError(err);
         });
-        if (!user)
+
+        institution = await Institution.findOne({ 'username': username }, function (err, person) {
+            if (err) return handleError(err);
+        });
+        if (!user && !institution)
             return res.status(500).json({
                 status: 'error',
-                msg: 'User with such username is not found!',
+                msg: 'Account with such username is not found!',
                 data: {}
             });
 
    }
+
+   if(user) type='user';
+   if(institution) type='institution'
 
    let salt = user.salt;
 
    let saltedHashPassword = saltedMd5(salt, req.body.password);
 
    if(saltedHashPassword === user.password) {
-    let token = TokenSign(user.id, user.username, user.role);
+    let token = TokenSign(user.id, user.username, user.role, type);
     return res.status(200).json({
         status: 'success',
-        msg: 'User successfully sign in!',
+        msg: 'You have successfully sign in!',
         data: { token: token, user: user }
     });
    } else {

@@ -13,6 +13,8 @@ module.exports = function (req, res, next) {
             req.username = decoded.username
             req.body.role = decoded.role
             req.role = decoded.role
+            req.body.type = decoded.type
+            req.type = decoded.type
             next();
         }
     } catch (err) {

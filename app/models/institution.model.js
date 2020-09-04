@@ -2,6 +2,7 @@ module.exports = mongoose => {
     var schema = mongoose.Schema(
       {
         name: String,
+        username: String,
         address: String,
         username: String,
         email: String,
@@ -10,6 +11,7 @@ module.exports = mongoose => {
         bio: String,
         isVerified: Boolean,
         profilePic: String,
+        country: String,
         password: String,
         salt: String,
         members: [String],

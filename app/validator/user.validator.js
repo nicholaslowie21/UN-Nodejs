@@ -1,6 +1,7 @@
 const { body, validationResult, oneOf, check } = require('express-validator');
 const db = require('../models');
 const Users = db.users;
+const Institution = db.institution;
 const Isemail = require('isemail');
 const nodeCountries =  require("node-countries");
 
@@ -10,14 +11,20 @@ exports.userSignup = [
         let user = await Users.findOne({ 'username': value }, function (err, person) {
             if (err) return handleError(err);
           });
-        if (user)
+        let institution = await Institution.findOne({ 'username': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        if (user || institution)
             return Promise.reject('username already exists. User cannot be created');
     }),
     body('email').isEmail().custom(async value => {
         let user = await Users.findOne({ 'email': value }, function (err, person) {
             if (err) return handleError(err);
           });
-        if (user)
+        let institution = await Institution.findOne({ 'email': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        if (user || institution)
             return Promise.reject('email already exists. User cannot be created');
     }),
     body('password').exists(),
@@ -29,7 +36,7 @@ exports.userSignup = [
     })
 ]
 
-exports.userLogin = async (req, res, next) => {
+exports.login = async (req, res, next) => {
     let field = req.body.usernameOrEmail;
     let password = req.body.password;
 

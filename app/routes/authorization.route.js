@@ -8,7 +8,7 @@ const UserValidator = require('../validator/user.validator');
 /* POST register user. */
 router.post('/user/signup', UserValidator.userSignup, UserValidator.ifErrors, authorizationController.postSignup);
 
-router.post('/user/login', UserValidator.userLogin, UserValidator.ifErrors, authorizationController.postLogin);
+router.post('/login', UserValidator.login, UserValidator.ifErrors, authorizationController.postLogin);
 
 // for testing purpose only
 router.post('/testing', auth, authorizationController.postTest)

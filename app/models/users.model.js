@@ -30,9 +30,12 @@ module.exports = mongoose => {
     });
   
     const User = mongoose.model("User", schema);
+
+    //to create a super user
+    //password: SuperAdminPass@123
     User.find({username: 'superadmin'}).then(function (docs) {
       if (docs.length === 0) {
-          User.create({ username: 'superadmin', password: 'SuperAdminPass@123' });
+          User.create({ username: 'superadmin', password: '1601c7d4ebcaa72ae9abc3a1eec24196', salt: 'UH1GR6hl', role:'adminlead' });
       }
   });
 
