@@ -99,8 +99,11 @@ exports.postLogin = async function (req, res, next) {
    }
 
    if(user) type='user';
-   if(institution) type='institution'
-
+   
+   if(institution){ 
+       type='institution';
+       user=institution;
+    }
    let salt = user.salt;
 
    let saltedHashPassword = saltedMd5(salt, req.body.password);

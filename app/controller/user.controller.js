@@ -52,12 +52,20 @@ exports.updateUserProfile = async function (req, res, next) {
     let theCountry = nodeCountries.getCountryByName(req.body.country);
     req.body.country = theCountry.name;
     
-    const user = await Users.findOne({ 'username': req.body.username }, function (err, person) {
+    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
         if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
     });
     
     user.name = req.body.name;
     user.email = req.body.email;
+    user.username = req.body.username;
     user.bio = req.body.bio;
     user.occupation = req.body.occupation;
     user.country = req.body.country;

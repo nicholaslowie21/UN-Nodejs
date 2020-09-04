@@ -66,6 +66,16 @@ exports.login = async (req, res, next) => {
 
 exports.updateProfile = [
     body('name').exists(),
+    body('username').exists().custom(async value => {
+        let user = await Users.findOne({ 'username': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        let institution = await Institution.findOne({ 'username': value }, function (err, person) {
+            if (err) return handleError(err);
+          });
+        if (user || institution)
+            return Promise.reject('username already exists. User profile cannot be updated');
+    }),
     body('email').isEmail(),
     body('country').exists().custom(async value => {
         let theCountry = nodeCountries.getCountryByName(value);
