@@ -11,5 +11,6 @@ db.users = require("./users.model.js")(mongoose);
 db.institution = require("./institution.model")(mongoose);
 db.project = require("./project.model.js")(mongoose);
 db.passwordreset = require("./passwordreset.model")(mongoose);
+db.verifyrequest = require("./verifyrequest.model")(mongoose);
 
 module.exports = db;

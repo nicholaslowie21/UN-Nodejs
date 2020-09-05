@@ -3,6 +3,7 @@ const db = require('../models')
 const Users = db.users;
 const Institution = db.institution;
 const PasswordReset = db.passwordreset;
+const VerifyRequest = db.verifyrequest;
 const saltedMd5 = require('salted-md5');
 const randomstring = require("randomstring");
 const TokenSign = require('../middleware/tokensign');
@@ -447,4 +448,34 @@ exports.postUpdatePassword = async function(req, res) {
         res.render('error-reset', { title: "Reset password", message: 'You might have changed your password!'});
         return;
     }
+}
+
+exports.verifyRequest = async function(req,res) {
+    if(req.body.type != 'user') {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Only user can request for verification',
+            data: {}
+        });
+    }
+    
+    const verifyrequest = new VerifyRequest({
+        id: req.body.id,
+        status: 'pending'
+    });
+    
+    verifyrequest.save(verifyrequest)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Verification request successfully sent!',
+            data: { verifyrequest: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
 }
