@@ -27,6 +27,9 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.set('views', __dirname+'/app/views');
+app.set('view engine', 'ejs');
+
 // connect to DB
 const db = require("./app/models");
 db.mongoose

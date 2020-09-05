@@ -317,3 +317,134 @@ exports.postChangePasswordRequest = async function (req, res) {
     });
 
 }
+
+exports.getChangePassword = async function (req,res) {
+    let passreset = await PasswordReset.findOne({ 'token': req.params.token }, function (err, person) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    if(passreset){
+        if (moment(passreset.expiredAt).isSameOrBefore(moment.tz('Asia/Singapore').format())) {
+            console.log('Expired Password Change Request');
+            res.render('error-reset', { title: "Reset password", message: 'Your request is already expired!'});
+            return;
+        } else {
+            console.log('Success access to change password page');
+            res.render('password-reset', { title: "Reset password", token: req.params.token });
+        }
+    } else {
+        res.render('error-reset', { title: "Reset password", message: 'No such request found!'});
+        return;
+    }
+}
+
+exports.postUpdatePassword = async function(req, res) {
+    console.log("reach post update password")
+    let password = req.body.password
+
+	if (!req.body.token) {
+        res.render('error-reset', { title: "Reset password", message: 'Your request token is corrupted, please make a new request!'});
+        return;
+    }
+
+    if(!password){        
+        res.render('error-reset', { title: "Reset password", message: 'Your password is empty!'});
+        return;
+    }
+
+    if(password.length < 8) {
+        res.render('error-reset', { title: "Reset password", message: 'Password length must be longer than 8!'});
+        return;
+    }
+    
+    
+    let passreset = await PasswordReset.findOne({ 'token': req.body.token }, function (err, person) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    if(!passreset) {
+        res.render('error-reset', { title: "Reset password", message: 'Your password change request is missing!'});
+        return;
+    }
+
+    if(passreset && passreset.status === 'pending'){
+        if(passreset.type === 'user') {
+            let user = await Users.findOne({ '_id': passreset.accountId }, function (err, person) {
+                if (err) return handleError(err);
+            });
+
+            if(!user)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong!',
+                data: {}
+            });
+
+            let randomString = randomstring.generate({ length: 8 });
+            let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    
+            user.password = saltedHashPassword;
+            user.salt = randomString;
+
+            passreset.status = 'completed';
+            passreset.save();
+
+            user.save(user)
+            .then(data => {
+                res.render('success-reset', { title: "Reset password"});
+                return;
+            }).catch(err => {
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong! Error: ' + err.message,
+                    data: {}
+                });
+            });
+            
+
+        } else {
+            let institution = await Institution.findOne({ '_id': passreset.accountId }, function (err, person) {
+                if (err) return handleError(err);
+            });
+
+            if(!institution)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong!',
+                data: {}
+            });
+
+            let randomString = randomstring.generate({ length: 8 });
+            let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    
+            institution.password = saltedHashPassword;
+            institution.salt = randomString;
+
+            passreset.status = 'completed';
+            passreset.save();
+
+            institution.save(institution)
+            .then(data => {
+                res.render('success-reset', { title: "Reset password"});
+                return;
+            }).catch(err => {
+                res.render('error-reset', { title: "Reset password"});
+                return;
+            });
+
+        }
+    } else {
+        res.render('error-reset', { title: "Reset password", message: 'You might have changed your password!'});
+        return;
+    }
+}
