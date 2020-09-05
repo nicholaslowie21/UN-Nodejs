@@ -21,6 +21,12 @@ router.post('/institution/changePassword', auth, UserValidator.userChangePasswor
 
 router.post('/login', UserValidator.login, UserValidator.ifErrors, authorizationController.postLogin);
 
+
+router.post('/reset-password-request', authorizationController.postChangePasswordRequest)
+// router.get('/reset-password-request/:token', authorizationController.getChangePassword)
+// router.post('/update-password', authorizationController.postUpdatePassword)
+
+
 // for testing purpose only
 router.post('/testing', auth, authorizationController.postTest)
 

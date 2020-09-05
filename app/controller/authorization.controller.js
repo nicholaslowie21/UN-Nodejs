@@ -2,11 +2,14 @@ const moment = require('moment-timezone')
 const db = require('../models')
 const Users = db.users;
 const Institution = db.institution;
+const PasswordReset = db.passwordreset;
 const saltedMd5 = require('salted-md5');
 const randomstring = require("randomstring");
 const TokenSign = require('../middleware/tokensign');
 const nodeCountries = require('node-countries');
-const { institution } = require('../models');
+const { v4: uuidv4 } = require('uuid');
+
+const Helper = require('../service/helper.service');
 
 exports.postTest = async function (req, res, next) {
     return res.status(200).json({
@@ -230,4 +233,87 @@ exports.institutionChangePassword = async function (req, res, next) {
             data: {}
         });
     });   
+}
+
+exports.postChangePasswordRequest = async function (req, res) {
+	let email = req.body.email;
+
+    if(!email) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Email is empty!',
+        data: {}
+    });
+
+    var user;
+    var institution;
+    var account;
+    user = await Users.findOne({ 'email': email }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    institution = await Institution.findOne({ 'email': email }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if (!user && !institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account with such email is not found!',
+            data: {}
+        });
+
+    if(user){ 
+        type='user';
+        account = user;
+    }
+    if(institution){ 
+       type='institution';
+       account=institution;
+       account.role = 'institution';
+    }
+
+    const passwordreset  = new PasswordReset({
+        token: uuidv4(),
+        type: type,
+        accountId: account.id,
+        expiredAt: moment.tz('Asia/Singapore').add(30, 'minutes').format(),
+        status: 'pending'
+    });
+
+    let passwordreseturl = 'https://localhost:8080/api/authorization/reset-password-request/'+passwordreset.token;
+    let subject = 'KoCoSD Password Reset'
+    let theMessage = `
+        <h1>Password Reset Request</h1>
+        <p>We received a request to reset your KoCoSD password.</p>
+        <a href="${passwordreseturl}">Click here to change your password.</a><br>
+    `
+    
+
+    passwordreset.save(passwordreset)
+    .then(data => {
+        Helper.sendEmail(req.body.email, subject, theMessage, function (info) {
+            if (!info) {
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong while sending email!',
+                    data: {}
+                });
+            } else {
+                return res.status(200).json({
+                    status: 'success',
+                    msg: 'Please check your email to reset the password.',
+                    data: {}
+                });
+            }
+        })
+
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
 }
