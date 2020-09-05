@@ -27,7 +27,11 @@ exports.signUp = [
         if (user || institution)
             return Promise.reject('email already exists. User cannot be created');
     }),
-    body('password').exists(),
+    body('password').exists().custom(async value => {
+        
+        if (value.length < 8)
+            return Promise.reject('Password must be at least 8 characters');
+    }),
     body('country').exists().custom(async value => {
         let theCountry = nodeCountries.getCountryByName(value);
 
