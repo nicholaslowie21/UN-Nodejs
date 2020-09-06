@@ -71,7 +71,7 @@ exports.postInstitutionSignup = async function (req, res, next) {
 		username: req.body.username,
 		email: req.body.email.toLowerCase(),
 		password: saltedHashPassword,
-		status: 'active',
+		status: 'pending',
         bio: '',
         phone: '',
         address: '',
@@ -141,9 +141,25 @@ exports.postLogin = async function (req, res, next) {
 
    }
 
-   if(user) type='user';
-
+   if(user) { 
+        if(user.status != 'active') {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Account is currently suspended!',
+                data: {}
+            });
+        }
+        type='user';
+   }
    if(institution){ 
+
+        if(institution.status != 'active') {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is currently not verified or suspended!',
+            data: {}
+        });
+        }
        type='institution';
        user=institution;
        user.role = 'institution';
