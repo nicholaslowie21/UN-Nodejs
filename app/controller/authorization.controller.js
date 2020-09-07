@@ -196,8 +196,17 @@ exports.userChangePassword = async function (req, res, next) {
         data: {}
     });
 
+    let verifyOldPassword = saltedMd5(user.salt,req.body.oldpassword);
+    if(verifyOldPassword != user.password) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'The old password mismatched!',
+            data: {}
+        });
+    }
+
     let randomString = randomstring.generate({ length: 8 });
-    let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    let saltedHashPassword = saltedMd5(randomString, req.body.newpassword);
     
     user.password = saltedHashPassword;
     user.salt = randomString;
@@ -215,7 +224,20 @@ exports.userChangePassword = async function (req, res, next) {
             msg: 'Something went wrong! Error: ' + err.message,
             data: {}
         });
-    });   
+    }); 
+    
+    let subject = 'KoCoSD Password Change'
+    let theMessage = `
+        <h1>Password Change!</h1>
+        <p>You have change your account password.</p>
+        <p>If this is not you, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(user.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.institutionChangePassword = async function (req, res, next) {
@@ -230,11 +252,22 @@ exports.institutionChangePassword = async function (req, res, next) {
         data: {}
     });
 
+    let verifyOldPassword = saltedMd5(institution.salt,req.body.oldpassword);
+    if(verifyOldPassword != institution.password) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'The old password mismatched!',
+            data: {}
+        });
+    }
+
     let randomString = randomstring.generate({ length: 8 });
-    let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    let saltedHashPassword = saltedMd5(randomString, req.body.newpassword);
     
     institution.password = saltedHashPassword;
     institution.salt = randomString;
+
+    
 
     institution.save(institution)
     .then(data => {
@@ -250,6 +283,19 @@ exports.institutionChangePassword = async function (req, res, next) {
             data: {}
         });
     });   
+
+    let subject = 'KoCoSD Password Change'
+    let theMessage = `
+        <h1>Password Change!</h1>
+        <p>You have change your account password.</p>
+        <p>If this is not you, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(institution.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.postChangePasswordRequest = async function (req, res) {

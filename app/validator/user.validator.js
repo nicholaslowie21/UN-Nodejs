@@ -41,11 +41,12 @@ exports.userSignup = [
 ]
 
 exports.userChangePassword = [
-    body('password').exists().custom(async value => {
+    body('newpassword').exists().custom(async value => {
         
         if (value.length < 8)
             return Promise.reject('Password must be at least 8 characters');
-    })
+    }),
+    body('oldpassword').exists()
 ]
 
 exports.login = async (req, res, next) => {
