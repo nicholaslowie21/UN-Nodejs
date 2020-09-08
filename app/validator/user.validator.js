@@ -37,6 +37,10 @@ exports.userSignup = [
 
         if (!theCountry)
             return Promise.reject('Country is not valid');
+    }),
+    body('gender').exists().custom(async value => {
+        if(value != 'male' && value != 'female') 
+            return Promise.reject('Gender input mismatched!')
     })
 ]
 
@@ -86,7 +90,28 @@ exports.updateProfile = [
             return Promise.reject('Country is not valid');
     }),
     body('bio').exists(),
-    body('occupation').exists()
+    body('occupation').exists(),
+    body('website').exists(),
+    body('gender').exists().custom(async value => {
+        if(value != 'male' && value != 'female') 
+            return Promise.reject('Gender input mismatched!')
+    }),
+    body('SDGs').exists().custom(async value => {
+        let valid = true;
+
+        value.forEach( sdg => {
+            if(sdg<1 || sdg > 17) {
+                valid = false;
+            }
+        })
+
+        if(!valid) 
+            return Promise.reject('SDGs are not valid')
+    }),
+    body('skills').exists().custom(async value => {
+        if(!Array.isArray(value)) 
+            return Promise.reject('Skill input should be an array')
+    })
 ]
 
 exports.updateUsername = [

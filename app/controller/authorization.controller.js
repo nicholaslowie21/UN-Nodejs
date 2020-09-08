@@ -35,11 +35,14 @@ exports.postSignup = async function (req, res, next) {
 		status: 'active',
 		bio: '',
         occupation: '',
-        isVerified: false,
+        isVerified: "false",
         profilePic: '',
         country: req.body.country,
         points: 0,
-        salt: randomString
+        salt: randomString,
+        wallet: 0,
+        badgePath: '',
+        gender: req.body.gender
     });
     
     let token = TokenSign(user.id, user.role, 'user');

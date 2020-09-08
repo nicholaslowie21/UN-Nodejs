@@ -59,7 +59,7 @@ exports.profilePicture = async function (req, res){
 exports.updateUserProfile = async function (req, res, next) {
     let theCountry = nodeCountries.getCountryByName(req.body.country);
     req.body.country = theCountry.name;
-    
+    console.log("reach here")
     const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
         if (err) return handleError(err);
     });
@@ -70,11 +70,36 @@ exports.updateUserProfile = async function (req, res, next) {
         msg: 'User not found!',
         data: {}
     });
+
+    var tempSDGs = req.body.SDGs;
     
+    var theSDGs = [];
+
+    tempSDGs.forEach(sdg => {
+        if(!theSDGs.includes(sdg))
+            theSDGs.push(sdg);
+    })
+
+    theSDGs.sort(function(a, b){return a - b});
+
+    var tempSkills = req.body.skills;
+    var theSkills = [];
+
+    tempSkills.forEach(skill => {
+        if(!theSkills.includes(skill))
+            theSkills.push(skill);
+    })
+
+    theSkills.sort();
+
     user.name = req.body.name;
     user.bio = req.body.bio;
     user.occupation = req.body.occupation;
     user.country = req.body.country;
+    user.website = req.body.website;
+    user.gender = req.body.gender;
+    user.SDGs = theSDGs;
+    user.skills = theSkills;
 
     user.save(user)
     .then(data => {

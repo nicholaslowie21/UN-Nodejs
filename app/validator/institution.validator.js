@@ -50,7 +50,20 @@ exports.updateProfile = [
     }),
     body('bio').exists(),
     body('phone').exists(),
-    body('address').exists()
+    body('address').exists(),
+    body('website').exists(),
+    body('SDGs').exists().custom(async value => {
+        let valid = true;
+
+        value.forEach( sdg => {
+            if(sdg<1 || sdg > 17) {
+                valid = false;
+            }
+        })
+
+        if(!valid) 
+            return Promise.reject('SDGs are not valid')
+    })
 ]
 
 exports.updateUsername = [

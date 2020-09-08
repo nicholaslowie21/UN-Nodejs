@@ -13,6 +13,7 @@ module.exports = mongoose => {
         country: String,
         password: String,
         salt: String,
+        website: String,
         members: [String],
         projects: [String],
         SDGs: [Number]

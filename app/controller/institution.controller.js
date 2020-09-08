@@ -69,12 +69,25 @@ exports.updateProfile = async function (req, res, next) {
         msg: 'Account not found!',
         data: {}
     });
+
+    var tempSDGs = req.body.SDGs;
+    
+    var theSDGs = [];
+
+    tempSDGs.forEach(sdg => {
+        if(!theSDGs.includes(sdg))
+            theSDGs.push(sdg);
+    })
+
+    theSDGs.sort();
     
     institution.name = req.body.name;
     institution.bio = req.body.bio;
     institution.phone = req.body.phone;
     institution.country = req.body.country;
     institution.address = req.body.address;
+    institution.website = req.body.website;
+    institution.SDGs = theSDGs;
 
     institution.save(institution)
     .then(data => {
