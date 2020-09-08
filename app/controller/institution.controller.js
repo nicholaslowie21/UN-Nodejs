@@ -19,6 +19,10 @@ var storage = multer.diskStorage({
         let thePath = 'ProfPic-Institution-'+req.id+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
     }
 })
 var upload = multer({ storage: storage })
