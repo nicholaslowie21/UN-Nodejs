@@ -41,7 +41,6 @@ exports.postSignup = async function (req, res, next) {
         points: 0,
         salt: randomString,
         wallet: 0,
-        badgePath: '',
         gender: req.body.gender
     });
     
