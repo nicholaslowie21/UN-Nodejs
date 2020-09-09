@@ -175,6 +175,13 @@ exports.getMembers = async function(req,res) {
         if (err) return handleError(err);
     });
 
+    if(!institution)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such account not found!',
+        data: {}
+    });
+
     let membersId = institution.members;
     var members = [];
 
@@ -200,11 +207,65 @@ exports.getMembers = async function(req,res) {
 
 }
 
-handleError = (err) => {
-   console.log("handleError :"+ err)
-   return res.status(500).json({
+exports.addMembers = async function(req,res) {
+    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution)
+    return res.status(500).json({
         status: 'error',
-        msg: 'Something went wrong! Error: ' + err.message,
+        msg: 'Such account not found!',
         data: {}
     });
+
+    var member = await User.findOne({ '_id': req.body.userId }, function (err, person) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+    
+    if(!member)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such account not found!',
+        data: {}
+    });
+
+    institution.members.push(member.id);
+    member.institutionIds.push(institution.id);
+
+    member.save(member)
+    .then(data => {
+        console.log("User is updated!")
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    }); 
+
+    institution.save(institution)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Institution members successfully updated',
+            data: { institution: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    }); 
+
+}
+
+handleError = (err) => {
+   console.log("handleError :"+ err)
 }

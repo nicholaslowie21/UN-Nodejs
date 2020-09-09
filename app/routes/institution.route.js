@@ -15,4 +15,6 @@ router.post('/uploadProfilePicture', auth, institutionController.multerUpload, i
 
 router.get('/getMembers', auth, InstitutionValidator.getMembers, institutionController.getMembers)
 
+router.post('/addMember', auth, InstitutionValidator.addMember, InstitutionValidator.ifErrors ,institutionController.addMembers )
+
 module.exports = router;
