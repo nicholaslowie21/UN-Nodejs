@@ -558,6 +558,17 @@ exports.verifyRequest = async function(req,res) {
         });
     }
 
+    let user = await Users.findOne({ '_id': req.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!user)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such user not found!',
+        data: {}
+    });
+
     let gotRequest = await VerifyRequest.findOne({ 'userId': req.id, 'status':'pending'  }, function (err, person) {
         if (err) 
         return res.status(500).json({
@@ -575,6 +586,9 @@ exports.verifyRequest = async function(req,res) {
         });
     }
     
+    user.isVerified = 'pending'
+    user.save();
+
     const verifyrequest = new VerifyRequest({
         userId: req.id,
         status: 'pending',
@@ -586,7 +600,7 @@ exports.verifyRequest = async function(req,res) {
         return res.status(200).json({
             status: 'success',
             msg: 'Verification request successfully sent!',
-            data: { verifyrequest: data }
+            data: { verifyrequest: data, user: user }
         });
     }).catch(err => {
         return res.status(500).json({
