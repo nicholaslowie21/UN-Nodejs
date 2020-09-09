@@ -40,7 +40,7 @@ module.exports = mongoose => {
       if (docs.length === 0) {
           User.create({ username: 'superadmin', password: '1601c7d4ebcaa72ae9abc3a1eec24196', salt: 'UH1GR6hl', role:'adminlead' });
       }
-  });
+    });
 
     return User;
   };

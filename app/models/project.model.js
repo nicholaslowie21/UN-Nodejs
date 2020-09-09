@@ -22,5 +22,12 @@ module.exports = mongoose => {
   
     const Project = mongoose.model("Project", schema);
 
+    //to create a dummy project
+    // Project.find({title: 'dummy'}).then(function (docs) {
+    //   if (docs.length === 0) {
+    //       Project.create({ title: 'dummy', status:'ongoing'});
+    //   }
+    // });
+
     return Project;
   };

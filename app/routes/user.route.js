@@ -13,4 +13,6 @@ router.post('/updateEmail', auth, UserValidator.updateEmail, UserValidator.ifErr
 
 router.post('/uploadProfilePicture', auth, userController.multerUpload, userController.profilePicture);
 
+router.get('/currProjects', auth, userController.currProjects)
+
 module.exports = router;
