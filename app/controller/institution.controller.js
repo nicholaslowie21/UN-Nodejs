@@ -227,11 +227,18 @@ exports.addMembers = async function(req,res) {
             data: {}
         });
     });
-    
+
     if(!member)
     return res.status(500).json({
         status: 'error',
         msg: 'Such account not found!',
+        data: {}
+    });
+
+    if(institution.members.includes(member.id)) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Member added!',
         data: {}
     });
 
@@ -263,6 +270,74 @@ exports.addMembers = async function(req,res) {
             data: {}
         });
     }); 
+
+}
+
+exports.delMembers = async function(req,res) {
+    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such account not found!',
+        data: {}
+    });
+
+    var member = await User.findOne({ '_id': req.body.userId }, function (err, person) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    if(!member)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such account not found!',
+        data: {}
+    });
+
+    if(institution.members.includes(member.id)) {
+        institution.members.pull(member.id);
+        member.institutionIds.pull(institution.id);
+
+        await member.save(member)
+        .then(data => {
+            console.log("User is updated!")
+        }).catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        }); 
+
+        await institution.save(institution)
+        .then(data => {
+            return res.status(200).json({
+                status: 'success',
+                msg: 'Institution members successfully updated',
+                data: { institution: data }
+            });
+        }).catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        });
+
+    } else {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Such member is not affiliated',
+            data: {}
+        });
+    } 
 
 }
 

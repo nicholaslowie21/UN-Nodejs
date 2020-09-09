@@ -96,6 +96,10 @@ exports.addMember = [
     body('userId').exists()
 ]
 
+exports.delMember = [
+    body('userId').exists()
+]
+
 exports.getMembers = (req,res,next) => {
     if(req.type!='institution')
     return res.status(500).json({

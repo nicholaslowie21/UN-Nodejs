@@ -17,4 +17,6 @@ router.get('/getMembers', auth, InstitutionValidator.getMembers, institutionCont
 
 router.post('/addMember', auth, InstitutionValidator.addMember, InstitutionValidator.ifErrors ,institutionController.addMembers )
 
+router.post('/delMember', auth, InstitutionValidator.delMember, InstitutionValidator.ifErrors, institutionController.delMembers)
+
 module.exports = router;
