@@ -9,6 +9,9 @@ const randomstring = require("randomstring");
 const TokenSign = require('../middleware/tokensign');
 const nodeCountries = require('node-countries');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const multer = require('multer');
+
 
 const Helper = require('../service/helper.service');
 
@@ -514,18 +517,68 @@ exports.postUpdatePassword = async function(req, res) {
     }
 }
 
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/verifyRequest'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = 'VerifyReq-User-'+req.id+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var upload = multer({ storage: storage })
+
+exports.multerUpload = upload.single('verifyPic');
+
 exports.verifyRequest = async function(req,res) {
-    if(req.body.type != 'user') {
+    if(!req.file || req.file.fieldname != 'verifyPic') 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'No image uploaded',
+        data: {}
+    });
+
+    if(req.type != 'user') {
         return res.status(500).json({
             status: 'error',
             msg: 'Only user can request for verification',
             data: {}
         });
     }
+
+    let gotRequest = await VerifyRequest.findOne({ 'userId': req.id, 'status':'pending'  }, function (err, person) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    if(gotRequest) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'You have already created a request!',
+            data: {}
+        });
+    }
     
     const verifyrequest = new VerifyRequest({
-        id: req.body.id,
-        status: 'pending'
+        userId: req.id,
+        status: 'pending',
+        imgPath: 'https://localhost:8080/public/uploads/verifyRequest/'+req.thePath
     });
     
     verifyrequest.save(verifyrequest)

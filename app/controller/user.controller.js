@@ -34,6 +34,14 @@ exports.profilePicture = async function (req, res){
         if (err) return handleError(err);
     });
 
+    if(!req.file) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No picture uploaded! ',
+            data: {}
+        });
+    }
+
     if(!user) {
         return res.status(500).json({
             status: 'error',

@@ -26,7 +26,7 @@ router.post('/reset-password-request', authorizationController.postChangePasswor
 router.get('/reset-password-request/:token', authorizationController.getChangePassword)
 router.post('/update-password', authorizationController.postUpdatePassword)
 
-router.post('/user/verifyRequest', auth, authorizationController.verifyRequest)
+router.post('/user/verifyRequest', auth, authorizationController.multerUpload, authorizationController.verifyRequest)
 
 // for testing purpose only
 router.post('/testing', auth, authorizationController.postTest)
