@@ -1,6 +1,7 @@
 const moment = require('moment-timezone')
 const db = require('../models')
 const Institution = db.institution
+const User = db.users;
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
@@ -167,4 +168,43 @@ exports.updateEmail = async function (req, res, next) {
             data: {}
         });
     });   
+}
+
+exports.getMembers = async function(req,res) {
+    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    let membersId = institution.members;
+    var members = [];
+
+    for (var i = 0; i < membersId.length; i++) {
+        var member = await User.findOne({ '_id': membersId[i] }, function (err, person) {
+            if (err) return handleError(err);
+        });
+        
+        if(!member) {
+            institution.members.pull(membersId[i]);
+        } else {
+            members.push(member)
+        }
+    }
+
+    await institution.save();
+   
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Affiliated users successfully retrieved and updated',
+        data: { members: members }
+    });
+
+}
+
+handleError = (err) => {
+   console.log("handleError :"+ err)
+   return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong! Error: ' + err.message,
+        data: {}
+    });
 }

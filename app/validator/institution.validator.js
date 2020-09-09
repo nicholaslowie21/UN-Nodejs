@@ -92,6 +92,17 @@ exports.updateEmail = [
     })
 ]
 
+exports.getMembers = (req,res,next) => {
+    if(req.type!='institution')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This is not an institution account!',
+        data: {}
+    });
+
+    next();
+}
+
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions

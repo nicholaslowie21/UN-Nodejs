@@ -13,4 +13,6 @@ router.post('/updateEmail', auth, InstitutionValidator.updateEmail, InstitutionV
 
 router.post('/uploadProfilePicture', auth, institutionController.multerUpload, institutionController.profilePicture);
 
+router.get('/getMembers', auth, InstitutionValidator.getMembers, institutionController.getMembers)
+
 module.exports = router;
