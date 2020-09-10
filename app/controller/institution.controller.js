@@ -238,12 +238,13 @@ exports.addMembers = async function(req,res) {
     if(institution.members.includes(member.id)) 
     return res.status(500).json({
         status: 'error',
-        msg: 'Member added!',
+        msg: 'Member already added!',
         data: {}
     });
 
     institution.members.push(member.id);
     member.institutionIds.push(institution.id);
+    member.isVerified = "true";
 
     member.save(member)
     .then(data => {
