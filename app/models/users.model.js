@@ -19,7 +19,7 @@ module.exports = mongoose => {
         skills: [String],
         institutionIds: [String],
         projects: [String],
-        badgePath: [String],
+        badges: [String],
         wallet: Number,
         SDGs: [Number]
       },
