@@ -23,4 +23,6 @@ router.get('/currProjects', auth, institutionController.currProjects)
 
 router.get('/pastProjects', auth, institutionController.pastProjects)
 
+router.post('/membersCSV', auth, institutionController.csvMulter, institutionController.membersCSVProcessing);
+
 module.exports = router;
