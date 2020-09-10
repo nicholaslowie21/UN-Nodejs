@@ -2,6 +2,7 @@ const moment = require('moment-timezone')
 const db = require('../models')
 const Institution = db.institution
 const User = db.users;
+const Projects = db.project;
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
@@ -339,6 +340,94 @@ exports.delMembers = async function(req,res) {
             data: {}
         });
     } 
+
+}
+
+exports.currProjects = async function (req, res, next) {
+    let institution  = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    let projects = institution.projects;
+    let currProjects = []
+
+    for (var i = 0; i < projects.length; i++) {
+        var project = await Projects.findOne({ '_id': projects[i] }, function (err, person) {
+            if (err) return handleError(err);
+        });
+        
+        if(!project) {
+            institution.projects.pull(projects[i]);
+        } else if(project.status === 'ongoing') {
+            currProjects.push(project)
+        }
+    }
+
+    institution.save(institution)
+    .then().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Current projects successfully retrieved',
+        data: { currProjects: currProjects }
+    });
+
+}
+
+exports.pastProjects = async function (req, res, next) {
+    let institution  = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    let projects = institution.projects;
+    let pastProjects = []
+
+    for (var i = 0; i < projects.length; i++) {
+        var project = await Projects.findOne({ '_id': projects[i] }, function (err, person) {
+            if (err) return handleError(err);
+        });
+        
+        if(!project) {
+            institution.projects.pull(projects[i]);
+        } else if(project.status === 'completed') {
+            pastProjects.push(project)
+        }
+    }
+
+    institution.save(institution)
+    .then().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Past involvement successfully retrieved',
+        data: { pastProjects: pastProjects }
+    });
 
 }
 

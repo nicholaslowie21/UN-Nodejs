@@ -19,4 +19,8 @@ router.post('/addMember', auth, InstitutionValidator.addMember, InstitutionValid
 
 router.post('/delMember', auth, InstitutionValidator.delMember, InstitutionValidator.ifErrors, institutionController.delMembers)
 
+router.get('/currProjects', auth, institutionController.currProjects)
+
+router.get('/pastProjects', auth, institutionController.pastProjects)
+
 module.exports = router;

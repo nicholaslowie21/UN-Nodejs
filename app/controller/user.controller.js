@@ -234,6 +234,50 @@ exports.currProjects = async function (req, res, next) {
 
 }
 
+exports.pastProjects = async function (req, res, next) {
+    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+    
+    let projects = user.projects;
+    let pastProjects = []
+
+    for (var i = 0; i < projects.length; i++) {
+        var project = await Projects.findOne({ '_id': projects[i] }, function (err, person) {
+            if (err) return handleError(err);
+        });
+        
+        if(!project) {
+            user.projects.pull(projects[i]);
+        } else if(project.status === 'completed') {
+            pastProjects.push(project)
+        }
+    }
+
+    user.save(user)
+    .then().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Current Projects successfully retrieved',
+        data: { pastProjects: pastProjects }
+    });
+
+}
+
 handleError = (err) => {
     console.log("handleError :"+ err)
  }

@@ -15,4 +15,6 @@ router.post('/uploadProfilePicture', auth, userController.multerUpload, userCont
 
 router.get('/currProjects', auth, userController.currProjects)
 
+router.get('/pastProjects', auth, userController.pastProjects)
+
 module.exports = router;
