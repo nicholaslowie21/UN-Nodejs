@@ -543,6 +543,43 @@ exports.membersCSVProcessing = async function (req, res, next) {
     }));
 }
 
+exports.viewInstitution = async function (req, res) {
+    const institution = await Institution.findOne({ '_id': req.body.institutionId }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Institution not found!',
+        data: {}
+    });
+    
+    var theInstitution = {
+        "name": institution.name,
+        "username": institution.username,
+        "email": institution.email,
+        "phone": institution.phone,
+        "status": institution.status,
+        "bio": institution.bio || '',
+        "address": institution.address || '',
+        "isVerified": institution.isVerified,
+        "profilePic": institution.profilePic,
+        "country": institution.country,
+        "website": institution.website || '',
+        "members": institution.members,
+        "projects": institution.projects,
+        "SDGs": institution.SDGs
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Institution profile successfully retrieved',
+        data: { targetInstitution: theInstitution }
+    });
+
+}
+
 handleError = (err) => {
    console.log("handleError :"+ err)
 }

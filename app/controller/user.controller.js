@@ -278,6 +278,45 @@ exports.pastProjects = async function (req, res, next) {
 
 }
 
+exports.viewUser = async function (req, res) {
+    const user = await Users.findOne({ '_id': req.body.userId }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+    
+    var theUser = {
+        "name": user.name,
+        "username": user.username,
+        "email": user.email,
+        "bio": user.bio || '',
+        "occupation": user.occupation || '',
+        "isVerified": user.isVerified,
+        "profilePic": user.profilePic,
+        "country": user.country,
+        "website": user.website || '',
+        "points": user.points,
+        "gender": user.gender,
+        "skills": user.skills,
+        "institutionIds": user.institutionIds,
+        "projects": user.projects,
+        "badges": user.badges,
+        "SDGs": user.SDGs
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'User profile successfully retrieved',
+        data: { targetUser: theUser }
+    });
+
+}
+
 handleError = (err) => {
     console.log("handleError :"+ err)
  }

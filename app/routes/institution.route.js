@@ -25,4 +25,6 @@ router.get('/pastProjects', auth, institutionController.pastProjects)
 
 router.post('/membersCSV', auth, institutionController.csvMulter, institutionController.membersCSVProcessing);
 
+router.get('/viewInstitution', auth, InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors , institutionController.viewInstitution)
+
 module.exports = router;

@@ -140,6 +140,9 @@ exports.updateEmail = [
     })
 ]
 
+exports.viewUser = [
+    body('userId').exists()
+]
 
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {

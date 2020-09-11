@@ -17,4 +17,6 @@ router.get('/currProjects', auth, userController.currProjects)
 
 router.get('/pastProjects', auth, userController.pastProjects)
 
+router.get('/viewUser', auth, UserValidator.viewUser , UserValidator.ifErrors , userController.viewUser)
+
 module.exports = router;
