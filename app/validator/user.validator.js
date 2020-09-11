@@ -164,7 +164,7 @@ exports.ifErrors = (req, res, next) => {
 
         return res.status(422).json({
             status: 'error',
-            msg: msg,
+            msg: param+': '+msg,
             param: param
         });
     }
