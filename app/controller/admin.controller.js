@@ -1,6 +1,7 @@
 const moment = require('moment-timezone')
 const db = require('../models')
 const Users = db.users;
+const Helper = require('../service/helper.service')
 
 exports.searchUsersToPromote = async function (req, res){
 
@@ -54,6 +55,19 @@ exports.assignRegionalAdmin = async function (req, res) {
             data: {}
         });
     }); 
+
+    let subject = 'KoCoSD Account Role'
+    let theMessage = `
+        <h1>Your account role has been updated!</h1>
+        <p>You are now a Regional Admin.</p>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.assignAdmin = async function (req, res) {
@@ -85,6 +99,19 @@ exports.assignAdmin = async function (req, res) {
             data: {}
         });
     }); 
+
+    let subject = 'KoCoSD Account Role'
+    let theMessage = `
+        <h1>Your account role has been updated!</h1>
+        <p>You are now an Admin.</p>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.assignAdminLead = async function (req, res) {
@@ -116,6 +143,20 @@ exports.assignAdminLead = async function (req, res) {
             data: {}
         });
     }); 
+
+    
+    let subject = 'KoCoSD Account Role'
+    let theMessage = `
+        <h1>Your account role has been updated!</h1>
+        <p>You are now an Admin Lead.</p>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 // demotion of any type of admin uses this function since any demotion is back to user
@@ -148,4 +189,17 @@ exports.assignUser = async function (req, res) {
             data: {}
         });
     }); 
+
+    let subject = 'KoCoSD Account Role'
+    let theMessage = `
+        <h1>Your account role has been updated!</h1>
+        <p>You are now a User.</p>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
