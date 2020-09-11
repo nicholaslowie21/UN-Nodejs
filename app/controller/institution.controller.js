@@ -125,7 +125,7 @@ exports.updateProfile = async function (req, res, next) {
         return res.status(200).json({
             status: 'success',
             msg: 'Account profile successfully updated',
-            data: { institution: data }
+            data: { user: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -155,7 +155,7 @@ exports.updateUsername = async function (req, res, next) {
         return res.status(200).json({
             status: 'success',
             msg: 'Account username successfully updated',
-            data: { institution: data }
+            data: { user: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -185,7 +185,7 @@ exports.updateEmail = async function (req, res, next) {
         return res.status(200).json({
             status: 'success',
             msg: 'Account email successfully updated',
-            data: { institution: data }
+            data: { user: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -288,7 +288,7 @@ exports.addMembers = async function(req,res) {
         return res.status(200).json({
             status: 'success',
             msg: 'Institution members successfully updated',
-            data: { institution: data }
+            data: { user: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -348,7 +348,7 @@ exports.delMembers = async function(req,res) {
             return res.status(200).json({
                 status: 'success',
                 msg: 'Institution members successfully updated',
-                data: { institution: data }
+                data: { user: data }
             });
         }).catch(err => {
             return res.status(500).json({
@@ -527,7 +527,7 @@ exports.membersCSVProcessing = async function (req, res, next) {
             return res.status(200).json({
                 status: 'success',
                 msg: 'Members Affiliated updated successfully',
-                data: { institution: institution, failedMember: failedMember }
+                data: { user: institution, failedMember: failedMember }
             });
         }
         else {
