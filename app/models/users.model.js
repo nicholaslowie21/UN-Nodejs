@@ -38,7 +38,7 @@ module.exports = mongoose => {
     //password: SuperAdminPass@123
     User.find({username: 'superadmin'}).then(function (docs) {
       if (docs.length === 0) {
-          User.create({ username: 'superadmin', password: '1601c7d4ebcaa72ae9abc3a1eec24196', salt: 'UH1GR6hl', role:'adminlead' });
+          User.create({ username: 'superadmin', status:'active' ,password: '1601c7d4ebcaa72ae9abc3a1eec24196', salt: 'UH1GR6hl', role:'adminlead' });
       }
     });
 
