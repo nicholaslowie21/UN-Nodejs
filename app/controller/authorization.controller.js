@@ -611,3 +611,7 @@ exports.verifyRequest = async function(req,res) {
         });
     });
 }
+
+handleError = (err) => {
+    console.log("handleError :"+ err)
+ }

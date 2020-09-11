@@ -13,6 +13,14 @@ exports.searchUsersToPromote = [
     body('username').exists()
 ]
 
+exports.retrieveListValidator = [
+    // check that the user performing this action is an admin lead
+    body('role').exists().custom(async value => {
+        if (value != 'adminlead') 
+            return Promise.reject('You are not authorised to promote users!')
+    })
+]
+
 exports.assignRegionalAdmin = [
     // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {

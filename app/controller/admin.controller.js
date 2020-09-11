@@ -21,8 +21,68 @@ exports.searchUsersToPromote = async function (req, res){
 
     return res.status(200).json({
         status: 'success',
-        msg: '',
+        msg: 'You have successfully queried for the users',
         data: { users: users }
+    });
+}
+
+exports.getRegionalAdmins = async function (req, res){    
+    var users = await Users.find({ 'role': "regionaladmin" }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!users) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No users found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'List of regional admins successfully retrieved',
+        data: { regionalAdmins: users }
+    });
+}
+
+exports.getAdmins = async function (req, res){    
+    var users = await Users.find({ 'role': "admin" }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!users) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No users found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'List of admins successfully retrieved',
+        data: { admins: users }
+    });
+}
+
+exports.getAdminLeads = async function (req, res){    
+    var users = await Users.find({ 'role': "adminlead", "username": { $ne: "superadmin"} }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!users) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No users found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'List of admin leads successfully retrieved',
+        data: { adminLeads: users }
     });
 }
 
@@ -203,3 +263,7 @@ exports.assignUser = async function (req, res) {
         } 
     })
 }
+
+handleError = (err) => {
+    console.log("handleError :"+ err)
+ }

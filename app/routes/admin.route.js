@@ -8,6 +8,15 @@ const AdminValidator = require('../validator/admin.validator');
 // search for a user to be promoted
 router.get('/searchUsers', auth, AdminValidator.searchUsersToPromote, AdminValidator.ifErrors, adminController.searchUsersToPromote)
 
+// get list of regional admin
+router.get('/regionalAdmins', auth, AdminValidator.retrieveListValidator, AdminValidator.ifErrors, adminController.getRegionalAdmins)
+
+// get list of admin
+router.get('/admins', auth, AdminValidator.retrieveListValidator, AdminValidator.ifErrors, adminController.getAdmins)
+
+// get list of admin lead
+router.get('/adminLeads', auth, AdminValidator.retrieveListValidator, AdminValidator.ifErrors, adminController.getAdminLeads)
+
 // promote an individual user to regional admin
 router.post('/assignRegionalAdmin', auth, AdminValidator.assignRegionalAdmin, AdminValidator.ifErrors, adminController.assignRegionalAdmin);
 
