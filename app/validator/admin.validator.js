@@ -6,17 +6,17 @@ const Institution = db.institution;
 exports.searchUsersToPromote = [
     // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {
-        if (value != 'adminLead') 
+        if (value != 'adminlead') 
             return Promise.reject('You are not authorised to promote users!')
     }),
     // check that search key exists
     body('username').exists()
 ]
 
-exports.promoteToRegionalAdmin = [
+exports.assignRegionalAdmin = [
     // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {
-        if (value != 'adminLead') 
+        if (value != 'adminlead') 
             return Promise.reject('You are not authorised to promote users!')
     }),
     // check if the user to be promoted is already a regional admin or higher
@@ -24,15 +24,15 @@ exports.promoteToRegionalAdmin = [
         let target = await Users.findOne({ '_id': value }, function (err, person) {
             if (err) return handleError(err);
           });
-        if (target.role == 'regionalAdmin' || target.role == 'admin' || target.role == 'adminLead')
-            return Promise.reject('This user is already a regional admin or higher!')
+        if (target.role == 'regionaladmin')
+            return Promise.reject('This user is already a regional admin!')
     })
 ]
 
-exports.promoteToAdmin = [
+exports.assignAdmin = [
     // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {
-        if (value != 'adminLead') 
+        if (value != 'adminlead') 
             return Promise.reject('You are not authorised to promote users!')
     }),
     // check if the user to be promoted is already an admin or higher
@@ -40,15 +40,15 @@ exports.promoteToAdmin = [
         let target = await Users.findOne({ '_id': value }, function (err, person) {
             if (err) return handleError(err);
           });
-        if (target.role == 'admin' || target.role == 'adminLead')
-            return Promise.reject('This user is already an admin or higher!')
+        if (target.role == 'admin')
+            return Promise.reject('This account is already an admin!')
     })
 ]
 
-exports.promoteToAdminLead = [
+exports.assignAdminLead = [
     // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {
-        if (value != 'adminLead') 
+        if (value != 'adminlead') 
             return Promise.reject('You are not authorised to promote users!')
     }),
     // check if the user to be promoted is already an admin lead
@@ -56,15 +56,15 @@ exports.promoteToAdminLead = [
         let target = await Users.findOne({ '_id': value }, function (err, person) {
             if (err) return handleError(err);
           });
-        if (target.role == 'adminLead')
+        if (target.role == 'adminlead')
             return Promise.reject('This user is already an admin lead!')
     })
 ]
 
-exports.demoteRegionalAdmin = [
+exports.assignUser = [
     // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {
-        if (value != 'adminLead') 
+        if (value != 'adminlead') 
             return Promise.reject('You are not authorised to demote users!')
     }),
     // check if the user to be demoted is a regional admin to begin with
@@ -72,40 +72,8 @@ exports.demoteRegionalAdmin = [
         let target = await Users.findOne({ '_id': value }, function (err, person) {
             if (err) return handleError(err);
           });
-        if (target.role == 'user' || target.role == 'admin' || target.role == 'adminLead')
-            return Promise.reject('This user is not a regional admin!')
-    })
-]
-
-exports.demoteAdmin = [
-    // check that the user performing this action is an admin lead
-    body('role').exists().custom(async value => {
-        if (value != 'adminLead') 
-            return Promise.reject('You are not authorised to demote users!')
-    }),
-    // check if the user to be demoted is an admin to begin with
-    body('targetId').exists().custom(async value => {
-        let target = await Users.findOne({ '_id': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (target.role == 'user' || target.role == 'regionalAdmin' || target.role == 'adminLead')
-            return Promise.reject('This user is not an admin!')
-    })
-]
-
-exports.demoteAdminLead = [
-    // check that the user performing this action is an admin lead
-    body('role').exists().custom(async value => {
-        if (value != 'adminLead') 
-            return Promise.reject('You are not authorised to demote users!')
-    }),
-    // check if the user to be demoted is an admin lead to begin with
-    body('targetId').exists().custom(async value => {
-        let target = await Users.findOne({ '_id': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (target.role == 'user' || target.role == 'regionalAdmin' || target.role == 'admin')
-            return Promise.reject('This user is not an admin lead!')
+        if (target.role == 'user')
+            return Promise.reject('This account is already a user!')
     })
 ]
 
@@ -132,7 +100,7 @@ exports.ifErrors = (req, res, next) => {
 
         return res.status(422).json({
             status: 'error',
-            msg: msg,
+            msg: param+': '+msg ,
             param: param
         });
     }

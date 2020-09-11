@@ -21,11 +21,11 @@ exports.searchUsersToPromote = async function (req, res){
     return res.status(200).json({
         status: 'success',
         msg: '',
-        data: { users }
+        data: { users: users }
     });
 }
 
-exports.promoteToRegionalAdmin = async function (req, res) {
+exports.assignRegionalAdmin = async function (req, res) {
     // find target user by id
     const target = await Users.findOne({ '_id': req.body.targetId }, function (err, person) {
         if (err) return handleError(err);
@@ -38,13 +38,13 @@ exports.promoteToRegionalAdmin = async function (req, res) {
         data: {}
     });
 
-    target.role = 'regionalAdmin';
+    target.role = 'regionaladmin';
 
     target.save(target)
     .then(data => {
         return res.status(200).json({
             status: 'success',
-            msg: 'User successfully promoted to regional admin',
+            msg: 'User successfully assigned as regional admin',
             data: { target: data }
         });
     }).catch(err => {
@@ -56,7 +56,7 @@ exports.promoteToRegionalAdmin = async function (req, res) {
     }); 
 }
 
-exports.promoteToAdmin = async function (req, res) {
+exports.assignAdmin = async function (req, res) {
     // find target user by id
     const target = await Users.findOne({ '_id': req.body.targetId }, function (err, person) {
         if (err) return handleError(err);
@@ -75,7 +75,7 @@ exports.promoteToAdmin = async function (req, res) {
     .then(data => {
         return res.status(200).json({
             status: 'success',
-            msg: 'User successfully promoted to admin',
+            msg: 'User successfully assigned as admin',
             data: { target: data }
         });
     }).catch(err => {
@@ -87,7 +87,7 @@ exports.promoteToAdmin = async function (req, res) {
     }); 
 }
 
-exports.promoteToAdminLead = async function (req, res) {
+exports.assignAdminLead = async function (req, res) {
     // find target user by id
     const target = await Users.findOne({ '_id': req.body.targetId }, function (err, person) {
         if (err) return handleError(err);
@@ -100,7 +100,7 @@ exports.promoteToAdminLead = async function (req, res) {
         data: {}
     });
 
-    target.role = 'adminLead';
+    target.role = 'adminlead';
 
     target.save(target)
     .then(data => {
@@ -119,7 +119,7 @@ exports.promoteToAdminLead = async function (req, res) {
 }
 
 // demotion of any type of admin uses this function since any demotion is back to user
-exports.demoteAnyAdmin = async function (req, res) {
+exports.assignUser = async function (req, res) {
     // find target user by id
     const target = await Users.findOne({ '_id': req.body.targetId }, function (err, person) {
         if (err) return handleError(err);
@@ -138,7 +138,7 @@ exports.demoteAnyAdmin = async function (req, res) {
     .then(data => {
         return res.status(200).json({
             status: 'success',
-            msg: 'User successfully demoted back to ordinary user',
+            msg: 'User successfully assigned back to ordinary user',
             data: { target: data }
         });
     }).catch(err => {
