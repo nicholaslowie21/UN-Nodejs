@@ -75,7 +75,7 @@ exports.profilePicture = async function (req, res){
         return res.status(200).json({
             status: 'success',
             msg: 'Account profile picture successfully updated',
-            data: { institution: data }
+            data: { user: data }
         });
     }).catch(err => {
         return res.status(500).json({
