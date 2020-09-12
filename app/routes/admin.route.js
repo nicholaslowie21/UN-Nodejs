@@ -29,4 +29,6 @@ router.post('/assignAdmin', auth, AdminValidator.assignAdmin, AdminValidator.ifE
 // promote an individual user, regional admin or admin to admin lead
 router.post('/assignAdminLead', auth, AdminValidator.assignAdminLead, AdminValidator.ifErrors, adminController.assignAdminLead);
 
+router.post('/suspendUser', auth, AdminValidator.suspendUser, AdminValidator.ifErrors , adminController.suspendUser)
+
 module.exports = router;
