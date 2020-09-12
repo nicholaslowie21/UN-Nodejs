@@ -12,5 +12,6 @@ router.get('/userRequest', auth, VerificationValidator.retrieveList, Helper.ifEr
 
 router.post('/verifyInstitution', auth, VerificationValidator.verifyInstitution, Helper.ifErrors, verificationController.verifyInstitution );
 
+router.post('/rejectInstitution', auth, VerificationValidator.verifyInstitution, Helper.ifErrors, verificationController.rejectInstitution );
 
 module.exports = router;

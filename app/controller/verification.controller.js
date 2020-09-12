@@ -88,6 +88,57 @@ exports.userRequest = async function (req, res){
     });
 }
 
+exports.rejectInstitution = async function (req, res){
+    const user = await Users.find({ '_id': req.body.id }, function (err, info) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No such user found! ',
+            data: {}
+        });
+    }
+
+    const institution = await Institutions.findOne({ '_id': req.body.institutionId }, function (err, info) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No such account found! ',
+            data: {}
+        });
+    }
+
+    let theEmail = institution.email;
+
+    institution.deleteOne({ "_id": req.body.institutionId }, function (err) {
+        if (err) return handleError(err);
+      });
+
+    let subject = 'KoCoSD Institution Account'
+    let theMessage = `
+        <h1>Your account has been declined!</h1>
+        <p>You may contact our admin if there is any discrepancies</p><br>
+    `
+
+    Helper.sendEmail(theEmail, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully declined the institution account',
+        data: {  }
+    });
+    
+}
+
 exports.verifyInstitution = async function (req, res){
     const user = await Users.find({ '_id': req.body.id }, function (err, info) {
         if (err) return handleError(err);
