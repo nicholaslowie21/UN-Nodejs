@@ -14,4 +14,6 @@ router.post('/verifyInstitution', auth, VerificationValidator.verifyInstitution,
 
 router.post('/rejectInstitution', auth, VerificationValidator.verifyInstitution, Helper.ifErrors, verificationController.rejectInstitution );
 
+router.post('/declineUserRequest', auth, VerificationValidator.declineUserRequest, Helper.ifErrors, verificationController.declineUserRequest );
+
 module.exports = router;
