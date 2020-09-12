@@ -194,6 +194,81 @@ exports.verifyInstitution = async function (req, res){
     }); 
 }
 
+exports.acceptUserRequest = async function (req, res){
+    const admin = await Users.find({ '_id': req.body.id }, function (err, info) {
+        if (err) return handleError(err);
+    });
+
+    if(!admin) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No such admin found! ',
+            data: {}
+        });
+    }
+
+    const verifyrequest = await VerifyRequests.findOne({ '_id': req.body.requestId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!verifyrequest || verifyrequest.status != "pending") {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No such request found! ',
+            data: {}
+        });
+    }
+
+    const user = await Users.findOne({ '_id': verifyrequest.userId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No such user found! ',
+            data: {}
+        });
+    }
+
+    user.isVerified = "true";
+    user.save().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: { }
+        });    
+    });
+
+    verifyrequest.status = "accepted";
+    verifyrequest.save().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: { }
+        });    
+    });
+
+    let subject = 'KoCoSD User Account Verification'
+    let theMessage = `
+        <h1>Your account verification request has been accepted!</h1>
+        <p>If there is any discrepancy, you may contact our admin</p>
+        <p>If this is not you, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(user.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully accepted for a user account verification request',
+        data: {}
+    });
+}
+
 exports.declineUserRequest = async function (req, res){
     const admin = await Users.find({ '_id': req.body.id }, function (err, info) {
         if (err) return handleError(err);
