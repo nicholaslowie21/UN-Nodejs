@@ -9,3 +9,12 @@ exports.retrieveList = [
             return Promise.reject('You are not authorised to retrieve this list!')
     })
 ]
+
+exports.verifyInstitution = [
+    // check that the user performing this action is an admin lead
+    body('role').exists().custom(async value => {
+        if (value == 'user') 
+            return Promise.reject('You are not authorised to retrieve this list!')
+    }),
+    body('institutionId').exists()
+]
