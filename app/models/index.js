@@ -12,5 +12,6 @@ db.institution = require("./institution.model")(mongoose);
 db.project = require("./project.model.js")(mongoose);
 db.passwordreset = require("./passwordreset.model")(mongoose);
 db.verifyrequest = require("./verifyrequest.model")(mongoose);
+db.badge = require("./badge.model")(mongoose);
 
 module.exports = db;

@@ -2,6 +2,7 @@ const moment = require('moment-timezone')
 const db = require('../models')
 const Users = db.users;
 const Projects = db.project;
+const Badges = db.badge;
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
@@ -313,6 +314,30 @@ exports.viewUser = async function (req, res) {
         status: 'success',
         msg: 'User profile successfully retrieved',
         data: { targetUser: theUser }
+    });
+
+}
+
+exports.getBadges = async function (req, res) {
+    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+
+    let badges = await Badges.find({ 'accountId': req.body.id, 'accountType':'user' }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Account\'s badges successfully retrieved',
+        data: { badges: badges }
     });
 
 }

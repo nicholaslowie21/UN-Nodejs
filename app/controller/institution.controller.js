@@ -3,6 +3,7 @@ const db = require('../models')
 const Institution = db.institution
 const User = db.users;
 const Projects = db.project;
+const Badges = db.badge;
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
@@ -576,6 +577,30 @@ exports.viewInstitution = async function (req, res) {
         status: 'success',
         msg: 'Institution profile successfully retrieved',
         data: { targetInstitution: theInstitution }
+    });
+
+}
+
+exports.getBadges = async function (req, res) {
+    const institution = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    let badges = await Badges.find({ 'accountId': req.body.id, 'accountType':'institution' }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Account\'s badges successfully retrieved',
+        data: { badges: badges }
     });
 
 }

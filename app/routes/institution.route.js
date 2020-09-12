@@ -27,4 +27,6 @@ router.post('/membersCSV', auth, institutionController.csvMulter, institutionCon
 
 router.get('/viewInstitution', auth, InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors , institutionController.viewInstitution)
 
+router.get('/badges', auth, institutionController.getBadges)
+
 module.exports = router;

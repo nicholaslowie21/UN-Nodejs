@@ -19,4 +19,6 @@ router.get('/pastProjects', auth, userController.pastProjects)
 
 router.get('/viewUser', auth, UserValidator.viewUser , UserValidator.ifErrors , userController.viewUser)
 
+router.get('/badges', auth, userController.getBadges)
+
 module.exports = router;
