@@ -3,7 +3,7 @@ const db = require('../models')
 const Users = db.users;
 const Helper = require('../service/helper.service')
 
-exports.searchUsersToPromote = async function (req, res){
+exports.searchUsers = async function (req, res){
 
     var rgx = new RegExp(req.body.username, "i");
     

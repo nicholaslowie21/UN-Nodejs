@@ -3,11 +3,11 @@ const db = require('../models');
 const Users = db.users;
 const Institution = db.institution;
 
-exports.searchUsersToPromote = [
+exports.searchUsers = [
     // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {
-        if (value != 'adminlead') 
-            return Promise.reject('You are not authorised to promote users!')
+        if (value == 'user') 
+            return Promise.reject('You are not authorised to access this!')
     }),
     // check that search key exists
     body('username').exists()

@@ -6,7 +6,7 @@ const auth = require('../middleware/auth')
 const AdminValidator = require('../validator/admin.validator');
 
 // search for a user to be promoted
-router.get('/searchUsers', auth, AdminValidator.searchUsersToPromote, AdminValidator.ifErrors, adminController.searchUsersToPromote)
+router.get('/searchUsers', auth, AdminValidator.searchUsers, AdminValidator.ifErrors, adminController.searchUsers)
 
 // get list of regional admin
 router.get('/regionalAdmins', auth, AdminValidator.retrieveListValidator, AdminValidator.ifErrors, adminController.getRegionalAdmins)
