@@ -9,7 +9,6 @@ module.exports = mongoose => {
         rating: Number,
         region: String,
         admins: [String],
-        contributions: [String],
         SDGs: [Number]
       },
       { timestamps: true }
