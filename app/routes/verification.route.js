@@ -8,4 +8,7 @@ const Helper = require('../service/helper.service');
 
 router.get('/institutionRequest', auth, VerificationValidator.retrieveList, Helper.ifErrors, verificationController.institutionRequest );
 
+router.get('/userRequest', auth, VerificationValidator.retrieveList, Helper.ifErrors, verificationController.userRequest );
+
+
 module.exports = router;
