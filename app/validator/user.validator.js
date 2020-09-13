@@ -1,4 +1,4 @@
-const { body, validationResult, oneOf, check } = require('express-validator');
+const { body, query, validationResult, oneOf, check } = require('express-validator');
 const db = require('../models');
 const Users = db.users;
 const Institution = db.institution;
@@ -141,7 +141,7 @@ exports.updateEmail = [
 ]
 
 exports.viewUser = [
-    body('userId').exists()
+    query('userId').exists()
 ]
 
 // to process error from built-in express check

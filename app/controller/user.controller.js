@@ -192,7 +192,7 @@ exports.updateEmail = async function (req, res, next) {
 }
 
 exports.currProjects = async function (req, res, next) {
-    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -236,7 +236,7 @@ exports.currProjects = async function (req, res, next) {
 }
 
 exports.pastProjects = async function (req, res, next) {
-    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -280,7 +280,7 @@ exports.pastProjects = async function (req, res, next) {
 }
 
 exports.viewUser = async function (req, res) {
-    const user = await Users.findOne({ '_id': req.body.userId }, function (err, person) {
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -319,7 +319,7 @@ exports.viewUser = async function (req, res) {
 }
 
 exports.getBadges = async function (req, res) {
-    const user = await Users.findOne({ '_id': req.body.id }, function (err, person) {
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err, person) {
         if (err) return handleError(err);
     });
 

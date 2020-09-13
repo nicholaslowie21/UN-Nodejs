@@ -1,4 +1,4 @@
-const { body, validationResult, oneOf, check } = require('express-validator');
+const { body, query, validationResult, oneOf, check } = require('express-validator');
 const db = require('../models');
 const Users = db.users;
 const Institution = db.institution;
@@ -9,7 +9,7 @@ exports.searchUsers = [
             return Promise.reject('You are not authorised to access this!')
     }),
     // check that search key exists
-    body('username').exists()
+    query('username').exists()
 ]
 
 exports.suspendUser = [

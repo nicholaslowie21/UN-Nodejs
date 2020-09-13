@@ -6,7 +6,7 @@ const Helper = require('../service/helper.service')
 
 exports.searchUsers = async function (req, res){
 
-    var rgx = new RegExp(req.body.username, "i");
+    var rgx = new RegExp(req.query.username, "i");
     
     const users = await Users.find({ 'username': { $regex: rgx } }, function (err, person) {
         if (err) return handleError(err);

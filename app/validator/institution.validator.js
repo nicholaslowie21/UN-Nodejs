@@ -1,4 +1,4 @@
-const { body, validationResult, oneOf, check } = require('express-validator');
+const { body, query, validationResult, oneOf, check } = require('express-validator');
 const db = require('../models');
 const Users = db.users;
 const Institution = db.institution;
@@ -42,7 +42,7 @@ exports.signUp = [
 
 exports.searchUsers = [
     // check that search key exists
-    body('username').exists()
+    query('username').exists()
 ]
 
 exports.updateProfile = [
@@ -106,19 +106,12 @@ exports.delMember = [
 ]
 
 exports.viewInstitution = [
-    body('institutionId').exists()
+    query('institutionId').exists()
 ]
 
-exports.getMembers = (req,res,next) => {
-    if(req.type!='institution')
-    return res.status(500).json({
-        status: 'error',
-        msg: 'This is not an institution account!',
-        data: {}
-    });
-
-    next();
-}
+exports.getMembers = [
+    query('institutionId').exists()
+]
 
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {

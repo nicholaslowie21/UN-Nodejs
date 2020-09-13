@@ -198,7 +198,7 @@ exports.updateEmail = async function (req, res, next) {
 }
 
 exports.getMembers = async function(req,res) {
-    const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
+    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err) {
         if (err) return handleError(err);
     });
 
@@ -370,7 +370,7 @@ exports.delMembers = async function(req,res) {
 }
 
 exports.currProjects = async function (req, res, next) {
-    let institution  = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+    let institution  = await Institution.findOne({ '_id': req.query.institutionId }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -414,7 +414,7 @@ exports.currProjects = async function (req, res, next) {
 }
 
 exports.pastProjects = async function (req, res, next) {
-    let institution  = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+    let institution  = await Institution.findOne({ '_id': req.query.institutionId }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -545,7 +545,7 @@ exports.membersCSVProcessing = async function (req, res, next) {
 }
 
 exports.viewInstitution = async function (req, res) {
-    const institution = await Institution.findOne({ '_id': req.body.institutionId }, function (err, person) {
+    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -582,7 +582,7 @@ exports.viewInstitution = async function (req, res) {
 }
 
 exports.getBadges = async function (req, res) {
-    const institution = await Institution.findOne({ '_id': req.body.id }, function (err, person) {
+    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err, person) {
         if (err) return handleError(err);
     });
 
@@ -607,7 +607,7 @@ exports.getBadges = async function (req, res) {
 
 exports.searchUsers = async function (req, res){
 
-    var rgx = new RegExp(req.body.username, "i");
+    var rgx = new RegExp(req.query.username, "i");
     
     const users = await User.find({ 'username': { $regex: rgx } }, function (err, person) {
         if (err) return handleError(err);

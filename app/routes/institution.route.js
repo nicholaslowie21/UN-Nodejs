@@ -13,21 +13,21 @@ router.post('/updateEmail', auth, InstitutionValidator.updateEmail, InstitutionV
 
 router.post('/uploadProfilePicture', auth, institutionController.multerUpload, institutionController.profilePicture);
 
-router.get('/getMembers', auth, InstitutionValidator.getMembers, institutionController.getMembers)
+router.get('/getMembers', auth, InstitutionValidator.getMembers, InstitutionValidator.ifErrors ,institutionController.getMembers)
 
 router.post('/addMember', auth, InstitutionValidator.addMember, InstitutionValidator.ifErrors ,institutionController.addMembers )
 
 router.post('/delMember', auth, InstitutionValidator.delMember, InstitutionValidator.ifErrors, institutionController.delMembers)
 
-router.get('/currProjects', auth, institutionController.currProjects)
+router.get('/currProjects', auth, InstitutionValidator.viewInstitution, InstitutionValidator.ifErrors, institutionController.currProjects)
 
-router.get('/pastProjects', auth, institutionController.pastProjects)
+router.get('/pastProjects', auth, InstitutionValidator.viewInstitution, InstitutionValidator.ifErrors, institutionController.pastProjects)
 
 router.post('/membersCSV', auth, institutionController.csvMulter, institutionController.membersCSVProcessing);
 
-router.get('/viewInstitution', auth, InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors , institutionController.viewInstitution)
+router.get('/viewInstitution', auth, InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors, institutionController.viewInstitution)
 
-router.get('/badges', auth, institutionController.getBadges)
+router.get('/badges', auth,InstitutionValidator.viewInstitution, InstitutionValidator.ifErrors, institutionController.getBadges)
 
 router.get('/searchUsers', auth, InstitutionValidator.searchUsers, InstitutionValidator.ifErrors, institutionController.searchUsers)
 

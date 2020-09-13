@@ -13,12 +13,12 @@ router.post('/updateEmail', auth, UserValidator.updateEmail, UserValidator.ifErr
 
 router.post('/uploadProfilePicture', auth, userController.multerUpload, userController.profilePicture);
 
-router.get('/currProjects', auth, userController.currProjects)
+router.get('/currProjects', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.currProjects)
 
-router.get('/pastProjects', auth, userController.pastProjects)
+router.get('/pastProjects', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.pastProjects)
 
-router.get('/viewUser', auth, UserValidator.viewUser , UserValidator.ifErrors , userController.viewUser)
+router.get('/viewUser', auth, UserValidator.viewUser, UserValidator.ifErrors , userController.viewUser)
 
-router.get('/badges', auth, userController.getBadges)
+router.get('/badges', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.getBadges)
 
 module.exports = router;
