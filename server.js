@@ -20,6 +20,7 @@ app.use(logger('dev'));
 app.use(express.json());
 
 app.use('/public', express.static('public'));
+app.use('/file', express.static('file'));
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
