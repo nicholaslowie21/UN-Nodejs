@@ -6,6 +6,7 @@ const Badges = db.badge;
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
+const nodeHtmlToImage = require('node-html-to-image');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -338,6 +339,47 @@ exports.getBadges = async function (req, res) {
         status: 'success',
         msg: 'Account\'s badges successfully retrieved',
         data: { badges: badges }
+    });
+
+}
+
+exports.shareProfile = async function (req, res) {
+    const user = await Users.findOne({ '_id': req.body.id }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+
+    let dir = 'public/shareProfile'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+    nodeHtmlToImage({
+        output: 'public/shareProfile/'+user.id+'.png',
+        html: `<html>
+        <body>
+        <p> KoCoSD Profile </p>
+        <p>
+        Name: {{name}} <br>
+        Username: {{username}} <br>
+        </p>
+        </body>
+        </html>`,
+        content: { name: user.name, username: user.username }
+      })
+        .then(() => console.log('The image was created successfully!'))
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Account\'s picture for sharing generated successfully',
+        data: { theLink: 'https://localhost:8080/public/shareProfile/'+user.id+'.png' }
     });
 
 }

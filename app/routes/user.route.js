@@ -21,4 +21,6 @@ router.get('/viewUser', auth, UserValidator.viewUser, UserValidator.ifErrors , u
 
 router.get('/badges', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.getBadges)
 
+router.get('/shareProfile', auth, userController.shareProfile)
+
 module.exports = router;
