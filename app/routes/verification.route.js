@@ -18,4 +18,10 @@ router.post('/acceptUserRequest', auth, VerificationValidator.declineUserRequest
 
 router.post('/declineUserRequest', auth, VerificationValidator.declineUserRequest, Helper.ifErrors, verificationController.declineUserRequest );
 
+router.get('/institutionRequest', auth, VerificationValidator.retrieveList, Helper.ifErrors, verificationController.institutionRequest );
+
+router.get('/regional/userRequest', auth, VerificationValidator.retrieveList, Helper.ifErrors, verificationController.userRequestRegional );
+
+router.get('/regional/institutionRequest', auth, VerificationValidator.retrieveList, Helper.ifErrors, verificationController.institutionRequestRegional );
+
 module.exports = router;

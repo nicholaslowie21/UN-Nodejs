@@ -593,7 +593,8 @@ exports.verifyRequest = async function(req,res) {
     const verifyrequest = new VerifyRequest({
         userId: req.id,
         status: 'pending',
-        imgPath: 'https://localhost:8080/public/uploads/verifyRequest/'+req.thePath
+        imgPath: 'https://localhost:8080/public/uploads/verifyRequest/'+req.thePath,
+        country: user.country
     });
     
     verifyrequest.save(verifyrequest)

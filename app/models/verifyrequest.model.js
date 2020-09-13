@@ -4,6 +4,7 @@ module.exports = mongoose => {
         userId: String,
         status: String,
         imgPath: String,
+        country: String
       },
       { timestamps: true }
     );
