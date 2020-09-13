@@ -4,7 +4,6 @@ const Users = db.users;
 const Institution = db.institution;
 
 exports.searchUsers = [
-    // check that the user performing this action is an admin lead
     body('role').exists().custom(async value => {
         if (value == 'user') 
             return Promise.reject('You are not authorised to access this!')
@@ -14,7 +13,14 @@ exports.searchUsers = [
 ]
 
 exports.suspendUser = [
-    // check that the user performing this action is an admin lead
+    body('role').exists().custom(async value => {
+        if (value == 'user') 
+            return Promise.reject('You are not authorised to retrieve this list!')
+    }),
+    body('targetId').exists()
+]
+
+exports.suspendProject = [
     body('role').exists().custom(async value => {
         if (value == 'user') 
             return Promise.reject('You are not authorised to retrieve this list!')

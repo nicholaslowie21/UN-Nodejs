@@ -40,6 +40,11 @@ exports.signUp = [
     })
 ]
 
+exports.searchUsers = [
+    // check that search key exists
+    body('username').exists()
+]
+
 exports.updateProfile = [
     body('name').exists(),
     body('country').exists().custom(async value => {

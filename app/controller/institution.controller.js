@@ -605,6 +605,29 @@ exports.getBadges = async function (req, res) {
 
 }
 
+exports.searchUsers = async function (req, res){
+
+    var rgx = new RegExp(req.body.username, "i");
+    
+    const users = await User.find({ 'username': { $regex: rgx } }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!users) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No users found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the users',
+        data: { users: users }
+    });
+}
+
 handleError = (err) => {
    console.log("handleError :"+ err)
 }

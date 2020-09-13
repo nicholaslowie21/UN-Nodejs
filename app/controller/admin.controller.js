@@ -1,6 +1,7 @@
 const moment = require('moment-timezone')
 const db = require('../models')
-const Users = db.users;
+const Users = db.users
+const Projects = db.project
 const Helper = require('../service/helper.service')
 
 exports.searchUsers = async function (req, res){
@@ -306,6 +307,112 @@ exports.suspendUser = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+}
+
+exports.activateUser = async function (req, res) {
+    // find target user by id
+    const target = await Users.findOne({ '_id': req.body.targetId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!target) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+
+    target.status = 'active';
+
+    target.save(target)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'User successfully activated!',
+            data: { target: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    }); 
+
+    
+    let subject = 'KoCoSD Account Re-activation'
+    let theMessage = `
+        <h1>Your account has been re-activated!</h1>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+}
+
+exports.suspendProject = async function (req, res) {
+    // find target user by id
+    const target = await Projects.findOne({ '_id': req.body.targetId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!target) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Project not found!',
+        data: {}
+    });
+
+    target.status = 'suspended';
+
+    target.save(target)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project successfully suspended!',
+            data: { target: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    }); 
+}
+
+exports.activateProject = async function (req, res) {
+    // find target user by id
+    const target = await Projects.findOne({ '_id': req.body.targetId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!target) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Project not found!',
+        data: {}
+    });
+
+    target.status = 'ongoing';
+
+    target.save(target)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project successfully re-activated!',
+            data: { target: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    }); 
 }
 
 handleError = (err) => {

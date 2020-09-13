@@ -31,4 +31,10 @@ router.post('/assignAdminLead', auth, AdminValidator.assignAdminLead, AdminValid
 
 router.post('/suspendUser', auth, AdminValidator.suspendUser, AdminValidator.ifErrors , adminController.suspendUser)
 
+router.post('/activateUser', auth, AdminValidator.suspendUser, AdminValidator.ifErrors , adminController.activateUser)
+
+router.post('/suspendProject', auth, AdminValidator.suspendProject, AdminValidator.ifErrors , adminController.suspendProject)
+
+router.post('/activateProject', auth, AdminValidator.suspendProject, AdminValidator.ifErrors , adminController.activateProject)
+
 module.exports = router;

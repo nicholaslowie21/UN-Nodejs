@@ -29,4 +29,6 @@ router.get('/viewInstitution', auth, InstitutionValidator.viewInstitution , Inst
 
 router.get('/badges', auth, institutionController.getBadges)
 
+router.get('/searchUsers', auth, InstitutionValidator.searchUsers, InstitutionValidator.ifErrors, institutionController.searchUsers)
+
 module.exports = router;
