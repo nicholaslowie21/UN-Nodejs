@@ -131,16 +131,6 @@ exports.userRequestRegional = async function (req, res){
         if (err) return handleError(err);
     });
 
-    var verifyrequest = {
-        "userId": "",
-        "status": "",
-        "imgPath": "",
-        "createdAt": "",
-        "name": "",
-        "username": "",
-        "email": "",
-        "country": ""
-    }
 
     var theList = []
 
@@ -148,6 +138,17 @@ exports.userRequestRegional = async function (req, res){
         var user = await Users.findOne({ '_id': verifyrequests[i].userId }, function (err, info) {
             if (err) return handleError(err);
         });
+
+        var verifyrequest = {
+            "userId": "",
+            "status": "",
+            "imgPath": "",
+            "createdAt": "",
+            "name": "",
+            "username": "",
+            "email": "",
+            "country": ""
+        }
         
         if(!user) {
             verifyrequests[i].status = "closed";
