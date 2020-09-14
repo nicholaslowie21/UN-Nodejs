@@ -70,16 +70,7 @@ exports.userRequest = async function (req, res){
         if (err) return handleError(err);
     });
 
-    var verifyrequest = {
-        "userId": "",
-        "status": "",
-        "imgPath": "",
-        "createdAt": "",
-        "name": "",
-        "username": "",
-        "email": "",
-        "country": ""
-    }
+    
 
     var theList = []
 
@@ -88,6 +79,17 @@ exports.userRequest = async function (req, res){
             if (err) return handleError(err);
         });
         
+        var verifyrequest = {
+            "userId": "",
+            "status": "",
+            "imgPath": "",
+            "createdAt": "",
+            "name": "",
+            "username": "",
+            "email": "",
+            "country": ""
+        }
+
         if(!user) {
             verifyrequests[i].status = "closed";
             verifyrequests[i].save();
