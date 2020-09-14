@@ -87,7 +87,8 @@ exports.userRequest = async function (req, res){
             "name": "",
             "username": "",
             "email": "",
-            "country": ""
+            "country": "",
+            "requestId": ""
         }
 
         if(!user) {
@@ -98,6 +99,7 @@ exports.userRequest = async function (req, res){
             verifyrequest.status = verifyrequests[i].status;
             verifyrequest.imgPath = verifyrequests[i].imgPath;
             verifyrequest.createdAt = verifyrequests[i].createdAt;
+            verifyrequest.requestId = verifyrequests[i].id;
             verifyrequest.name = user.name;
             verifyrequest.username = user.username;
             verifyrequest.email = user.email;
@@ -147,7 +149,8 @@ exports.userRequestRegional = async function (req, res){
             "name": "",
             "username": "",
             "email": "",
-            "country": ""
+            "country": "",
+            "requestId":"",
         }
         
         if(!user) {
@@ -158,6 +161,7 @@ exports.userRequestRegional = async function (req, res){
             verifyrequest.status = verifyrequests[i].status;
             verifyrequest.imgPath = verifyrequests[i].imgPath;
             verifyrequest.createdAt = verifyrequests[i].createdAt;
+            verifyrequest.requestId = verifyrequests[i].id;
             verifyrequest.name = user.name;
             verifyrequest.username = user.username;
             verifyrequest.email = user.email;
