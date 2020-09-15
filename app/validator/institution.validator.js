@@ -106,7 +106,7 @@ exports.delMember = [
 ]
 
 exports.viewInstitution = [
-    query('institutionId').exists()
+    query('username').exists()
 ]
 
 exports.getMembers = [

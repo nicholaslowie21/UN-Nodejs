@@ -547,7 +547,7 @@ exports.membersCSVProcessing = async function (req, res, next) {
 }
 
 exports.viewInstitution = async function (req, res) {
-    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err, person) {
+    const institution = await Institution.findOne({ 'username': req.query.username }, function (err, person) {
         if (err) return handleError(err);
     });
 

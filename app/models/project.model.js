@@ -8,6 +8,7 @@ module.exports = mongoose => {
         status: String,
         rating: Number,
         region: String,
+        code: String,
         admins: [String],
         SDGs: [Number]
       },
@@ -25,7 +26,7 @@ module.exports = mongoose => {
     //to create a dummy project
     Project.find({title: 'dummy'}).then(function (docs) {
       if (docs.length === 0) {
-          Project.create({ title: 'dummy', status:'ongoing'});
+          Project.create({ title: 'dummy', status:'ongoing', code:'randomcode'});
       }
     });
 

@@ -141,7 +141,7 @@ exports.updateEmail = [
 ]
 
 exports.viewUser = [
-    query('userId').exists()
+    query('username').exists()
 ]
 
 // to process error from built-in express check

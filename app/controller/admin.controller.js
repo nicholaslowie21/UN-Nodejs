@@ -2,13 +2,14 @@ const moment = require('moment-timezone')
 const db = require('../models')
 const Users = db.users
 const Projects = db.project
+const Institutions = db.institution
 const Helper = require('../service/helper.service')
 
 exports.searchUsers = async function (req, res){
 
     var rgx = new RegExp(req.query.username, "i");
     
-    const users = await Users.find({ 'username': { $regex: rgx } }, function (err, person) {
+    const users = await Users.find({ 'username': { $regex: rgx } }, function (err) {
         if (err) return handleError(err);
     });
 
@@ -24,6 +25,29 @@ exports.searchUsers = async function (req, res){
         status: 'success',
         msg: 'You have successfully queried for the users',
         data: { users: users }
+    });
+}
+
+exports.searchInstitutions = async function (req, res){
+
+    var rgx = new RegExp(req.query.username, "i");
+    
+    const institutions = await Institutions.find({ 'username': { $regex: rgx } }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!institutions) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No users found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the institutions',
+        data: { institutions: institutions }
     });
 }
 

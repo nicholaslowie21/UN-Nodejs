@@ -282,7 +282,7 @@ exports.pastProjects = async function (req, res, next) {
 }
 
 exports.viewUser = async function (req, res) {
-    const user = await Users.findOne({ '_id': req.query.userId }, function (err, person) {
+    const user = await Users.findOne({ 'username': req.query.username }, function (err, person) {
         if (err) return handleError(err);
     });
 
