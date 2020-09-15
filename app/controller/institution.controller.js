@@ -8,6 +8,8 @@ const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
 const csvtojson = require("csvtojson");
+const nodeHtmlToImage = require('node-html-to-image');
+const Helper = require('../service/helper.service');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -626,6 +628,48 @@ exports.searchUsers = async function (req, res){
         msg: 'You have successfully queried for the users',
         data: { users: users }
     });
+}
+
+exports.shareProfile = async function (req, res) {
+    const institution = await Institution.findOne({ '_id': req.body.id }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such account not found!',
+        data: {}
+    });
+
+    let dir = 'public/shareProfile'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+    nodeHtmlToImage({
+        output: 'public/shareProfile/Institution-'+institution.id+'.png',
+        html: `<html>
+        <body>
+        <p> KoCoSD Profile </p>
+        <p>
+        Name: {{name}} <br>
+        Username: {{username}} <br>
+        </p>
+        </body>
+        </html>`,
+        content: { name: institution.name, username: institution.username }
+      })
+        .then(() => console.log('The image was created successfully!'))
+
+    var ourlocalip = Helper.getLocalIP();
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Account\'s picture for sharing generated successfully',
+        data: { theLink: 'http://'+ourlocalip+':8081/public/shareProfile/Institution-'+institution.id+'.png' }
+    });
+
 }
 
 handleError = (err) => {

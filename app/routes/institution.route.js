@@ -31,4 +31,6 @@ router.get('/badges', auth,InstitutionValidator.viewInstitution, InstitutionVali
 
 router.get('/searchUsers', auth, InstitutionValidator.searchUsers, InstitutionValidator.ifErrors, institutionController.searchUsers)
 
+router.get('/shareProfile', auth, institutionController.shareProfile)
+
 module.exports = router;
