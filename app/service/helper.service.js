@@ -2,6 +2,11 @@ const env = require('../config/env');
 const nodemailer = require('nodemailer');
 const { body, validationResult, oneOf, check } = require('express-validator');
 
+const { networkInterfaces } = require('os');
+
+const nets = networkInterfaces();
+const results = {}; 
+
 exports.sendEmail = function(target, subject, message, callback) {
     var transporter = nodemailer.createTransport({
         service: env.emailService,
@@ -60,4 +65,20 @@ exports.ifErrors = (req, res, next) => {
       });
   }
   next();
+}
+
+exports.getLocalIP = function() {
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+        // skip over non-ipv4 and internal (i.e. 127.0.0.1) addresses
+        if (net.family === 'IPv4' && !net.internal) {
+            if (!results[name]) {
+                results[name] = [];
+            }
+  
+            results[name].push(net.address);
+        }
+    }
+  }  
+  return results['Wi-Fi'][0];
 }

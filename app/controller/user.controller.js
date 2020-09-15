@@ -7,6 +7,7 @@ const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
 const nodeHtmlToImage = require('node-html-to-image');
+const Helper = require('../service/helper.service');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -376,10 +377,11 @@ exports.shareProfile = async function (req, res) {
       })
         .then(() => console.log('The image was created successfully!'))
 
+    var ourlocalip = Helper.getLocalIP();
     return res.status(200).json({
         status: 'success',
         msg: 'Account\'s picture for sharing generated successfully',
-        data: { theLink: 'https://localhost:8080/public/shareProfile/'+user.id+'.png' }
+        data: { theLink: 'http://'+ourlocalip+':8081/public/shareProfile/'+user.id+'.png' }
     });
 
 }
