@@ -7,7 +7,9 @@ module.exports = mongoose => {
         status: { type: String, default: '' },
         projectIds: { type: String, default: '' },
         region: { type: String, default: '' },
-        ownerType: { type: String, default: '' }
+        ownerType: { type: String, default: '' },
+        address: { type: String, default: '' },
+        imgPath: [String]
       },
       { timestamps: true }
     );
@@ -18,14 +20,14 @@ module.exports = mongoose => {
       return object;
     });
   
-    const Manpower = mongoose.model("Manpower", schema);
+    const Venue = mongoose.model("Venue", schema);
 
-    //to create a dummy manpower
-    Manpower.find({title: 'dummy'}).then(function (docs) {
-      if (docs.length === 0) {
-          Manpower.create({ title: 'dummy', status:'active'});
-      }
-    });
+    //to create a dummy venue resource
+    Venue.find({title: 'dummy'}).then(function (docs) {
+        if (docs.length === 0) {
+            Venue.create({ title: 'dummy', status:'active'});
+        }
+      });
 
-    return Manpower;
+    return Venue;
   };

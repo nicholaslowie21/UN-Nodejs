@@ -3,11 +3,12 @@ module.exports = mongoose => {
       {
         title: { type: String, default: '' },
         desc: { type: String, default: '' },
-        owner: { type: String, default: '' },
         status: { type: String, default: '' },
         projectIds: { type: String, default: '' },
         region: { type: String, default: '' },
-        ownerType: { type: String, default: '' }
+        owner: [{ theId: String, ownerType: String}],
+        attachment: { type: String, default: '' }
+
       },
       { timestamps: true }
     );
@@ -18,14 +19,14 @@ module.exports = mongoose => {
       return object;
     });
   
-    const Manpower = mongoose.model("Manpower", schema);
+    const Knowledge = mongoose.model("Knowledge", schema);
 
-    //to create a dummy manpower
-    Manpower.find({title: 'dummy'}).then(function (docs) {
-      if (docs.length === 0) {
-          Manpower.create({ title: 'dummy', status:'active'});
-      }
-    });
+    //to create a knowledge resource
+    Knowledge.find({title: 'dummy'}).then(function (docs) {
+        if (docs.length === 0) {
+            Knowledge.create({ title: 'dummy', status:'active'});
+        }
+      });
 
-    return Manpower;
+    return Knowledge;
   };

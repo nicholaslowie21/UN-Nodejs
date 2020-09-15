@@ -13,5 +13,10 @@ db.project = require("./project.model.js")(mongoose);
 db.passwordreset = require("./passwordreset.model")(mongoose);
 db.verifyrequest = require("./verifyrequest.model")(mongoose);
 db.badge = require("./badge.model")(mongoose);
+db.item = require("./item.model")(mongoose);
+db.knowledge = require("./knowledge.model")(mongoose);
+db.manpower = require("./manpower.model")(mongoose);
+db.money = require("./money.model")(mongoose);
+db.venue = require("./venue.model")(mongoose);
 
 module.exports = db;

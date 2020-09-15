@@ -18,14 +18,14 @@ module.exports = mongoose => {
       return object;
     });
   
-    const Manpower = mongoose.model("Manpower", schema);
+    const Item = mongoose.model("Item", schema);
 
-    //to create a dummy manpower
-    Manpower.find({title: 'dummy'}).then(function (docs) {
-      if (docs.length === 0) {
-          Manpower.create({ title: 'dummy', status:'active'});
-      }
-    });
+    //to create a dummy Item resource
+    Item.find({title: 'dummy'}).then(function (docs) {
+        if (docs.length === 0) {
+            Item.create({ title: 'dummy', status:'active'});
+        }
+      });
 
-    return Manpower;
+    return Item;
   };

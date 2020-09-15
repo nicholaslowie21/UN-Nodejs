@@ -7,6 +7,7 @@ const institutionRouter = require('./institution.route')
 const adminRouter = require('./admin.route')
 const verificationRouter = require('./verification.route')
 const projectRouter = require('./project.route')
+const resourceRouter = require('./resource.route')
 
 router.use('/authorization', authorizationRouter)
 router.use('/user', userRouter)
@@ -14,5 +15,6 @@ router.use('/institution', institutionRouter)
 router.use('/admin', adminRouter)
 router.use('/verification', verificationRouter)
 router.use('/project', projectRouter)
+router.use('/resource', resourceRouter)
 
 module.exports = router;
