@@ -109,6 +109,10 @@ exports.viewInstitution = [
     query('username').exists()
 ]
 
+exports.currProject = [
+    query('institutionId').exists()
+]
+
 exports.getMembers = [
     query('institutionId').exists()
 ]

@@ -13,9 +13,9 @@ router.post('/updateEmail', auth, UserValidator.updateEmail, UserValidator.ifErr
 
 router.post('/uploadProfilePicture', auth, userController.multerUpload, userController.profilePicture);
 
-router.get('/currProjects', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.currProjects)
+router.get('/currProjects', auth, UserValidator.currProject, UserValidator.ifErrors, userController.currProjects)
 
-router.get('/pastProjects', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.pastProjects)
+router.get('/pastProjects', auth, UserValidator.currProject, UserValidator.ifErrors, userController.pastProjects)
 
 router.get('/viewUser', auth, UserValidator.viewUser, UserValidator.ifErrors , userController.viewUser)
 

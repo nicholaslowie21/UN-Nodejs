@@ -144,6 +144,10 @@ exports.viewUser = [
     query('username').exists()
 ]
 
+exports.currProject = [
+    query('userId').exists()
+]
+
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
