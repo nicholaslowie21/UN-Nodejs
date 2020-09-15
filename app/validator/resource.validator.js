@@ -3,3 +3,7 @@ const { body, query, validationResult, oneOf, check } = require('express-validat
 exports.viewResource = [
     query('userId').exists()
 ]
+
+exports.viewInstitutionResource = [
+    query('institutionId').exists()
+]
