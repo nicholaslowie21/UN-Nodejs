@@ -25,7 +25,7 @@ router.get('/pastProjects', auth, InstitutionValidator.currProject, InstitutionV
 
 router.post('/membersCSV', auth, institutionController.csvMulter, institutionController.membersCSVProcessing);
 
-router.get('/viewInstitution', auth, InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors, institutionController.viewInstitution)
+router.get('/viewInstitution', InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors, institutionController.viewInstitution)
 
 router.get('/badges', auth,InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.getBadges)
 

@@ -17,7 +17,7 @@ router.get('/currProjects', auth, UserValidator.currProject, UserValidator.ifErr
 
 router.get('/pastProjects', auth, UserValidator.currProject, UserValidator.ifErrors, userController.pastProjects)
 
-router.get('/viewUser', auth, UserValidator.viewUser, UserValidator.ifErrors , userController.viewUser)
+router.get('/viewUser', UserValidator.viewUser, UserValidator.ifErrors , userController.viewUser)
 
 router.get('/badges', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.getBadges)
 
