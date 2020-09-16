@@ -8,6 +8,7 @@ const nodeCountries =  require("node-countries");
 exports.userSignup = [
     body('name').exists(),
     body('username').exists().custom(async value => {
+        value = value.toLowerCase();
         let user = await Users.findOne({ 'username': value }, function (err, person) {
             if (err) return handleError(err);
           });

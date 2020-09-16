@@ -63,7 +63,11 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
-  res.send(err);
+  return res.json({
+    status: 'error',
+    msg: err,
+    data: {}
+});
 });
 
 const PORT = process.env.PORT || 8080;

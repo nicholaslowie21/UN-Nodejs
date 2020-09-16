@@ -16,6 +16,7 @@ module.exports = mongoose => {
         points: Number,
         salt: String,
         gender: String,
+        ionicImg: String,
         skills: [String],
         institutionIds: [String],
         projects: [String],

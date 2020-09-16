@@ -10,6 +10,7 @@ const multer = require('multer');
 const csvtojson = require("csvtojson");
 const nodeHtmlToImage = require('node-html-to-image');
 const Helper = require('../service/helper.service');
+const path = require('path');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -31,7 +32,27 @@ var storage = multer.diskStorage({
         next(err);
     }
 })
-var upload = multer({ storage: storage })
+var upload = multer({ 
+    storage: storage,
+    fileFilter: function(_req, file, cb){
+        checkFileType(file, cb);
+    }     
+})
+
+function checkFileType(file, cb){
+    // Allowed ext
+    const filetypes = /jpeg|jpg|png/;
+    // Check ext
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // Check mime
+    const mimetype = filetypes.test(file.mimetype);
+  
+    if(mimetype && extname){
+      return cb(null,true);
+    } else {
+      cb('Error: Images Only!');
+    }
+}
 
 exports.multerUpload = upload.single('profilePic');
 
@@ -55,7 +76,27 @@ var csvStorage = multer.diskStorage({
         next(err);
     }
 })
-var uploadCSV = multer({ storage: csvStorage })
+var uploadCSV = multer({ 
+    storage: csvStorage,
+    fileFilter: function(_req, file, cb){
+        checkCSVFileType(file, cb);
+    } 
+})
+
+function checkCSVFileType(file, cb){
+    // Allowed ext
+    const filetypes = /csv/;
+    // Check ext
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // Check mime
+    const mimetype = filetypes.test(file.mimetype);
+  
+    if(mimetype && extname){
+      return cb(null,true);
+    } else {
+      cb('Error: CSV Only!');
+    }
+}
 
 exports.csvMulter = uploadCSV.single('CSV');
 
@@ -72,6 +113,7 @@ exports.profilePicture = async function (req, res){
     });
 
     institution.profilePic = 'https://localhost:8080/public/uploads/profilePicture/'+req.thePath;
+    institution.ionicImg = "/public/uploads/profilePicture/"+req.thePath;
 
     institution.save(institution)
     .then(data => {

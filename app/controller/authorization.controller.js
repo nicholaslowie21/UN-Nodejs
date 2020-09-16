@@ -11,7 +11,7 @@ const nodeCountries = require('node-countries');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const multer = require('multer');
-
+const path = require('path');
 
 const Helper = require('../service/helper.service');
 
@@ -31,7 +31,7 @@ exports.postSignup = async function (req, res, next) {
     
     const user = new Users({
 		name: req.body.name,
-		username: req.body.username,
+		username: req.body.username.toLowerCase(),
 		email: req.body.email.toLowerCase(),
 		password: saltedHashPassword,
         role: 'user',
@@ -74,7 +74,7 @@ exports.postInstitutionSignup = async function (req, res, next) {
     
     const institution = new Institution({
 		name: req.body.name,
-		username: req.body.username,
+		username: req.body.username.toLowerCase(),
 		email: req.body.email.toLowerCase(),
 		password: saltedHashPassword,
 		status: 'pending',
@@ -539,8 +539,27 @@ var storage = multer.diskStorage({
         next(err);
     }
 })
-var upload = multer({ storage: storage })
+var upload = multer({ 
+    storage: storage,
+    fileFilter: function(_req, file, cb){
+        checkFileType(file, cb);
+    }     
+})
 
+function checkFileType(file, cb){
+    // Allowed ext
+    const filetypes = /jpeg|jpg|png/;
+    // Check ext
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // Check mime
+    const mimetype = filetypes.test(file.mimetype);
+  
+    if(mimetype && extname){
+      return cb(null,true);
+    } else {
+      cb('Error: Images Only!');
+    }
+}
 exports.multerUpload = upload.single('verifyPic');
 
 exports.verifyRequest = async function(req,res) {
