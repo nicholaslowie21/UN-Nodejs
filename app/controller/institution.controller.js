@@ -615,7 +615,8 @@ exports.viewInstitution = async function (req, res) {
         "website": institution.website || '',
         "members": institution.members,
         "projects": institution.projects,
-        "SDGs": institution.SDGs
+        "SDGs": institution.SDGs,
+        "ionicImg": institution.ionicImg || ''
     }
 
     return res.status(200).json({

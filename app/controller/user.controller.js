@@ -321,6 +321,8 @@ exports.viewUser = async function (req, res) {
         "username": user.username,
         "email": user.email,
         "bio": user.bio || '',
+        "role": user.role,
+        "status": user.status,
         "occupation": user.occupation || '',
         "isVerified": user.isVerified,
         "profilePic": user.profilePic,
@@ -332,7 +334,9 @@ exports.viewUser = async function (req, res) {
         "institutionIds": user.institutionIds,
         "projects": user.projects,
         "badges": user.badges,
-        "SDGs": user.SDGs
+        "SDGs": user.SDGs,
+        "wallet": user.wallet,
+        "ionicImg": user.ionicImg || ''
     }
 
     return res.status(200).json({
