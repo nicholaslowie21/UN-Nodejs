@@ -145,6 +145,10 @@ exports.viewUser = [
     query('username').exists()
 ]
 
+exports.getBadges = [
+    query('userId').exists()
+]
+
 exports.currProject = [
     query('userId').exists()
 ]

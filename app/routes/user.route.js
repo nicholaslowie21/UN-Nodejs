@@ -19,7 +19,7 @@ router.get('/pastProjects', auth, UserValidator.currProject, UserValidator.ifErr
 
 router.get('/viewUser', UserValidator.viewUser, UserValidator.ifErrors , userController.viewUser)
 
-router.get('/badges', auth, UserValidator.viewUser, UserValidator.ifErrors, userController.getBadges)
+router.get('/badges', auth, UserValidator.getBadges, UserValidator.ifErrors, userController.getBadges)
 
 router.get('/shareProfile', auth, userController.shareProfile)
 
