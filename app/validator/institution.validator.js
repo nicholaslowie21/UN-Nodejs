@@ -9,6 +9,9 @@ exports.signUp = [
     body('name').exists(),
     body('username').exists().custom(async value => {
         value = value.toLowerCase();
+        if(value.indexOf(" ")>-1) {
+            return Promise.reject('username contains space! No space is allowed.')
+        }
         let user = await Users.findOne({ 'username': value }, function (err, person) {
             if (err) return handleError(err);
           });

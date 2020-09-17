@@ -397,10 +397,25 @@ exports.shareProfile = async function (req, res) {
         <p>
         Name: {{name}} <br>
         Username: {{username}} <br>
+        Email: {{email}} <br>
+        Bio: {{bio}} <br>
+        Occupation: {{occupation}} <br>
+        Country: {{country}} <br>
+        Website:  {{website}} <br>
+        SDGs: {{sdgs}} <br>
         </p>
         </body>
         </html>`,
-        content: { name: user.name, username: user.username }
+        content: { 
+            name: user.name, 
+            username: user.username,
+            email: user.email,
+            bio: user.bio,
+            occupation: user.occupation,
+            country: user.country,
+            website: user.website,
+            sdgs: user.SDGs.toString() 
+        }
       })
         .then(() => console.log('The image was created successfully!'))
 

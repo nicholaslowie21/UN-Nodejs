@@ -9,6 +9,7 @@ module.exports = mongoose => {
         rating: Number,
         region: String,
         code: String,
+        imgPath: String,
         admins: [String],
         SDGs: [Number]
       },
