@@ -333,6 +333,55 @@ exports.suspendUser = async function (req, res) {
     })
 }
 
+exports.suspendInstitution = async function (req, res) {
+    // find target institution by id
+    const target = await Institutions.findOne({ '_id': req.body.targetId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong!',
+            data: {}
+        });
+    });
+
+    if(!target) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    target.status = 'suspended';
+
+    target.save(target)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Institution account successfully suspended!',
+            data: { target: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    }); 
+
+    
+    let subject = 'KoCoSD Account Suspension'
+    let theMessage = `
+        <h1>Your account has been suspended!</h1>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+}
+
 exports.activateUser = async function (req, res) {
     // find target user by id
     const target = await Users.findOne({ '_id': req.body.targetId }, function (err) {
@@ -353,6 +402,55 @@ exports.activateUser = async function (req, res) {
         return res.status(200).json({
             status: 'success',
             msg: 'User successfully activated!',
+            data: { target: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    }); 
+
+    
+    let subject = 'KoCoSD Account Re-activation'
+    let theMessage = `
+        <h1>Your account has been re-activated!</h1>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+}
+
+exports.activateInstitution = async function (req, res) {
+    // find target user by id
+    const target = await Institutions.findOne({ '_id': req.body.targetId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong!',
+            data: {}
+        });
+    });
+
+    if(!target) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    target.status = 'active';
+
+    target.save(target)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Institution successfully re-activated!',
             data: { target: data }
         });
     }).catch(err => {

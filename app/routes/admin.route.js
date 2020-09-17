@@ -36,6 +36,10 @@ router.post('/suspendUser', auth, AdminValidator.suspendUser, AdminValidator.ifE
 
 router.post('/activateUser', auth, AdminValidator.suspendUser, AdminValidator.ifErrors , adminController.activateUser)
 
+router.post('/suspendInstitution', auth, AdminValidator.suspendUser, AdminValidator.ifErrors , adminController.suspendInstitution)
+
+router.post('/activateInstitution', auth, AdminValidator.suspendUser, AdminValidator.ifErrors , adminController.activateInstitution)
+
 router.post('/suspendProject', auth, AdminValidator.suspendProject, AdminValidator.ifErrors , adminController.suspendProject)
 
 router.post('/activateProject', auth, AdminValidator.suspendProject, AdminValidator.ifErrors , adminController.activateProject)
