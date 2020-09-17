@@ -601,6 +601,7 @@ exports.viewInstitution = async function (req, res) {
     });
     
     var theInstitution = {
+        "id": institution.id,
         "name": institution.name,
         "username": institution.username,
         "email": institution.email,
