@@ -628,7 +628,7 @@ exports.viewInstitution = async function (req, res) {
 }
 
 exports.getBadges = async function (req, res) {
-    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err, person) {
+    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err) {
         if (err) return handleError(err);
     });
 
@@ -639,7 +639,7 @@ exports.getBadges = async function (req, res) {
         data: {}
     });
 
-    let badges = await Badges.find({ 'accountId': req.body.id, 'accountType':'institution' }, function (err, person) {
+    let badges = await Badges.find({ 'accountId': req.query.institutionId, 'accountType':'institution' }, function (err) {
         if (err) return handleError(err);
     });
 

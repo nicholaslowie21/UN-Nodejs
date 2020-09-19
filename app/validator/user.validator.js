@@ -152,6 +152,10 @@ exports.getBadges = [
     query('userId').exists()
 ]
 
+exports.getAffiliations = [
+    query('userId').exists()
+]
+
 exports.currProject = [
     query('userId').exists()
 ]
