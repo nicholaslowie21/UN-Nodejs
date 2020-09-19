@@ -21,11 +21,11 @@ module.exports = mongoose => {
     const Manpower = mongoose.model("Manpower", schema);
 
     //to create a dummy manpower
-    Manpower.find({title: 'dummy'}).then(function (docs) {
-      if (docs.length === 0) {
-          Manpower.create({ title: 'dummy', status:'active'});
-      }
-    });
+    // Manpower.find({title: 'dummy'}).then(function (docs) {
+    //   if (docs.length === 0) {
+    //       Manpower.create({ title: 'dummy', status:'active'});
+    //   }
+    // });
 
     return Manpower;
   };

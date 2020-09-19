@@ -354,7 +354,8 @@ exports.postChangePasswordRequest = async function (req, res) {
     let subject = 'KoCoSD Password Reset'
     let theMessage = `
         <h1>Password Reset Request</h1>
-        <p>We received a request to reset your KoCoSD password.</p>
+        <p>We received a request to reset your KoCoSD password.</p> <br>
+        <p>This link is only valid for 30 minutes.</p>
         <a href="${passwordreseturl}">Click here to change your password.</a><br>
     `
     

@@ -23,11 +23,11 @@ module.exports = mongoose => {
     const Venue = mongoose.model("Venue", schema);
 
     //to create a dummy venue resource
-    Venue.find({title: 'dummy'}).then(function (docs) {
-        if (docs.length === 0) {
-            Venue.create({ title: 'dummy', status:'active'});
-        }
-      });
+    // Venue.find({title: 'dummy'}).then(function (docs) {
+    //     if (docs.length === 0) {
+    //         Venue.create({ title: 'dummy', status:'active'});
+    //     }
+    //   });
 
     return Venue;
   };

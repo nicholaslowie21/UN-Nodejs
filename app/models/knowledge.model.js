@@ -22,11 +22,11 @@ module.exports = mongoose => {
     const Knowledge = mongoose.model("Knowledge", schema);
 
     //to create a knowledge resource
-    Knowledge.find({title: 'dummy'}).then(function (docs) {
-        if (docs.length === 0) {
-            Knowledge.create({ title: 'dummy', status:'active'});
-        }
-      });
+    // Knowledge.find({title: 'dummy'}).then(function (docs) {
+    //     if (docs.length === 0) {
+    //         Knowledge.create({ title: 'dummy', status:'active'});
+    //     }
+    //   });
 
     return Knowledge;
   };
