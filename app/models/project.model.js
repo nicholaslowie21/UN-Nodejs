@@ -7,7 +7,7 @@ module.exports = mongoose => {
         hostType: String,
         status: String,
         rating: Number,
-        region: String,
+        country: String,
         code: String,
         imgPath: String,
         admins: [String],

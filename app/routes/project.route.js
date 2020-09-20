@@ -10,5 +10,9 @@ router.get('/viewProject', ProjectValidator.viewProject, Helper.ifErrors, projec
 
 router.get('/searchProjectsCode', auth, ProjectValidator.searchProjects, Helper.ifErrors, projectController.searchProjects)
 
+router.post('/createProject', auth, ProjectValidator.createProject, Helper.ifErrors, projectController.createProject)
+
+router.post('/updateProject', auth, ProjectValidator.updateProject, Helper.ifErrors, projectController.postUpdateProject)
+
 
 module.exports = router;

@@ -57,13 +57,13 @@ exports.ifErrors = (req, res, next) => {
 
       }
 
-
       return res.status(422).json({
           status: 'error',
           msg: param+': '+msg ,
           param: param
       });
   }
+  
   next();
 }
 
