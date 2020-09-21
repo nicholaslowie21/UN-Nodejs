@@ -24,4 +24,6 @@ router.get('/projectAdmins', ProjectValidator.getAdmins, Helper.ifErrors, projec
 
 router.get('/projectHost', ProjectValidator.getAdmins, Helper.ifErrors, projectController.getProjectHost)
 
+router.post('/uploadProjectPicture', auth, projectController.multerUpload, projectController.projectPicture)
+
 module.exports = router;

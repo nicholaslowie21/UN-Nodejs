@@ -5,6 +5,174 @@ const Institutions = db.institution
 const Users = db.users
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
+const path = require('path')
+const fs = require('fs')
+const multer = require('multer')
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/projectPicture'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = 'ProjectPic-'+req.body.projectId+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var upload = multer({ 
+    storage: storage,
+    fileFilter: function(_req, file, cb){
+        checkFileType(file, cb);
+    }     
+})
+
+function checkFileType(file, cb){
+    // Allowed ext
+    const filetypes = /jpeg|jpg|png/;
+    // Check ext
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // Check mime
+    const mimetype = filetypes.test(file.mimetype);
+  
+    if(mimetype && extname){
+      return cb(null,true);
+    } else {
+      cb('Error: Images Only!');
+    }
+}
+
+exports.multerUpload = upload.single('projectPic');
+
+exports.projectPicture = async function (req, res){
+    if(!req.body.projectId) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Project id is empty! ',
+            data: {}
+        });
+    }
+
+    
+    if(!req.file) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No picture uploaded! ',
+            data: {}
+        });
+    }
+
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such project!',
+            data: {}
+        });
+    });
+
+    if(!project || project.status!='ongoing')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Project is suspended or currently not ongoing!',
+        data: {}
+    });
+
+    var host,hostType,theUsername,country,target;
+
+    if(req.type === "institution") {
+        const institution = await Institutions.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
+        host = institution.id
+        hostType = "institution"
+        country = institution.country
+        theUsername = institution.username
+        target = institution
+    } else if (req.type === "user") {
+        const user = await Users.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(user.isVerified != "true")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account not authorized to create project! Not verified yet.',
+            data: {}
+        });
+
+        host = user.id
+        hostType = "user"
+        country = user.country
+        theUsername = user.username
+        target = user
+    }
+
+    if(host!=project.host)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to perform this action!',
+        data: {}
+    });
+
+    project.imgPath = "/public/uploads/projectPicture/"+req.thePath;
+
+    project.save(project)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project picture successfully updated',
+            data: { project: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
 
 exports.viewProject = async function (req, res) {
     const project = await Projects.findOne({ 'code': req.query.code }, function (err) {
