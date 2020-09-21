@@ -61,7 +61,7 @@ exports.searchProjects = async function (req, res){
 exports.createProject = async function (req, res){
     let host = ""
     let hostType = ""
-    let region = ""
+    let country = ""
     let theUsername = ""
 
     if(req.type === "institution") {
@@ -72,6 +72,13 @@ exports.createProject = async function (req, res){
                 msg: 'There was no such account!',
                 data: {}
             });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
         });
 
         host = institution.id
@@ -86,6 +93,20 @@ exports.createProject = async function (req, res){
                 msg: 'There was no such account!',
                 data: {}
             });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(user.isVerified != "true")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account not authorized to create project! Not verified yet.',
+            data: {}
         });
 
         host = user.id
