@@ -511,3 +511,85 @@ exports.searchUsers = async function (req, res){
         data: { users: users }
     });
 }
+
+exports.getAdmins = async function (req, res){
+
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong when retrieving the project! ',
+            data: {}
+        });
+    });
+
+    if(!project) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No project found! ',
+            data: {}
+        });
+    }
+
+    var adminsId = project.admins;
+    var arr = [];
+    
+    for (var i = 0; i < adminsId.length; i++) {
+        var admin = await Users.findOne({ '_id': adminsId[i] }, function (err) {
+            if (err) return handleError(err);
+        });
+        
+        if(!admin) {
+            project.admins.pull(adminsId[i]);
+        } else {
+            arr.push(admin)
+        }
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the project admins',
+        data:  { admins: arr} 
+    });
+}
+
+exports.getProjectHost = async function (req, res){
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong when retrieving the project! ',
+            data: {}
+        });
+    });
+
+    if(!project) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No project found! ',
+            data: {}
+        });
+    }
+
+    var host;
+
+    if (project.hostType === "institution") {
+        var targetHost = await Institutions.findOne({ '_id': project.host }, function (err) {
+            if (err) return handleError(err);
+        });
+
+        host = targetHost;
+    } else if (project.hostType === "user") {
+        var targetHost = await Users.findOne({ '_id': project.host }, function (err) {
+            if (err) return handleError(err);
+        });
+
+        host = targetHost;
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the project host!',
+        data:  { host: host, type: project.hostType} 
+    });
+}

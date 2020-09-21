@@ -20,4 +20,8 @@ router.post('/editAdmin', auth, ProjectValidator.editAdmin, Helper.ifErrors, pro
 
 router.get('/searchUsers', auth, ProjectValidator.searchUsers, Helper.ifErrors, projectController.searchUsers)
 
+router.get('/projectAdmins', ProjectValidator.getAdmins, Helper.ifErrors, projectController.getAdmins)
+
+router.get('/projectHost', ProjectValidator.getAdmins, Helper.ifErrors, projectController.getProjectHost)
+
 module.exports = router;

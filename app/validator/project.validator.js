@@ -9,6 +9,10 @@ exports.searchProjects = [
     query('code').exists()
 ]
 
+exports.getAdmins = [
+    query('projectId').exists()
+]
+
 exports.createProject = [
     body('title').exists(),
     body('desc').exists(),
