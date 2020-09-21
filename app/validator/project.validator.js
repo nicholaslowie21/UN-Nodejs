@@ -62,5 +62,6 @@ exports.deleteProject = [
 ]
 
 exports.editAdmin = [
+    body('projectId').exists(),
     body('admins').exists()
 ]

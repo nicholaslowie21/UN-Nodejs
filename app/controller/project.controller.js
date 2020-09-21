@@ -326,6 +326,42 @@ exports.deleteProject = async function (req, res) {
 
     project.status = "closed"
 
+    var admins = project.admins;
+    var adminsArr = [];
+
+    for(var i = 0; i < admins.length; i++) {
+        const user = await Users.findOne({ '_id': admins[i] }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an issue retrieving the user!',
+                data: {}
+            });    
+        })
+
+        if (!user) {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Such user is not found!',
+                data: {}
+            });  
+        }
+        user.projects.pull(project.id);
+        adminsArr.push(user)
+
+    }
+
+    for(var i = 0; i < adminsArr.length; i++) {
+        adminsArr[i].save().catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        })
+    }
+
+
     project.save(project)
     .then(data => {
 
@@ -372,21 +408,77 @@ exports.editAdmin = async function (req, res) {
         data: {}
     });
 
-    if(project.host != req.body.id)
+    if(project.status != "ongoing") 
     return res.status(500).json({
         status: 'error',
-        msg: 'You are not authorized to closed this project!',
+        msg: 'This project is not active!',
         data: {}
     });
 
-    project.status = "closed"
+    if(project.host != req.body.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit admin for this project!',
+        data: {}
+    });
+
+    var tempAdmins = project.admins;
+    var returnAdmins = []
+    var receivedAdmins = req.body.admins
+
+    for(var i = 0; i < receivedAdmins.length; i++) {
+        const user = await Users.findOne({ '_id': receivedAdmins[i] }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an issue retrieving the user!',
+                data: {}
+            });    
+        })
+
+        if (!user) {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Such user is not found!',
+                data: {}
+            });  
+        }
+
+        if(user.id === req.body.id) {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'You cannot add yourself as admin!',
+                data: {}
+            });  
+        }
+
+        if(!tempAdmins.includes(user.id)){
+            tempAdmins.push(user.id)
+            user.projects.push(project.id)
+        }
+
+        returnAdmins.push(user)
+    }
+
+    project.admins = tempAdmins
+
+    
+    for(var i = 0; i < returnAdmins.length; i++) {
+        returnAdmins[i].save().catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        })
+    }
 
     project.save(project)
     .then(data => {
         return res.status(200).json({
             status: 'success',
-            msg: 'Project successfully deleted',
-            data: { project: data }
+            msg: 'Project admins successfully edited',
+            data: { project: data, admins: returnAdmins }
         });
     }).catch(err => {
         return res.status(500).json({
