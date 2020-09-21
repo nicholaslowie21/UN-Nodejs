@@ -16,4 +16,6 @@ router.post('/updateProject', auth, ProjectValidator.updateProject, Helper.ifErr
 
 router.post('/deleteProject', auth, ProjectValidator.deleteProject, Helper.ifErrors, projectController.deleteProject)
 
+router.post('/editAdmin', auth, ProjectValidator.editAdmin, Helper.ifErrors, projectController.deleteProject)
+
 module.exports = router;

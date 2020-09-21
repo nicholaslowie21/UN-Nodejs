@@ -63,6 +63,7 @@ exports.createProject = async function (req, res){
     let hostType = ""
     let country = ""
     let theUsername = ""
+    var target;
 
     if(req.type === "institution") {
         const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
@@ -92,6 +93,7 @@ exports.createProject = async function (req, res){
         hostType = "institution"
         country = institution.country
         theUsername = institution.username
+        target = institution
     } else if (req.type === "user") {
         const user = await Users.findOne({ '_id': req.body.id }, function (err) {
             if (err)
@@ -120,6 +122,7 @@ exports.createProject = async function (req, res){
         hostType = "user"
         country = user.country
         theUsername = user.username
+        target = user
     }
 
     var tempSDGs = req.body.SDGs;
@@ -148,10 +151,23 @@ exports.createProject = async function (req, res){
 
     project.save(project)
     .then(data => {
+
+        let tempProjects = target.projects
+        tempProjects.push(data.id); 
+        target.projects = tempProjects
+        
+        target.save(target).catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        });
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project successfully created!',
-            data: { project: data }
+            data: { project: data, account: target }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -160,6 +176,7 @@ exports.createProject = async function (req, res){
             data: {}
         });
     });
+
 }
 
 exports.postUpdateProject = async function (req, res) {
@@ -232,6 +249,113 @@ exports.postUpdateProject = async function (req, res) {
 }
 
 exports.deleteProject = async function (req, res) {
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.host != req.body.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to closed this project!',
+        data: {}
+    });
+
+    if(req.type === "institution") {
+        const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
+        target = institution
+    } else if (req.type === "user") {
+        const user = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(user.isVerified != "true" || user.status != 'active')
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account not authorized to create project!',
+            data: {}
+        });
+
+        target = user
+    }
+
+    project.status = "closed"
+
+    project.save(project)
+    .then(data => {
+
+        let tempProjects = target.projects
+        tempProjects.pull(data.id); 
+        target.projects = tempProjects
+        
+        target.save(target).catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project successfully deleted',
+            data: { project: data, account: target }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.editAdmin = async function (req, res) {
     const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
         if (err)
         return res.status(500).json({
