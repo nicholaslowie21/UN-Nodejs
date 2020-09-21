@@ -20,4 +20,10 @@ router.get('/institution/item', ResourceValidator.viewInstitutionResource, Helpe
 
 router.get('/institution/venue', ResourceValidator.viewInstitutionResource, Helper.ifErrors, resourceController.viewInstitutionVenue);
 
+router.post('/createItem', auth, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem )
+
+router.post('/updateItem', auth, ResourceValidator.updateItemResource, Helper.ifErrors, resourceController.updateItem )
+
+router.post('/uploadItemPicture', auth, resourceController.multerItemPicUpload, resourceController.itemPicture)
+
 module.exports = router;

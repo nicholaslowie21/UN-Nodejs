@@ -5,7 +5,7 @@ module.exports = mongoose => {
         desc: { type: String, default: '' },
         owner: { type: String, default: '' },
         status: { type: String, default: '' },
-        region: { type: String, default: '' },
+        country: { type: String, default: '' },
         ownerType: { type: String, default: '' }
       },
       { timestamps: true }

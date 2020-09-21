@@ -9,6 +9,7 @@ const uid = new ShortUniqueId();
 const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
+const nodeCountries =  require("node-countries");
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -349,6 +350,9 @@ exports.createProject = async function (req, res){
 }
 
 exports.postUpdateProject = async function (req, res) {
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
+    
     const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
         if (err)
         return res.status(500).json({
