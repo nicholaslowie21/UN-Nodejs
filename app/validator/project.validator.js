@@ -65,3 +65,7 @@ exports.editAdmin = [
     body('projectId').exists(),
     body('admins').exists()
 ]
+
+exports.searchUsers = [
+    query('username').exists()
+]

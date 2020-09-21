@@ -476,7 +476,6 @@ exports.activateInstitution = async function (req, res) {
 }
 
 exports.suspendProject = async function (req, res) {
-    // find target user by id
     const target = await Projects.findOne({ '_id': req.body.targetId }, function (err) {
         if (err) return handleError(err);
     });
@@ -487,6 +486,19 @@ exports.suspendProject = async function (req, res) {
         msg: 'Project not found!',
         data: {}
     });
+
+    var targetHost;
+
+    if (target.hostType === "institution") {
+        targetHost = await Institutions.findOne({ '_id': target.host }, function (err) {
+            if (err) return handleError(err);
+        });
+
+    } else if (target.hostType === "user") {
+        targetHost = await Users.findOne({ '_id': target.host }, function (err) {
+            if (err) return handleError(err);
+        });
+    }
 
     target.status = 'suspended';
 
@@ -504,6 +516,18 @@ exports.suspendProject = async function (req, res) {
             data: {}
         });
     }); 
+    let subject = 'KoCoSD Project Suspended'
+    let theMessage = `
+        <h1>Your project has been suspended!</h1>
+        <p>The project code is ${target.code}<p>
+        <p>Please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(targetHost.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.activateProject = async function (req, res) {
@@ -518,6 +542,19 @@ exports.activateProject = async function (req, res) {
         msg: 'Project not found!',
         data: {}
     });
+
+    var targetHost;
+
+    if (target.hostType === "institution") {
+        targetHost = await Institutions.findOne({ '_id': target.host }, function (err) {
+            if (err) return handleError(err);
+        });
+
+    } else if (target.hostType === "user") {
+        targetHost = await Users.findOne({ '_id': target.host }, function (err) {
+            if (err) return handleError(err);
+        });
+    }
 
     target.status = 'ongoing';
 
@@ -535,6 +572,19 @@ exports.activateProject = async function (req, res) {
             data: {}
         });
     }); 
+
+    let subject = 'KoCoSD Project Re-activated'
+    let theMessage = `
+        <h1>Your project has been reactivated!</h1>
+        <p>The project code is ${target.code}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(targetHost.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 handleError = (err) => {

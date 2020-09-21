@@ -18,4 +18,6 @@ router.post('/deleteProject', auth, ProjectValidator.deleteProject, Helper.ifErr
 
 router.post('/editAdmin', auth, ProjectValidator.editAdmin, Helper.ifErrors, projectController.editAdmin)
 
+router.get('/searchUsers', auth, ProjectValidator.searchUsers, Helper.ifErrors, projectController.searchUsers)
+
 module.exports = router;

@@ -488,3 +488,26 @@ exports.editAdmin = async function (req, res) {
         });
     });
 }
+
+exports.searchUsers = async function (req, res){
+
+    var rgx = new RegExp(req.query.username, "i");
+    
+    const users = await Users.find({ 'username': { $regex: rgx } }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!users) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No users found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the users',
+        data: { users: users }
+    });
+}
