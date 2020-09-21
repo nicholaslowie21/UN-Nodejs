@@ -18,5 +18,6 @@ db.knowledge = require("./knowledge.model")(mongoose);
 db.manpower = require("./manpower.model")(mongoose);
 db.money = require("./money.model")(mongoose);
 db.venue = require("./venue.model")(mongoose);
+db.kpi = require("./kpi.model")(mongoose);
 
 module.exports = db;

@@ -3,6 +3,7 @@ const db = require('../models')
 const Projects = db.project
 const Institutions = db.institution
 const Users = db.users
+const KPI = db.kpi
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
 const path = require('path')
@@ -760,4 +761,201 @@ exports.getProjectHost = async function (req, res){
         msg: 'You have successfully queried for the project host!',
         data:  { host: host, type: project.hostType} 
     });
+}
+
+exports.createKPI = async function (req, res) {
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.status != "ongoing") 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This project is not active!',
+        data: {}
+    });
+
+    if(project.host != req.body.id && !project.admins.includes(req.body.id))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit KPI for this project!',
+        data: {}
+    });
+
+    const kpi = new KPI({
+		title: req.body.title,
+		desc: req.body.desc,
+        completion: 0,
+        projectId: project.id
+    });
+
+    kpi.save(kpi)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'KPI successfully created',
+            data: { kpi: kpi }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.updateKPI = async function (req, res) {
+    const kpi = await KPI.findOne({ '_id': req.body.kpiId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the kpi!',
+            data: {}
+        });
+    });
+
+    if(!kpi) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such kpi not found!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': kpi.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.host != req.body.id && !project.admins.includes(req.body.id))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit KPI for this project!',
+        data: {}
+    });
+
+    kpi.title = req.body.title
+    kpi.desc = req.body.desc
+    kpi.completion = req.body.completion
+
+    kpi.save(kpi)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'KPI successfully updated',
+            data: { kpi: kpi }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteKPI = async function (req, res) {
+    const kpi = await KPI.findOne({ '_id': req.body.kpiId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the kpi!',
+            data: {}
+        });
+    });
+
+    if(!kpi) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such kpi not found!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': kpi.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.host != req.body.id && !project.admins.includes(req.body.id))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit KPI for this project!',
+        data: {}
+    });
+
+    kpi.deleteOne({ "_id": kpi.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue deleting the kpi!' + err.message,
+            data: {}
+        });
+      });
+
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'KPI successfully deleted',
+        data: { }
+    });
+
+}
+
+exports.getKPIs = async function (req, res) {
+    const kpis = await KPI.find({ 'projectId': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the kpis!',
+            data: {}
+        });
+    });
+
+    if(!kpis) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'KPIs not found!',
+        data: {}
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'KPIs successfully retrieved!',
+        data: { kpis: kpis}
+    });
+
 }

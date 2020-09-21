@@ -13,6 +13,10 @@ exports.getAdmins = [
     query('projectId').exists()
 ]
 
+exports.getKPIs = [
+    query('projectId').exists()
+]
+
 exports.createProject = [
     body('title').exists(),
     body('desc').exists(),
@@ -63,6 +67,26 @@ exports.updateProject = [
 
 exports.deleteProject = [
     body('projectId').exists()
+]
+
+exports.deleteKPI = [
+    body('kpiId').exists()
+]
+
+exports.createKPI = [
+    body('projectId').exists(),
+    body('title').exists(),
+    body('desc').exists()
+]
+
+exports.updateKPI = [
+    body('kpiId').exists(),
+    body('title').exists(),
+    body('desc').exists(),
+    body('completion').exists().custom(async value => {
+        if(value<0 || value >100)
+            return Promise.reject('Completion rate is not valid')
+    })
 ]
 
 exports.editAdmin = [

@@ -5,7 +5,6 @@ module.exports = mongoose => {
         desc: { type: String, default: '' },
         owner: { type: String, default: '' },
         status: { type: String, default: '' },
-        projectIds: { type: String, default: '' },
         region: { type: String, default: '' },
         ownerType: { type: String, default: '' },
         address: { type: String, default: '' },

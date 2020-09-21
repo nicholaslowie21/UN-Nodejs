@@ -26,4 +26,12 @@ router.get('/projectHost', ProjectValidator.getAdmins, Helper.ifErrors, projectC
 
 router.post('/uploadProjectPicture', auth, projectController.multerUpload, projectController.projectPicture)
 
+router.post('/createKPI', auth, ProjectValidator.createKPI, Helper.ifErrors, projectController.createKPI)
+
+router.post('/updateKPI', auth, ProjectValidator.updateKPI, Helper.ifErrors, projectController.updateKPI)
+
+router.post('/deleteKPI', auth, ProjectValidator.deleteKPI, Helper.ifErrors, projectController.deleteKPI)
+
+router.get('/projectKPI', ProjectValidator.getKPIs, Helper.ifErrors, projectController.getKPIs)
+
 module.exports = router;

@@ -4,7 +4,6 @@ module.exports = mongoose => {
         title: { type: String, default: '' },
         desc: { type: String, default: '' },
         status: { type: String, default: '' },
-        projectIds: { type: String, default: '' },
         region: { type: String, default: '' },
         owner: [{ theId: String, ownerType: String}],
         attachment: { type: String, default: '' }
