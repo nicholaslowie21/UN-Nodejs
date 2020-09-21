@@ -44,7 +44,7 @@ exports.postSignup = async function (req, res, next) {
         points: 0,
         salt: randomString,
         wallet: 0,
-        gender: req.body.gender,
+        salutation: req.body.salutation,
         website: ''
     });
     

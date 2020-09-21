@@ -136,7 +136,7 @@ exports.updateUserProfile = async function (req, res, next) {
     user.occupation = req.body.occupation;
     user.country = req.body.country;
     user.website = req.body.website;
-    user.gender = req.body.gender;
+    user.salutation = req.body.salutation;
     user.SDGs = theSDGs;
     user.skills = theSkills;
 
