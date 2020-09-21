@@ -81,6 +81,13 @@ exports.createProject = async function (req, res){
             data: {}
         });
 
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
         host = institution.id
         hostType = "institution"
         country = institution.country
