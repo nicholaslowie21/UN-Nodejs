@@ -2,7 +2,7 @@ const { body, query, validationResult, oneOf, check } = require('express-validat
 const nodeCountries =  require("node-countries");
 
 exports.viewProject = [
-    query('code').exists()
+    query('projectId').exists()
 ]
 
 exports.searchProjects = [
@@ -92,6 +92,10 @@ exports.updateKPI = [
 exports.editAdmin = [
     body('projectId').exists(),
     body('admins').exists()
+]
+
+exports.completeProject = [
+    body('projectId').exists()
 ]
 
 exports.searchUsers = [

@@ -176,7 +176,7 @@ exports.projectPicture = async function (req, res){
 }
 
 exports.viewProject = async function (req, res) {
-    const project = await Projects.findOne({ 'code': req.query.code }, function (err) {
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -415,6 +415,75 @@ exports.postUpdateProject = async function (req, res) {
             data: {}
         });
     });
+}
+
+exports.completeProject = async function (req, res) {
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+
+    if(project.host != req.body.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to mark this project as completed!',
+        data: {}
+    });
+
+    var targetHost;
+
+    if (project.hostType === "institution") {
+        targetHost = await Institutions.findOne({ '_id': project.host }, function (err) {
+            if (err) return handleError(err);
+        });
+
+    } else if (project.hostType === "user") {
+        targetHost = await Users.findOne({ '_id': project.host }, function (err) {
+            if (err) return handleError(err);
+        });
+    }
+
+    project.status = "completed";
+
+    project.save(project)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project successfully mark as completed!',
+            data: { project: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    let subject = 'KoCoSD Project Completion'
+    let theMessage = `
+        <h1>Congratulations on completing your project!</h1>
+        <p>The project code ${project.code}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(targetHost.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.deleteProject = async function (req, res) {
@@ -958,4 +1027,8 @@ exports.getKPIs = async function (req, res) {
         data: { kpis: kpis}
     });
 
+}
+
+handleError = (err) => {
+    console.log("handleError :"+ err)
 }

@@ -34,4 +34,6 @@ router.post('/deleteKPI', auth, ProjectValidator.deleteKPI, Helper.ifErrors, pro
 
 router.get('/projectKPI', ProjectValidator.getKPIs, Helper.ifErrors, projectController.getKPIs)
 
+router.post('/completeProject', auth, ProjectValidator.completeProject, Helper.ifErrors, projectController.completeProject)
+
 module.exports = router;
