@@ -56,3 +56,7 @@ exports.updateProject = [
             return Promise.reject('SDGs are not valid')
     })
 ]
+
+exports.deleteProject = [
+    body('projectId').exists()
+]

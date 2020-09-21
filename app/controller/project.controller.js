@@ -163,7 +163,6 @@ exports.createProject = async function (req, res){
 }
 
 exports.postUpdateProject = async function (req, res) {
-    console.log("sampe")
     const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
         if (err)
         return res.status(500).json({
@@ -172,7 +171,6 @@ exports.postUpdateProject = async function (req, res) {
             data: {}
         });
     });
-    console.log("saya")
 
     if(!project) 
     return res.status(500).json({
@@ -222,6 +220,48 @@ exports.postUpdateProject = async function (req, res) {
         return res.status(200).json({
             status: 'success',
             msg: 'Project successfully updated',
+            data: { project: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteProject = async function (req, res) {
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.host != req.body.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to closed this project!',
+        data: {}
+    });
+
+    project.status = "closed"
+
+    project.save(project)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project successfully deleted',
             data: { project: data }
         });
     }).catch(err => {
