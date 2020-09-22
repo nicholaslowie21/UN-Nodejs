@@ -10,8 +10,7 @@ const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
 const nodeCountries =  require("node-countries")
-const util = require("util")
-const { manpower } = require('../models')
+
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -56,6 +55,30 @@ function checkFileType(file, cb){
 }
 
 exports.multerItemPicUpload = upload.single('itemPic');
+
+var IPStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/resources/IP'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = file.originalname+"-"+req.body.knowledgeId+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var uploadIPAttachment = multer({ storage: IPStorage  })
+
+exports.multerIPUpload = uploadIPAttachment.single('IP');
 
 exports.itemPicture = async function (req, res){
     if(!req.body.itemId) {
@@ -152,6 +175,118 @@ exports.itemPicture = async function (req, res){
             status: 'success',
             msg: 'Item picture successfully updated',
             data: { item: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.IPupload = async function (req, res){
+    if(!req.body.knowledgeId) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Knowledge id is empty! ',
+            data: {}
+        });
+    }
+
+    
+    if(!req.file) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No file uploaded! ',
+            data: {}
+        });
+    }
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such knowledge resource!',
+            data: {}
+        });
+    });
+
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Knowledge does not exists!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(req.type === "institution") {
+        const institution = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform this action right now!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (req.type === "user") {
+        const user = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to upload file for this knowledge resource',
+        data: {}
+    });
+
+    knowledge.attachment = "/public/uploads/resources/IP/"+req.thePath;
+
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge attachment successfully updated',
+            data: { knowledge: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -1228,6 +1363,150 @@ var venueStorage = multer.diskStorage({
             status: 'success',
             msg: 'Venue picture successfully updated',
             data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.activateItem = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const item = await Item.findOne({ '_id': req.body.itemId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    
+    if(!item)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such item resource not found!',
+        data: {}
+    });
+    
+    if(item.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this item resource',
+        data: {}
+    });
+
+    item.status = "active"
+
+    item.save(item)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Item Resource successfully activated',
+            data: { item: item }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deactivateItem = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const item = await Item.findOne({ '_id': req.body.itemId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    
+    if(!item)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such item resource not found!',
+        data: {}
+    });
+    
+    if(item.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this item resource',
+        data: {}
+    });
+
+    item.status = "inactive"
+
+    item.save(item)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Item Resource successfully deactivated',
+            data: { item: item }
         });
     }).catch(err => {
         return res.status(500).json({

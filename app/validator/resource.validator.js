@@ -5,6 +5,10 @@ exports.viewResource = [
     query('userId').exists()
 ]
 
+exports.activateItem = [
+    body('itemId').exists()
+]
+
 exports.viewInstitutionResource = [
     query('institutionId').exists()
 ]
