@@ -33,4 +33,14 @@ router.post('/updateVenue', auth, ResourceValidator.updateVenueResource, Helper.
 
 router.post('/uploadVenuePicture', auth, updloadMultipleFiles, resourceController.multerVenuePicUpload, resourceController.venuePicture)
 
+router.post('/createManpower', auth, ResourceValidator.createManpowerResource, Helper.ifErrors, resourceController.createManpower )
+
+router.post('/updateManpower', auth, ResourceValidator.updateManpowerResource, Helper.ifErrors, resourceController.updateManpower )
+
+router.post('/createKnowledge', auth, ResourceValidator.createKnowledgeResource, Helper.ifErrors, resourceController.createKnowledge )
+
+router.post('/updateKnowledge', auth, ResourceValidator.updateKnowledgeResource, Helper.ifErrors, resourceController.updateKnowledge )
+
+router.post('/updateKnowledgeOwner', auth, ResourceValidator.updateKnowledgeResourceOwner, Helper.ifErrors, resourceController.updateKnowledgeOwner )
+
 module.exports = router;

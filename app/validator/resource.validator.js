@@ -20,6 +20,38 @@ exports.createVenueResource = [
     body('address').exists()
 ]
 
+exports.createManpowerResource = [
+    body('title').exists(),
+    body('desc').exists()
+]
+
+exports.createKnowledgeResource = [
+    body('title').exists(),
+    body('desc').exists()
+]
+
+exports.updateKnowledgeResource = [
+    body('knowledgeId').exists(),
+    body('title').exists(),
+    body('desc').exists()
+]
+
+exports.updateKnowledgeResourceOwner = [
+    body('knowledgeId').exists(),
+    body('owners').exists()
+]
+
+exports.updateManpowerResource = [
+    body('manpowerId').exists(),
+    body('title').exists(),
+    body('desc').exists(),
+    body('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    })
+]
+
 exports.updateItemResource = [
     body('itemId').exists(),
     body('title').exists(),

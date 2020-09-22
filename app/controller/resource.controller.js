@@ -11,6 +11,7 @@ const fs = require('fs')
 const multer = require('multer')
 const nodeCountries =  require("node-countries")
 const util = require("util")
+const { manpower } = require('../models')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -552,6 +553,114 @@ exports.createVenue = async function (req, res) {
     });
 }
 
+exports.createManpower = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    const manpower = new Manpower({
+		title: req.body.title,
+		desc: req.body.desc,
+		owner: theOwner.id,
+		status: "active",
+        country: theOwner.country,
+        ownerType: req.body.type
+    });
+
+    manpower.save(manpower)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Manpower Resource successfully created!',
+            data: { manpower: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.createKnowledge = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    const knowledge = new Knowledge({
+		title: req.body.title,
+		desc: req.body.desc,
+		owner: [{theId: theOwner.id, ownerType:req.body.type}],
+		status: "active"
+    });
+
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge Resource successfully created!',
+            data: { knowledge: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
 exports.updateItem = async function (req, res) {
     var theOwner
 
@@ -593,6 +702,14 @@ exports.updateItem = async function (req, res) {
             msg: 'Something went wrong! '+err,
             data: {}
         });
+    });
+
+    
+    if(!item)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such item resource not found!',
+        data: {}
     });
     
     if(item.owner != theOwner.id)
@@ -664,6 +781,14 @@ exports.updateVenue = async function (req, res) {
             data: {}
         });
     });
+
+    
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such venue resource not found!',
+        data: {}
+    });
     
     if(venue.owner != theOwner.id)
     return res.status(500).json({
@@ -683,6 +808,289 @@ exports.updateVenue = async function (req, res) {
             status: 'success',
             msg: 'Venue Resource successfully updated',
             data: { venue: venue }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.updateManpower = async function (req, res) {
+    var theOwner
+
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
+    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const manpower = await Manpower.findOne({ '_id': req.body.manpowerId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!manpower)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such manpower resource not found!',
+        data: {}
+    });
+
+    if(manpower.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this manpower resource',
+        data: {}
+    });
+
+    manpower.title = req.body.title
+    manpower.desc = req.body.desc
+    manpower.country = req.body.country
+    
+    manpower.save(manpower)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Manpower Resource successfully updated',
+            data: { manpower: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.updateKnowledge = async function (req, res) {
+    var theOwner    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this knowledge resource',
+        data: {}
+    });
+
+    knowledge.title = req.body.title
+    knowledge.desc = req.body.desc
+    
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge Resource successfully updated',
+            data: { knowledge: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.updateKnowledgeOwner = async function (req, res) {
+    var theOwner    
+    console.log("here")
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this knowledge resource',
+        data: {}
+    });
+
+    var arr = []
+    var owner = req.body.owners;
+
+    for(var i = 0; i < owner.length; i++) {
+        if(!owner[i].theId || !owner[i].ownerType) {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There is an invalid field!',
+                data: {}
+            });
+        }
+
+        var tempAcc;
+
+        if(owner[i].ownerType === "institution") {
+            const institution = await Institution.findOne({ '_id': owner[i].theId }, function (err) {
+                if (err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong! '+err,
+                    data: {}
+                });
+            });
+
+            tempAcc = institution
+        } else if(owner[i].ownerType === "user") {
+            const user = await User.findOne({ '_id': owner[i].theId }, function (err) {
+                if (err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong! '+err,
+                    data: {}
+                });
+            });
+
+            tempAcc = user
+        }
+
+        if(!tempAcc)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an invalid owner field',
+            data: {}
+        });
+
+        if(!arr.includes({theId: owner[i].theId, ownerType: owner[i].ownerType}))
+            arr.push(owner[i]);
+    }
+
+    knowledge.owner = arr;
+    
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge Resource owners successfully updated',
+            data: { knowledge: data }
         });
     }).catch(err => {
         return res.status(500).json({
