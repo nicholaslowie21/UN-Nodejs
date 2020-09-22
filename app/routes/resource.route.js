@@ -39,11 +39,14 @@ router.post('/delete/item', auth, ResourceValidator.activateItem, Helper.ifError
 
 router.post('/activate/manpower', auth, ResourceValidator.activateManpower, Helper.ifErrors, resourceController.activateManpower)
 router.post('/deactivate/manpower', auth, ResourceValidator.activateManpower, Helper.ifErrors, resourceController.deactivateManpower)
+router.post('/delete/manpower', auth, ResourceValidator.activateManpower, Helper.ifErrors, resourceController.deleteManpower)
 
 router.post('/activate/knowledge', auth, ResourceValidator.activateKnowledge, Helper.ifErrors, resourceController.activateKnowledge)
 router.post('/deactivate/knowledge', auth, ResourceValidator.activateKnowledge, Helper.ifErrors, resourceController.deactivateKnowledge)
+router.post('/delete/knowledge', auth, ResourceValidator.activateKnowledge, Helper.ifErrors, resourceController.deleteKnowledge)
 
 router.post('/activate/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.activateVenue)
 router.post('/deactivate/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.deactivateVenue)
+router.post('/delete/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.deleteVenue)
 
 module.exports = router;

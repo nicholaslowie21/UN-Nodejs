@@ -1731,6 +1731,77 @@ exports.deactivateManpower = async function (req, res) {
     });
 }
 
+exports.deleteManpower = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const manpower = await Manpower.findOne({ '_id': req.body.manpowerId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!manpower)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such manpower resource not found!',
+        data: {}
+    });
+
+    if(manpower.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this manpower resource',
+        data: {}
+    });
+
+    manpower.status = "deleted"
+
+    manpower.save(manpower)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Manpower Resource successfully deleted',
+            data: { manpower: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
 exports.activateKnowledge = async function (req, res) {
     var theOwner    
 
@@ -1887,6 +1958,84 @@ exports.deactivateKnowledge = async function (req, res) {
     });
 }
 
+exports.deleteKnowledge = async function (req, res) {
+    var theOwner    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this knowledge resource',
+        data: {}
+    });
+
+    knowledge.status = "deleted"
+    
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge Resource successfully deleted',
+            data: { knowledge: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
 exports.activateVenue = async function (req, res) {
     var theOwner    
 
@@ -2020,6 +2169,78 @@ exports.deactivateVenue = async function (req, res) {
         return res.status(200).json({
             status: 'success',
             msg: 'Venue Resource successfully deactivated',
+            data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteVenue = async function (req, res) {
+    var theOwner    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const venue = await Venue.findOne({ '_id': req.body.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such venue resource not found!',
+        data: {}
+    });
+    
+    if(venue.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this venue resource',
+        data: {}
+    });
+
+    venue.status = "deleted"
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue Resource successfully deleted',
             data: { venue: data }
         });
     }).catch(err => {
