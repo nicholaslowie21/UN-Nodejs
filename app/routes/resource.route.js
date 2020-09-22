@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const resourceController = require('../controller/resource.controller');
 const auth = require('../middleware/auth')
+const updloadMultipleFiles = require('../middleware/uploadMultipleFiles')
 
 const ResourceValidator = require('../validator/resource.validator');
 const Helper = require('../service/helper.service');
@@ -25,5 +26,11 @@ router.post('/createItem', auth, ResourceValidator.createItemResource, Helper.if
 router.post('/updateItem', auth, ResourceValidator.updateItemResource, Helper.ifErrors, resourceController.updateItem )
 
 router.post('/uploadItemPicture', auth, resourceController.multerItemPicUpload, resourceController.itemPicture)
+
+router.post('/createVenue', auth, ResourceValidator.createVenueResource, Helper.ifErrors, resourceController.createVenue )
+
+router.post('/updateVenue', auth, ResourceValidator.updateVenueResource, Helper.ifErrors, resourceController.updateVenue )
+
+router.post('/uploadVenuePicture', auth, updloadMultipleFiles, resourceController.multerVenuePicUpload, resourceController.venuePicture)
 
 module.exports = router;

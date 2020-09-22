@@ -9,7 +9,8 @@ const Institution = db.institution
 const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
-const nodeCountries =  require("node-countries");
+const nodeCountries =  require("node-countries")
+const util = require("util")
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -111,7 +112,7 @@ exports.itemPicture = async function (req, res){
         if(institution.status != "active")
         return res.status(500).json({
             status: 'error',
-            msg: 'Account is not authorized to perform project creation right now!',
+            msg: 'Account is not authorized to perform this action right now!',
             data: {}
         });
 
@@ -148,7 +149,7 @@ exports.itemPicture = async function (req, res){
     .then(data => {
         return res.status(200).json({
             status: 'success',
-            msg: 'Project picture successfully updated',
+            msg: 'Item picture successfully updated',
             data: { item: data }
         });
     }).catch(err => {
@@ -495,6 +496,62 @@ exports.createItem = async function (req, res) {
     });
 }
 
+exports.createVenue = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    const venue = new Venue({
+		title: req.body.title,
+		desc: req.body.desc,
+		owner: theOwner.id,
+		status: "active",
+        country: theOwner.country,
+        ownerType: req.body.type,
+        address: req.body.address
+    });
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue Resource successfully created!',
+            data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
 exports.updateItem = async function (req, res) {
     var theOwner
 
@@ -555,6 +612,214 @@ exports.updateItem = async function (req, res) {
             status: 'success',
             msg: 'Item Resource successfully updated',
             data: { item: item }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.updateVenue = async function (req, res) {
+    var theOwner
+
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
+    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const venue = await Venue.findOne({ '_id': req.body.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(venue.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this venue resource',
+        data: {}
+    });
+
+    venue.title = req.body.title
+    venue.desc = req.body.desc
+    venue.country = req.body.country
+    venue.address = req.body.address
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue Resource successfully updated',
+            data: { venue: venue }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+var venueStorage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        let dir = 'public/uploads/resources/venue'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        callback(null, dir)
+    },
+    filename: (req, file, callback) => {
+      const match = ["image/png", "image/jpeg"];
+  
+      if (match.indexOf(file.mimetype) === -1) {
+        var message = `${file.originalname} is invalid. Only accept png/jpeg.`;
+        return callback(message, null);
+      }
+
+      let extentsion = file.originalname.split('.')
+      let thePath = 'VenuePic-'+req.body.venueId+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+      req.thePath.push('/public/uploads/resources/venue/'+thePath);
+      callback(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+  });
+  
+  var uploadVenueFiles = multer({ storage: venueStorage }).array("venuePics", 10);
+//   var uploadFilesMiddleware = util.promisify(uploadFiles);
+  exports.multerVenuePicUpload = uploadVenueFiles;
+
+  exports.venuePicture = async function (req, res){
+    if(!req.body.venueId) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Venue id is empty! ',
+            data: {}
+        });
+    }
+
+    
+    if(!req.files) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No picture uploaded! ',
+            data: {}
+        });
+    }
+
+    const venue = await Venue.findOne({ '_id': req.body.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such venue resource!',
+            data: {}
+        });
+    });
+
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Venue does not exists!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(req.type === "institution") {
+        const institution = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform this action right now!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (req.type === "user") {
+        const user = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    if(theOwner.id!=venue.owner)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to perform this action!',
+        data: {}
+    });
+
+    venue.imgPath = req.thePath;
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue picture successfully updated',
+            data: { venue: data }
         });
     }).catch(err => {
         return res.status(500).json({

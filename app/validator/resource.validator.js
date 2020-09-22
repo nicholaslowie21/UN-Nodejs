@@ -14,6 +14,12 @@ exports.createItemResource = [
     body('desc').exists()
 ]
 
+exports.createVenueResource = [
+    body('title').exists(),
+    body('desc').exists(),
+    body('address').exists()
+]
+
 exports.updateItemResource = [
     body('itemId').exists(),
     body('title').exists(),
@@ -23,4 +29,16 @@ exports.updateItemResource = [
         if (!theCountry)
             return Promise.reject('Country is not valid');
     })
+]
+
+exports.updateVenueResource = [
+    body('venueId').exists(),
+    body('title').exists(),
+    body('desc').exists(),
+    body('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    }),
+    body('address').exists()
 ]
