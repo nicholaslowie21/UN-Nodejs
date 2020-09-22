@@ -32,7 +32,18 @@ router.post('/updateKnowledge', auth, ResourceValidator.updateKnowledgeResource,
 router.post('/updateKnowledgeOwner', auth, ResourceValidator.updateKnowledgeResourceOwner, Helper.ifErrors, resourceController.updateKnowledgeOwner )
 router.post('/uploadKnowledgeAttachment', auth, resourceController.multerIPUpload, resourceController.IPupload)
 
-router.post('/activate/item', auth, ResourceValidator.activateItem, resourceController.activateItem)
-router.post('/deactivate/item', auth, ResourceValidator.activateItem, resourceController.deactivateItem)
+router.post('/activate/item', auth, ResourceValidator.activateItem, Helper.ifErrors, resourceController.activateItem)
+router.post('/deactivate/item', auth, ResourceValidator.activateItem, Helper.ifErrors, resourceController.deactivateItem)
+router.post('/delete/item', auth, ResourceValidator.activateItem, Helper.ifErrors, resourceController.deleteItem)
+
+
+router.post('/activate/manpower', auth, ResourceValidator.activateManpower, Helper.ifErrors, resourceController.activateManpower)
+router.post('/deactivate/manpower', auth, ResourceValidator.activateManpower, Helper.ifErrors, resourceController.deactivateManpower)
+
+router.post('/activate/knowledge', auth, ResourceValidator.activateKnowledge, Helper.ifErrors, resourceController.activateKnowledge)
+router.post('/deactivate/knowledge', auth, ResourceValidator.activateKnowledge, Helper.ifErrors, resourceController.deactivateKnowledge)
+
+router.post('/activate/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.activateVenue)
+router.post('/deactivate/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.deactivateVenue)
 
 module.exports = router;

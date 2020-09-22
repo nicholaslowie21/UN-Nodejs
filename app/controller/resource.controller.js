@@ -1516,3 +1516,517 @@ exports.deactivateItem = async function (req, res) {
         });
     });
 }
+
+exports.deleteItem = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const item = await Item.findOne({ '_id': req.body.itemId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    
+    if(!item)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such item resource not found!',
+        data: {}
+    });
+    
+    if(item.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this item resource',
+        data: {}
+    });
+
+    item.status = "deleted"
+
+    item.save(item)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Item Resource successfully deleted',
+            data: { item: item }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.activateManpower = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const manpower = await Manpower.findOne({ '_id': req.body.manpowerId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!manpower)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such manpower resource not found!',
+        data: {}
+    });
+
+    if(manpower.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this manpower resource',
+        data: {}
+    });
+
+    manpower.status = "active"
+
+    manpower.save(manpower)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Manpower Resource successfully activated',
+            data: { manpower: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deactivateManpower = async function (req, res) {
+    var theOwner
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const manpower = await Manpower.findOne({ '_id': req.body.manpowerId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!manpower)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such manpower resource not found!',
+        data: {}
+    });
+
+    if(manpower.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this manpower resource',
+        data: {}
+    });
+
+    manpower.status = "inactive"
+
+    manpower.save(manpower)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Manpower Resource successfully deactivated',
+            data: { manpower: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.activateKnowledge = async function (req, res) {
+    var theOwner    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this knowledge resource',
+        data: {}
+    });
+
+    knowledge.status = "active"
+    
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge Resource successfully activated',
+            data: { knowledge: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deactivateKnowledge = async function (req, res) {
+    var theOwner    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this knowledge resource',
+        data: {}
+    });
+
+    knowledge.status = "inactive"
+    
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge Resource successfully deactivated',
+            data: { knowledge: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.activateVenue = async function (req, res) {
+    var theOwner    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const venue = await Venue.findOne({ '_id': req.body.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such venue resource not found!',
+        data: {}
+    });
+    
+    if(venue.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this venue resource',
+        data: {}
+    });
+
+    venue.status = "active"
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue Resource successfully activated',
+            data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deactivateVenue = async function (req, res) {
+    var theOwner    
+
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const venue = await Venue.findOne({ '_id': req.body.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such venue resource not found!',
+        data: {}
+    });
+    
+    if(venue.owner != theOwner.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this venue resource',
+        data: {}
+    });
+
+    venue.status = "inactive"
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue Resource successfully deactivated',
+            data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}

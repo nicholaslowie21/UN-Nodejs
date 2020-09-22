@@ -9,6 +9,18 @@ exports.activateItem = [
     body('itemId').exists()
 ]
 
+exports.activateManpower = [
+    body('manpowerId').exists()
+]
+
+exports.activateKnowledge = [
+    body('knowledgeId').exists()
+]
+
+exports.activateVenue = [
+    body('venueId').exists()
+]
+
 exports.viewInstitutionResource = [
     query('institutionId').exists()
 ]
