@@ -2591,6 +2591,200 @@ exports.viewItemDetails = async function (req, res) {
     return res.status(200).json({
         status: 'success',
         msg: 'Item resource detail successfully retrieved',
-        data: { item: item, owner: theOwner }
+        data: { item: item, owner: theOwner, ownerType: item.ownerType }
+    });
+}
+
+exports.viewManpowerDetails = async function (req, res) {
+    const manpower = await Manpower.findOne({ '_id': req.query.manpowerId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!manpower)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'No such manpower found!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(manpower.ownerType === "institution") {
+        const institution = await Institution.findOne({ '_id': manpower.owner }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (manpower.ownerType === "user") {
+        const user = await User.findOne({ '_id': manpower.owner }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Manpower resource detail successfully retrieved',
+        data: { manpower: manpower, owner: theOwner, ownerType: manpower.ownerType }
+    });
+}
+
+exports.viewVenueDetails = async function (req, res) {
+    const venue = await Venue.findOne({ '_id': req.query.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'No such venue found!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(venue.ownerType === "institution") {
+        const institution = await Institution.findOne({ '_id': venue.owner }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (venue.ownerType === "user") {
+        const user = await User.findOne({ '_id': venue.owner }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Venue resource detail successfully retrieved',
+        data: { venue: venue, owner: theOwner, ownerType: venue.ownerType }
+    });
+}
+
+exports.viewKnowledgeDetails = async function (req, res) {
+    const knowledge = await Knowledge.findOne({ '_id': req.query.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'No such knowledge found!',
+        data: {}
+    });
+
+    var userOwner = [];
+    var institutionOwner = [];
+    var owners = knowledge.owner;
+
+    for(var i = 0; i < owners.length; i++) {
+        if(owners[i].ownerType === "institution") {
+            const institution = await Institution.findOne({ '_id': owners[i].theId }, function (err) {
+                if (err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'There was no such account!',
+                    data: {}
+                });
+            });
+
+            if(!institution)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+
+            institutionOwner.push(institution)
+        } else if (owners[i].ownerType === "user") {
+            const user = await User.findOne({ '_id': owners[i].theId }, function (err) {
+                if (err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'There was no such account!',
+                    data: {}
+                });
+            });
+
+            if(!user)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+            
+            userOwner.push(user)
+        }
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Knowledge resource detail successfully retrieved',
+        data: { knowledge: knowledge, userOwner: userOwner, institutionOwner: institutionOwner }
     });
 }

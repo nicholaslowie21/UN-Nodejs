@@ -5,12 +5,28 @@ exports.viewResource = [
     query('userId').exists()
 ]
 
-exports.viewItemDetails = [
-    query('itemId').exists()
+exports.viewKnowledgeDetails = [
+    query('knowledgeId').exists()
+]
+
+exports.viewManpowerDetails = [
+    query('manpowerId').exists()
+]
+
+exports.viewVenueDetails = [
+    query('venueId').exists()
 ]
 
 exports.activateItem = [
     body('itemId').exists()
+]
+
+exports.viewItemDetails = [
+    query('itemId').exists()
+]
+
+exports.viewKnowledgeDetails = [
+    query('knowledgeId').exists()
 ]
 
 exports.activateManpower = [

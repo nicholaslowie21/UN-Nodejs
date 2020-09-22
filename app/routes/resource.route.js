@@ -58,6 +58,9 @@ router.post('/activate/venue', auth, ResourceValidator.activateVenue, Helper.ifE
 router.post('/deactivate/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.deactivateVenue)
 router.post('/delete/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.deleteVenue)
 
-router.get('/item/details',  ResourceValidator.viewItemDetails, Helper.ifErrors, resourceController.viewItemDetails);
+router.get('/item/details',  ResourceValidator.viewItemDetails, Helper.ifErrors, resourceController.viewItemDetails)
+router.get('/knowledge/details',  ResourceValidator.viewKnowledgeDetails, Helper.ifErrors, resourceController.viewKnowledgeDetails)
+router.get('/manpower/details',  ResourceValidator.viewManpowerDetails, Helper.ifErrors, resourceController.viewManpowerDetails)
+router.get('/venue/details',  ResourceValidator.viewVenueDetails, Helper.ifErrors, resourceController.viewVenueDetails)
 
 module.exports = router;
