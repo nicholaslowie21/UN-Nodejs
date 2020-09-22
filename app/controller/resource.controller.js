@@ -2531,3 +2531,66 @@ exports.deleteVenue = async function (req, res) {
         });
     });
 }
+
+exports.viewItemDetails = async function (req, res) {
+    const item = await Item.findOne({ '_id': req.query.itemId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!item)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'No such item found!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(item.ownerType === "institution") {
+        const institution = await Institution.findOne({ '_id': item.owner }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (item.ownerType === "user") {
+        const user = await User.findOne({ '_id': item.owner }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Item resource detail successfully retrieved',
+        data: { item: item, owner: theOwner }
+    });
+}

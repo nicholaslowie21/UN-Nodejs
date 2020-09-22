@@ -5,7 +5,7 @@ exports.viewResource = [
     query('userId').exists()
 ]
 
-exports.viewItem = [
+exports.viewItemDetails = [
     query('itemId').exists()
 ]
 

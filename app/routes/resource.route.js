@@ -58,4 +58,6 @@ router.post('/activate/venue', auth, ResourceValidator.activateVenue, Helper.ifE
 router.post('/deactivate/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.deactivateVenue)
 router.post('/delete/venue', auth, ResourceValidator.activateVenue, Helper.ifErrors, resourceController.deleteVenue)
 
+router.get('/item/details',  ResourceValidator.viewItemDetails, Helper.ifErrors, resourceController.viewItemDetails);
+
 module.exports = router;
