@@ -12,9 +12,18 @@ router.get('/user/knowledge',  ResourceValidator.viewResource, Helper.ifErrors, 
 router.get('/user/item', ResourceValidator.viewResource, Helper.ifErrors, resourceController.viewUserItem);
 router.get('/user/venue', ResourceValidator.viewResource, Helper.ifErrors, resourceController.viewUserVenue);
 
+router.get('/private/user/manpower', auth, resourceController.viewPrivateUserManpower);
+router.get('/private/user/knowledge',  auth, resourceController.viewPrivateUserKnowledge);
+router.get('/private/user/item', auth, resourceController.viewPrivateUserItem);
+router.get('/private/user/venue', auth, resourceController.viewPrivateUserVenue);
+
 router.get('/institution/knowledge', ResourceValidator.viewInstitutionResource, Helper.ifErrors, resourceController.viewInstitutionKnowledge);
 router.get('/institution/item', ResourceValidator.viewInstitutionResource, Helper.ifErrors, resourceController.viewInstitutionItem);
 router.get('/institution/venue', ResourceValidator.viewInstitutionResource, Helper.ifErrors, resourceController.viewInstitutionVenue);
+
+router.get('/private/institution/knowledge', auth, resourceController.viewPrivateInstitutionKnowledge);
+router.get('/private/institution/item', auth, resourceController.viewPrivateInstitutionItem);
+router.get('/private/institution/venue', auth, resourceController.viewPrivateInstitutionVenue);
 
 router.post('/createItem', auth, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem )
 router.post('/updateItem', auth, ResourceValidator.updateItemResource, Helper.ifErrors, resourceController.updateItem )
