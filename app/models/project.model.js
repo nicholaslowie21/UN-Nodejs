@@ -11,8 +11,7 @@ module.exports = mongoose => {
         code: String,
         imgPath: String,
         admins: [String],
-        SDGs: [Number],
-        resourceNeeds: [String]
+        SDGs: [Number]
       },
       { timestamps: true }
     );

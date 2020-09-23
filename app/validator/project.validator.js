@@ -98,6 +98,16 @@ exports.completeProject = [
     body('projectId').exists()
 ]
 
+exports.createResourceNeed = [
+    body('projectId').exists(),
+    body('title').exists(),
+    body('desc').exists(),
+    body('resourceType').exists().custom(async value =>{
+        if(value!="manpower" && value!="venue" && value!="knowledge" && value!="money" && value!="item")
+        return Promise.reject('Resource Need type is not valid')
+    })
+]
+
 exports.searchUsers = [
     query('username').exists()
 ]

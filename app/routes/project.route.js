@@ -36,4 +36,6 @@ router.get('/projectKPI', ProjectValidator.getKPIs, Helper.ifErrors, projectCont
 
 router.post('/completeProject', auth, ProjectValidator.completeProject, Helper.ifErrors, projectController.completeProject)
 
+router.post('/createResourceNeed', auth, ProjectValidator.createResourceNeed, Helper.ifErrors, projectController.createResourceNeed)
+
 module.exports = router;
