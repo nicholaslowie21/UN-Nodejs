@@ -14,7 +14,7 @@ router.post('/createProject', auth, ProjectValidator.createProject, Helper.ifErr
 router.post('/updateProject', auth, ProjectValidator.updateProject, Helper.ifErrors, projectController.postUpdateProject)
 router.post('/deleteProject', auth, ProjectValidator.deleteProject, Helper.ifErrors, projectController.deleteProject)
 
-router.post('/editAdmin', auth, ProjectValidator.editAdmin, Helper.ifErrors, projectController.editAdmin)
+// router.post('/editAdmin', auth, ProjectValidator.editAdmin, Helper.ifErrors, projectController.editAdmin)
 router.post('/addAdmin', auth, ProjectValidator.addAdmin, Helper.ifErrors, projectController.addAdmin)
 router.post('/deleteAdmin', auth, ProjectValidator.addAdmin, Helper.ifErrors, projectController.deleteAdmin)
 
