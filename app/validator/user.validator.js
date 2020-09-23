@@ -42,10 +42,7 @@ exports.userSignup = [
         if (!theCountry)
             return Promise.reject('Country is not valid');
     }),
-    body('gender').exists().custom(async value => {
-        if(value != 'male' && value != 'female') 
-            return Promise.reject('Gender input mismatched!')
-    })
+    body('salutation').exists()
 ]
 
 exports.userChangePassword = [
@@ -96,10 +93,7 @@ exports.updateProfile = [
     body('bio').exists(),
     body('occupation').exists(),
     body('website').exists(),
-    body('gender').exists().custom(async value => {
-        if(value != 'male' && value != 'female') 
-            return Promise.reject('Gender input mismatched!')
-    }),
+    body('salutation').exists(),
     body('SDGs').exists().custom(async value => {
         let valid = true;
 
@@ -149,6 +143,10 @@ exports.viewUser = [
 ]
 
 exports.getBadges = [
+    query('userId').exists()
+]
+
+exports.getAffiliations = [
     query('userId').exists()
 ]
 

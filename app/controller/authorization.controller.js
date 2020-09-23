@@ -44,7 +44,7 @@ exports.postSignup = async function (req, res, next) {
         points: 0,
         salt: randomString,
         wallet: 0,
-        gender: req.body.gender,
+        salutation: req.body.salutation,
         website: ''
     });
     
@@ -354,7 +354,8 @@ exports.postChangePasswordRequest = async function (req, res) {
     let subject = 'KoCoSD Password Reset'
     let theMessage = `
         <h1>Password Reset Request</h1>
-        <p>We received a request to reset your KoCoSD password.</p>
+        <p>We received a request to reset your KoCoSD password.</p> <br>
+        <p>This link is only valid for 30 minutes.</p>
         <a href="${passwordreseturl}">Click here to change your password.</a><br>
     `
     
@@ -634,4 +635,4 @@ exports.verifyRequest = async function(req,res) {
 
 handleError = (err) => {
     console.log("handleError :"+ err)
- }
+}

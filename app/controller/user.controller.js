@@ -3,6 +3,7 @@ const db = require('../models')
 const Users = db.users;
 const Projects = db.project;
 const Badges = db.badge;
+const Institutions = db.institution;
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
@@ -135,7 +136,7 @@ exports.updateUserProfile = async function (req, res, next) {
     user.occupation = req.body.occupation;
     user.country = req.body.country;
     user.website = req.body.website;
-    user.gender = req.body.gender;
+    user.salutation = req.body.salutation;
     user.SDGs = theSDGs;
     user.skills = theSkills;
 
@@ -348,8 +349,13 @@ exports.viewUser = async function (req, res) {
 }
 
 exports.getBadges = async function (req, res) {
-    const user = await Users.findOne({ '_id': req.query.userId }, function (err, person) {
-        if (err) return handleError(err);
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong, please try again in a while!',
+            data: {}
+        });
     });
 
     if(!user) 
@@ -359,7 +365,7 @@ exports.getBadges = async function (req, res) {
         data: {}
     });
 
-    let badges = await Badges.find({ 'accountId': req.body.id, 'accountType':'user' }, function (err, person) {
+    let badges = await Badges.find({ 'accountId': req.query.userId, 'accountType':'user' }, function (err) {
         if (err) return handleError(err);
     });
 
@@ -367,6 +373,42 @@ exports.getBadges = async function (req, res) {
         status: 'success',
         msg: 'Account\'s badges successfully retrieved',
         data: { badges: badges }
+    });
+
+}
+
+exports.getAffiliations = async function (req, res) {
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong, please try again in a while!',
+            data: {}
+        });
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+
+    let institutionIds = user.institutionIds;
+
+    let institutions = await Institutions.find({ '_id': { $in: institutionIds }}, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong, please try again in a while!',
+            data: {}
+        });
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Account\'s affiliated institutions successfully retrieved',
+        data: { affiliations: institutions }
     });
 
 }

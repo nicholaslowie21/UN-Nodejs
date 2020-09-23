@@ -89,9 +89,9 @@ function checkCSVFileType(file, cb){
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime
-    const mimetype = filetypes.test(file.mimetype);
+    // /const mimetype = filetypes.test(file.mimetype);
   
-    if(mimetype && extname){
+    if(extname){
       return cb(null,true);
     } else {
       cb('Error: CSV Only!');
@@ -628,7 +628,7 @@ exports.viewInstitution = async function (req, res) {
 }
 
 exports.getBadges = async function (req, res) {
-    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err, person) {
+    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err) {
         if (err) return handleError(err);
     });
 
@@ -639,7 +639,7 @@ exports.getBadges = async function (req, res) {
         data: {}
     });
 
-    let badges = await Badges.find({ 'accountId': req.body.id, 'accountType':'institution' }, function (err, person) {
+    let badges = await Badges.find({ 'accountId': req.query.institutionId, 'accountType':'institution' }, function (err) {
         if (err) return handleError(err);
     });
 

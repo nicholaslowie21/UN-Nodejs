@@ -5,8 +5,7 @@ module.exports = mongoose => {
         desc: { type: String, default: '' },
         owner: { type: String, default: '' },
         status: { type: String, default: '' },
-        projectIds: { type: String, default: '' },
-        region: { type: String, default: '' },
+        country: { type: String, default: '' },
         ownerType: { type: String, default: '' }
       },
       { timestamps: true }
@@ -21,11 +20,11 @@ module.exports = mongoose => {
     const Manpower = mongoose.model("Manpower", schema);
 
     //to create a dummy manpower
-    Manpower.find({title: 'dummy'}).then(function (docs) {
-      if (docs.length === 0) {
-          Manpower.create({ title: 'dummy', status:'active'});
-      }
-    });
+    // Manpower.find({title: 'dummy'}).then(function (docs) {
+    //   if (docs.length === 0) {
+    //       Manpower.create({ title: 'dummy', status:'active'});
+    //   }
+    // });
 
     return Manpower;
   };

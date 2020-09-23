@@ -19,15 +19,15 @@ router.post('/addMember', auth, InstitutionValidator.addMember, InstitutionValid
 
 router.post('/delMember', auth, InstitutionValidator.delMember, InstitutionValidator.ifErrors, institutionController.delMembers)
 
-router.get('/currProjects', auth, InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.currProjects)
+router.get('/currProjects', InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.currProjects)
 
-router.get('/pastProjects', auth, InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.pastProjects)
+router.get('/pastProjects', InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.pastProjects)
 
 router.post('/membersCSV', auth, institutionController.csvMulter, institutionController.membersCSVProcessing);
 
 router.get('/viewInstitution', InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors, institutionController.viewInstitution)
 
-router.get('/badges', auth,InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.getBadges)
+router.get('/badges', auth, InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.getBadges)
 
 router.get('/searchUsers', auth, InstitutionValidator.searchUsers, InstitutionValidator.ifErrors, institutionController.searchUsers)
 

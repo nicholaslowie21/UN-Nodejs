@@ -19,10 +19,10 @@ module.exports = mongoose => {
     const Badge = mongoose.model("Badge", schema);
 
     //to create a dummy badge
-    Badge.find({title: 'dummy'}).then(function (docs) {
-      if (docs.length === 0) {
-          Badge.create({ title: 'dummy'});
-      }
-    });
+    // Badge.find({title: 'dummy'}).then(function (docs) {
+    //   if (docs.length === 0) {
+    //       Badge.create({ title: 'dummy'});
+    //   }
+    // });
     return Badge;
   };
