@@ -540,6 +540,7 @@ exports.deleteProject = async function (req, res) {
         });
 
         target = institution
+        target = target.projects.pull(project.id)
     } else if (req.type === "user") {
         const user = await Users.findOne({ '_id': req.body.id }, function (err) {
             if (err)
@@ -565,6 +566,7 @@ exports.deleteProject = async function (req, res) {
         });
 
         target = user
+        target.projects.pull(project.id)
     }
 
     project.status = "closed"
@@ -665,8 +667,8 @@ exports.editAdmin = async function (req, res) {
         data: {}
     });
 
-    var tempAdmins = project.admins;
-    var returnAdmins = []
+    var oldAdmins = project.admins;
+    var tempAdmins = []
     var receivedAdmins = req.body.admins
 
     for(var i = 0; i < receivedAdmins.length; i++) {
@@ -699,15 +701,36 @@ exports.editAdmin = async function (req, res) {
             tempAdmins.push(user.id)
             user.projects.push(project.id)
         }
-
-        returnAdmins.push(user)
     }
+
+    var updateOldAminsProjs = [];
+    for(var i = 0; i < oldAdmins.length; i++) {
+        console.log("here")
+        const user = await Users.findOne({ '_id': oldAdmins[i] }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an issue retrieving the user!',
+                data: {}
+            });    
+        })
+
+        if (!user) continue;
+        
+
+        if(!tempAdmins.includes(user.id)){
+            user.projects.pull(project.id)
+            updateOldAminsProjs.push(user)
+        }
+
+    }
+
 
     project.admins = tempAdmins
 
     
-    for(var i = 0; i < returnAdmins.length; i++) {
-        returnAdmins[i].save().catch(err => {
+    for(var i = 0; i < tempAdmins.length; i++) {
+        tempAdmins[i].save().catch(err => {
             return res.status(500).json({
                 status: 'error',
                 msg: 'Something went wrong! Error: ' + err.message,
@@ -716,12 +739,23 @@ exports.editAdmin = async function (req, res) {
         })
     }
 
+    for(var i = 0; i < updateOldAminsProjs.length; i++) {
+        updateOldAminsProjs[i].save().catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        })
+    }
+
+
     project.save(project)
     .then(data => {
         return res.status(200).json({
             status: 'success',
             msg: 'Project admins successfully edited',
-            data: { project: data, admins: returnAdmins }
+            data: { project: data, admins: tempAdmins }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -1111,7 +1145,7 @@ exports.createResourceNeed = async function (req, res){
             data: {}
         });
     });
-    
+
     if(!project) 
     return res.status(500).json({
         status: 'error',
