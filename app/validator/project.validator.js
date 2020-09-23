@@ -108,6 +108,21 @@ exports.createResourceNeed = [
     })
 ]
 
+exports.editResourceNeed = [
+    body('needId').exists(),
+    body('title').exists(),
+    body('desc').exists(),
+    body('total').exists().toInt(),
+    body('completion').exists().custom(async value =>{
+        if(value<0 || value >100)
+        return Promise.reject('Completion rate is invalid');
+    })
+]
+
+exports.deleteResourceNeed = [
+    body('needId').exists()
+]
+
 exports.searchUsers = [
     query('username').exists()
 ]

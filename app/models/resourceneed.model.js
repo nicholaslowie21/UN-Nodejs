@@ -10,8 +10,7 @@ module.exports = mongoose => {
         pendingSum: Number,
         receivedSum: Number,
         completion: Number,
-        projectId: String,
-        receivedRes: [String]
+        projectId: String
       },
       { timestamps: true }
     );

@@ -38,4 +38,8 @@ router.post('/completeProject', auth, ProjectValidator.completeProject, Helper.i
 
 router.post('/createResourceNeed', auth, ProjectValidator.createResourceNeed, Helper.ifErrors, projectController.createResourceNeed)
 
+router.post('/editResourceNeed', auth, ProjectValidator.editResourceNeed, Helper.ifErrors, projectController.editResourceNeed)
+
+router.post('/deleteResourceNeed', auth, ProjectValidator.deleteResourceNeed, Helper.ifErrors, projectController.deleteResourceNeed)
+
 module.exports = router;

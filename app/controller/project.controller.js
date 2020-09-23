@@ -609,10 +609,6 @@ exports.deleteProject = async function (req, res) {
 
     project.save(project)
     .then(data => {
-
-        let tempProjects = target.projects
-        tempProjects.pull(data.id); 
-        target.projects = tempProjects
         
         target.save(target).catch(err => {
             return res.status(500).json({
@@ -1071,7 +1067,7 @@ exports.getKPIs = async function (req, res) {
 exports.createResourceNeed = async function (req, res){
     let actor
 
-    if(req.body.type === "money" && !req.body.total)
+    if(req.body.resourceType === "money" && !req.body.total)
     return res.status(500).json({
         status: 'error',
         msg: 'Invalid input! The total sum is not declared.',
@@ -1190,6 +1186,295 @@ exports.createResourceNeed = async function (req, res){
         return res.status(200).json({
             status: 'success',
             msg: 'Resource need successfully created!',
+            data: { resourceneed: resourceneed, project: project }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+}
+
+exports.editResourceNeed = async function (req, res){
+    let actor
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': req.body.needId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such resource need!',
+        data: {}
+    });
+
+    if(req.type === "institution") {
+        const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
+        actor = institution
+    } else if (req.type === "user") {
+        const user = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(user.isVerified != "true")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account not authorized to create project! Not verified yet.',
+            data: {}
+        });
+
+        actor = user
+    }
+
+    if(!actor)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': resourceneed.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to create resource need for this project!',
+        data: {}
+    });
+
+    if(resourceneed.status === "closed")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not allowed to change the details of a deleted resourceneed!',
+        data: {}
+    });
+
+
+    resourceneed.title = req.body.title
+    resourceneed.desc = req.body.desc
+    resourceneed.total = req.body.total
+    resourceneed.completion = req.body.completion
+
+    if(resourceneed.completion === 100)
+        resourceneed.status = "completed"
+    else 
+        resourceneed.status = "progress"
+
+    resourceneed.save(resourceneed)
+    .then(data => {
+
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Resource need successfully updated!',
+            data: { resourceneed: resourceneed, project: project }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+}
+
+exports.deleteResourceNeed = async function (req, res){
+    let actor
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': req.body.needId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such resource need!',
+        data: {}
+    });
+
+    if(req.type === "institution") {
+        const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
+        actor = institution
+    } else if (req.type === "user") {
+        const user = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(user.isVerified != "true")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account not authorized to create project! Not verified yet.',
+            data: {}
+        });
+
+        actor = user
+    }
+
+    if(!actor)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': resourceneed.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete resource need for this project!',
+        data: {}
+    });
+
+    if(resourceneed.status === "closed")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You have deleted this resource need!',
+        data: {}
+    });
+
+    resourceneed.status = "closed"
+
+    resourceneed.save(resourceneed)
+    .then(data => {
+
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Resource need successfully deleted!',
             data: { resourceneed: resourceneed, project: project }
         });
     }).catch(err => {
