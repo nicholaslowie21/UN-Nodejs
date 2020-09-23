@@ -1177,7 +1177,9 @@ exports.createResourceNeed = async function (req, res){
         completion: 0,
         projectId: project.id,
         code: actor.username+"-"+uid(),
-        status: "progress"
+        status: "progress",
+        pendingSum: 0,
+        receivedSum: 0
     });
 
     resourceneed.save(resourceneed)
@@ -1483,6 +1485,31 @@ exports.deleteResourceNeed = async function (req, res){
             msg: 'Something went wrong! Error: ' + err.message,
             data: {}
         });
+    });
+
+}
+
+exports.getResourceNeeds = async function (req, res){
+    const resourceneeds = await ResourceNeed.find({ 'projectId': req.query.projectId, 'status': { $ne: 'closed'} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!resourceneeds)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such resource need!',
+        data: {}
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Resource need successfully retrieved!',
+        data: { resourceneeds: resourceneeds }
     });
 
 }

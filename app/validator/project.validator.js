@@ -17,6 +17,10 @@ exports.getKPIs = [
     query('projectId').exists()
 ]
 
+exports.getResourceNeeds = [
+    query('projectId').exists()
+]
+
 exports.createProject = [
     body('title').exists(),
     body('desc').exists(),
