@@ -98,6 +98,11 @@ exports.editAdmin = [
     body('admins').exists()
 ]
 
+exports.addAdmin = [
+    body('projectId').exists(),
+    body('userId').exists()
+]
+
 exports.completeProject = [
     body('projectId').exists()
 ]

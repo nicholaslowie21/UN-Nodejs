@@ -15,6 +15,8 @@ router.post('/updateProject', auth, ProjectValidator.updateProject, Helper.ifErr
 router.post('/deleteProject', auth, ProjectValidator.deleteProject, Helper.ifErrors, projectController.deleteProject)
 
 router.post('/editAdmin', auth, ProjectValidator.editAdmin, Helper.ifErrors, projectController.editAdmin)
+router.post('/addAdmin', auth, ProjectValidator.addAdmin, Helper.ifErrors, projectController.addAdmin)
+router.post('/deleteAdmin', auth, ProjectValidator.addAdmin, Helper.ifErrors, projectController.deleteAdmin)
 
 router.get('/searchUsers', auth, ProjectValidator.searchUsers, Helper.ifErrors, projectController.searchUsers)
 

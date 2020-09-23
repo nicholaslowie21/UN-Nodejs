@@ -11,6 +11,7 @@ const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
 const nodeCountries =  require("node-countries");
+const Helper = require('../service/helper.service')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -760,6 +761,222 @@ exports.editAdmin = async function (req, res) {
             data: {}
         });
     });
+}
+
+exports.addAdmin = async function (req, res) {
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.status != "ongoing") 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This project is not active!',
+        data: {}
+    });
+
+    if(project.host != req.body.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit admin for this project!',
+        data: {}
+    });
+
+    const user = await Users.findOne({ '_id': req.body.userId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the user!',
+            data: {}
+        });    
+    })
+
+    if (!user) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Such user is not found!',
+            data: {}
+        });  
+    }
+
+    if(user.id === req.body.id) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'You cannot add yourself as admin!',
+            data: {}
+        });  
+    }
+    
+    var tempAdmins = project.admins
+
+    if(!tempAdmins.includes(user.id)){
+        tempAdmins.push(user.id)
+        user.projects.push(project.id)
+    } else {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'This user is already added as admin',
+            data: {}
+        });
+    }
+
+    project.admins = tempAdmins
+
+    user.save().catch(err =>{
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    })
+
+    project.save(project)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project admin successfully added',
+            data: { project: data}
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    let subject = 'KoCoSD Project Admin Assignment'
+    let theMessage = `
+        <h1>Congratulations you have been assigned as admin for a project!</h1>
+        <p>The project code ${project.code}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(user.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+}
+
+exports.deleteAdmin = async function (req, res) {
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.status != "ongoing") 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This project is not active!',
+        data: {}
+    });
+
+    if(project.host != req.body.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit admin for this project!',
+        data: {}
+    });
+
+    const user = await Users.findOne({ '_id': req.body.userId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the user!',
+            data: {}
+        });    
+    })
+
+    if (!user) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Such user is not found!',
+            data: {}
+        });  
+    }
+
+    if(user.id === req.body.id) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'You cannot add yourself as admin!',
+            data: {}
+        });  
+    }
+    
+    var tempAdmins = project.admins
+
+    if(!tempAdmins.includes(user.id)){
+        return res.status(500).json({
+            status: 'error',
+            msg: 'This user is not an admin',
+            data: {}
+        });
+    } else {
+        tempAdmins.pull(user.id)
+        user.projects.pull(project.id)
+    }
+
+    project.admins = tempAdmins
+
+    user.save().catch(err =>{
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    })
+
+    project.save(project)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project admin successfully deleted',
+            data: { project: data}
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    let subject = 'KoCoSD Project Admin Removed'
+    let theMessage = `
+        <h1>You have been removed from being an admin for a project!</h1>
+        <p>The project code ${project.code}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(user.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.searchUsers = async function (req, res){
