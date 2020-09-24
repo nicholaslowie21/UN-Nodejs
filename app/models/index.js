@@ -20,5 +20,8 @@ db.money = require("./money.model")(mongoose);
 db.venue = require("./venue.model")(mongoose);
 db.kpi = require("./kpi.model")(mongoose);
 db.resourceneed = require("./resourceneed.model")(mongoose);
+db.contribution = require("./contribution.model")(mongoose);
+db.projectreq = require("./projectreq.model")(mongoose);
+db.resourcereq = require("./resourcereq.model")(mongoose);
 
 module.exports = db;
