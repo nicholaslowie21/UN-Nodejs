@@ -1,15 +1,15 @@
 module.exports = mongoose => {
     var schema = mongoose.Schema(
       {
-        title: String,
-        desc: String,
-        host: String,
-        hostType: String,
-        status: String,
-        rating: Number,
-        country: String,
-        code: String,
-        imgPath: String,
+        title: { type: String, default: '' },
+        desc: { type: String, default: '' },
+        host: { type: String, default: '' },
+        hostType: { type: String, default: '' },
+        status: { type: String, default: '' },
+        rating: { type: Number, default: 1 },
+        country: { type: String, default: '' },
+        code: { type: String, default: '' },
+        imgPath: { type: String, default: '' },
         admins: [String],
         SDGs: [Number]
       },

@@ -47,13 +47,23 @@ exports.viewInstitutionResource = [
 
 exports.createItemResource = [
     body('title').exists(),
-    body('desc').exists()
+    body('desc').exists(),
+    body('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    })
 ]
 
 exports.createVenueResource = [
     body('title').exists(),
     body('desc').exists(),
-    body('address').exists()
+    body('address').exists(),
+    body('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    })
 ]
 
 exports.createManpowerResource = [
