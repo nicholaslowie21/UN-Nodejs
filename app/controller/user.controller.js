@@ -330,7 +330,7 @@ exports.viewUser = async function (req, res) {
         "country": user.country,
         "website": user.website || '',
         "points": user.points,
-        "gender": user.gender,
+        "salutation": user.salutation || '',
         "skills": user.skills,
         "institutionIds": user.institutionIds,
         "projects": user.projects,
