@@ -5,6 +5,14 @@ const Institutions = db.institution
 const Users = db.users
 const KPI = db.kpi
 const ResourceNeed = db.resourceneed
+const Contribution = db.contribution
+const ProjectReq = db.projectreq
+const ResourceReq = db.resourcereq
+const Manpower = db.manpower
+const Knowledge = db.knowledge
+const Item = db.item
+const Venue = db.venue
+const Money = db.money
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
 const path = require('path')
@@ -1711,7 +1719,7 @@ exports.getResourceNeeds = async function (req, res){
         if (err)
         return res.status(500).json({
             status: 'error',
-            msg: 'There was no such account!',
+            msg: 'An error occur when retrieving resource needs!',
             data: {}
         });
     });
@@ -1719,7 +1727,7 @@ exports.getResourceNeeds = async function (req, res){
     if(!resourceneeds)
     return res.status(500).json({
         status: 'error',
-        msg: 'There was no such resource need!',
+        msg: 'There was no resource needs for this project or something went wrong!',
         data: {}
     });
 
@@ -1728,8 +1736,219 @@ exports.getResourceNeeds = async function (req, res){
         msg: 'Resource need successfully retrieved!',
         data: { resourceneeds: resourceneeds }
     });
+}
+
+exports.getContributions = async function (req, res){
+    const contributions = await Contribution.find({ 'projectId': req.query.projectId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an error retrieving contributions!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!contributions)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no contributions or something went wrong!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i = 0; i < contributions.length; i++) {
+        var contributionItem = {
+            "projectId": "",
+            "needId": "",
+            "requestId": "",
+            "requestType": "",
+            "resType": "",
+            "rating": "",
+            "contributor": "",
+            "contributorType": "",
+            "needTitle":"",
+            "resourceTitle":"",
+            "resourceId":"",
+            "desc":"",
+            "contributorUsername":""
+        }
+
+        contributionItem.projectId = contributions[i].projectId
+        contributionItem.needId = contributions[i].needId
+        contributionItem.requestId = contributions[i].requestId
+        contributionItem.requestType = contributions[i].requestType
+        contributionItem.resType = contributions[i].resType
+        contributionItem.rating = contributions[i].rating
+        contributionItem.contributor = contributions[i].contributor
+        contributionItem.contributorType = contributions[i].contributorType
+
+        await getNeedInfo(contributionItem)
+        await getRequestInfo(contributionItem)
+        await getResourceInfo(contributionItem)
+        await getContributorInfo(contributionItem)
+        
+        theList.push(contributionItem)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Contributions successfully retrieved!',
+        data: { contributions: theList }
+    });
 
 }
+
+async function getNeedInfo(contributionItem) {
+    const need = await ResourceNeed.findOne({ '_id': contributionItem.needId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an error retrieving a resource need!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!need)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an error retrieving a resource need!' + err.message,
+        data: {}
+    });
+
+    contributionItem.needTitle = need.title;
+}
+
+async function getRequestInfo(contributionItem) {
+    var request;
+
+    if(contributionItem.requestType === "project") {
+        request = await ProjectReq.findOne({ '_id': contributionItem.requestId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource need!' + err.message,
+                data: {}
+            });
+        });
+    } else if (contributionItem.requestType === 'resource') {
+        request = await ResourceReq.findOne({ '_id': contributionItem.requestId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource need!' + err.message,
+                data: {}
+            });
+        });
+    }
+
+    if(!request)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an issue retrieving request info!',
+        data: {}
+    });
+
+    contributionItem.resourceId = request.resourceId
+    contributionItem.desc = request.desc
+}
+
+async function getContributorInfo(contributionItem) {
+    var owner;
+
+    if(contributionItem.contributorType === "user") {
+        owner = await Users.findOne({ '_id': contributionItem.contributor }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource contributor!' + err.message,
+                data: {}
+            });
+        });
+    } else if (contributionItem.contributorType === 'institution') {
+        owner = await Institutions.findOne({ '_id': contributionItem.contributor }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource contributor!' + err.message,
+                data: {}
+            });
+        });
+    }
+
+    if(!owner)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an issue retrieving a contributor info!',
+        data: {}
+    });
+
+    contributionItem.contributorUsername = owner.username
+}
+
+async function getResourceInfo(contributionItem) {
+    var resource;
+
+    if(contributionItem.resType === 'manpower') {
+        resource = await Manpower.findOne({ '_id': contributionItem.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a manpower resource!' + err.message,
+                data: {}
+            });
+        });    
+    } else if(contributionItem.resType === 'venue') {
+        resource = await Venue.findOne({ '_id': contributionItem.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a venue resource!' + err.message,
+                data: {}
+            });
+        });    
+    } else if(contributionItem.resType === 'money') {
+        resource = await Money.findOne({ '_id': contributionItem.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a money resource!' + err.message,
+                data: {}
+            });
+        });    
+    } else if(contributionItem.resType === 'knowledge') {
+        resource = await Knowledge.findOne({ '_id': contributionItem.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a knowledge resource!' + err.message,
+                data: {}
+            });
+        });    
+    } else if(contributionItem.resType === 'item') {
+        resource = await Item.findOne({ '_id': contributionItem.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving an item resource!' + err.message,
+                data: {}
+            });
+        });    
+    }
+    
+    if(!resource)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an error retrieving a resource!' + err.message,
+        data: {}
+    });
+
+    if(contributionItem.resType!= 'money')
+        contributionItem.resourceTitle = resource.title;
+    else
+        contributionItem.resourceTitle = '$'+resource.sum+' contributed';
+}
+
 
 handleError = (err) => {
     console.log("handleError :"+ err)

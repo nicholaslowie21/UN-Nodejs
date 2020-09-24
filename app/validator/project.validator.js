@@ -21,6 +21,10 @@ exports.getResourceNeeds = [
     query('projectId').exists()
 ]
 
+exports.getContributions = [
+    query('projectId').exists()
+]
+
 exports.createProject = [
     body('title').exists(),
     body('desc').exists(),
