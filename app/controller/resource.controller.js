@@ -67,7 +67,7 @@ var IPStorage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = file.originalname+"-"+req.body.knowledgeId+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = extentsion[0]+"-"+req.body.knowledgeId+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },
@@ -860,6 +860,9 @@ exports.viewPrivateInstitutionVenue = async function (req, res) {
 exports.createItem = async function (req, res) {
     var theOwner
 
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
+
     if (req.body.type === "user") {
         theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
             if (err)
@@ -892,7 +895,7 @@ exports.createItem = async function (req, res) {
 		desc: req.body.desc,
 		owner: theOwner.id,
 		status: "active",
-        country: theOwner.country,
+        country: req.body.country,
 		ownerType: req.body.type
     });
 
@@ -914,6 +917,9 @@ exports.createItem = async function (req, res) {
 
 exports.createVenue = async function (req, res) {
     var theOwner
+
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
 
     if (req.body.type === "user") {
         theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
@@ -947,7 +953,7 @@ exports.createVenue = async function (req, res) {
 		desc: req.body.desc,
 		owner: theOwner.id,
 		status: "active",
-        country: theOwner.country,
+        country: req.body.country,
         ownerType: req.body.type,
         address: req.body.address
     });
