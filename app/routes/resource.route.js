@@ -32,6 +32,7 @@ router.post('/uploadItemPicture', auth, resourceController.multerItemPicUpload, 
 router.post('/createVenue', auth, ResourceValidator.createVenueResource, Helper.ifErrors, resourceController.createVenue )
 router.post('/updateVenue', auth, ResourceValidator.updateVenueResource, Helper.ifErrors, resourceController.updateVenue )
 router.post('/uploadVenuePicture', auth, updloadMultipleFiles, resourceController.multerVenuePicUpload, resourceController.venuePicture)
+router.post('/deleteVenuePicture', auth, ResourceValidator.deleteVenuePicture, resourceController.deleteVenuePicture)
 
 router.post('/createManpower', auth, ResourceValidator.createManpowerResource, Helper.ifErrors, resourceController.createManpower )
 router.post('/updateManpower', auth, ResourceValidator.updateManpowerResource, Helper.ifErrors, resourceController.updateManpower )

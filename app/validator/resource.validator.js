@@ -131,3 +131,8 @@ exports.updateVenueResource = [
     }),
     body('address').exists()
 ]
+
+exports.deleteVenuePicture = [
+    body('venueId').exists(),
+    body('indexes').exists()
+]

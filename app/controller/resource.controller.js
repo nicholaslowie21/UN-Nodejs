@@ -1872,7 +1872,111 @@ var venueStorage = multer.diskStorage({
         data: {}
     });
 
-    venue.imgPath = req.thePath;
+    venue.imgPath = venue.imgPath.concat(req.thePath);
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue picture successfully updated',
+            data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteVenuePicture = async function (req, res){
+    if(!req.body.venueId) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Venue id is empty! ',
+            data: {}
+        });
+    }
+
+    const venue = await Venue.findOne({ '_id': req.body.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such venue resource!',
+            data: {}
+        });
+    });
+
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Venue does not exists!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(req.type === "institution") {
+        const institution = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform this action right now!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (req.type === "user") {
+        const user = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    if(theOwner.id!=venue.owner)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to perform this action!',
+        data: {}
+    });
+
+    var oldList = venue.imgPath
+    var toDelete = req.body.indexes
+    var newList = []
+
+    for(var i = 0; i < oldList.length; i++) {
+        if(!toDelete.includes(i))
+            newList.push(oldList[i])
+    }
+    venue.imgPath = newList;
 
     venue.save(venue)
     .then(data => {
