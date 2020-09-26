@@ -17,6 +17,10 @@ exports.viewVenueDetails = [
     query('venueId').exists()
 ]
 
+exports.searchResource = [
+    query('title').exists()
+]
+
 exports.activateItem = [
     body('itemId').exists()
 ]

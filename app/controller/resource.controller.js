@@ -2794,3 +2794,115 @@ exports.viewKnowledgeDetails = async function (req, res) {
         data: { knowledge: knowledge, userOwner: userOwner, institutionOwner: institutionOwner }
     });
 }
+
+exports.searchItem = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const items = await Item.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!items) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No item found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the items',
+        data: { items: items }
+    });
+}
+
+exports.searchVenue = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const venues = await Venue.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!venues) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No venue found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the venues',
+        data: { venues: venues }
+    });
+}
+
+exports.searchManpower = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const manpowers = await Manpower.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!manpowers) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No manpower found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the manpowers',
+        data: { manpowers: manpowers }
+    });
+}
+
+exports.searchKnowledge = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const knowledges = await Knowledge.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!knowledges) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No knowledge found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the knowledges',
+        data: { knowledges: knowledges }
+    });
+}
