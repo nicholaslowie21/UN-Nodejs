@@ -627,6 +627,45 @@ exports.viewInstitution = async function (req, res) {
 
 }
 
+exports.viewInstitutionById = async function (req, res) {
+    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Institution not found!',
+        data: {}
+    });
+    
+    var theInstitution = {
+        "id": institution.id,
+        "name": institution.name,
+        "username": institution.username,
+        "email": institution.email,
+        "phone": institution.phone,
+        "status": institution.status,
+        "bio": institution.bio || '',
+        "address": institution.address || '',
+        "isVerified": institution.isVerified,
+        "profilePic": institution.profilePic,
+        "country": institution.country,
+        "website": institution.website || '',
+        "members": institution.members,
+        "projects": institution.projects,
+        "SDGs": institution.SDGs,
+        "ionicImg": institution.ionicImg || ''
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Institution profile successfully retrieved',
+        data: { targetInstitution: theInstitution }
+    });
+
+}
+
 exports.getBadges = async function (req, res) {
     const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err) {
         if (err) return handleError(err);

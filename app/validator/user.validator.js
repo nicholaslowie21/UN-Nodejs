@@ -142,6 +142,10 @@ exports.viewUser = [
     query('username').exists()
 ]
 
+exports.viewUserById = [
+    query('userId').exists()
+]
+
 exports.getBadges = [
     query('userId').exists()
 ]
