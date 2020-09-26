@@ -1552,6 +1552,12 @@ exports.editResourceNeed = async function (req, res){
         data: {}
     });
 
+    if(resourceneed.type === "money" && req.body.total <= 0)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Invalid input! The total sum is invalid.',
+        data: {}
+    });
 
     resourceneed.title = req.body.title
     resourceneed.desc = req.body.desc
