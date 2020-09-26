@@ -1784,7 +1784,8 @@ exports.getContributions = async function (req, res){
             "resourceTitle":"",
             "resourceId":"",
             "desc":"",
-            "contributorUsername":""
+            "contributorUsername":"",
+            "contributorName":""
         }
 
         contributionItem.projectId = contributions[i].projectId
@@ -1897,6 +1898,7 @@ async function getContributorInfo(contributionItem) {
     });
 
     contributionItem.contributorUsername = owner.username
+    contributionItem.contributorName = owner.name
 }
 
 async function getResourceInfo(contributionItem) {

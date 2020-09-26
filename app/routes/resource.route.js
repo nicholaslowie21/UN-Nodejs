@@ -32,6 +32,7 @@ router.post('/uploadItemPicture', auth, resourceController.multerItemPicUpload, 
 router.post('/createVenue', auth, ResourceValidator.createVenueResource, Helper.ifErrors, resourceController.createVenue )
 router.post('/updateVenue', auth, ResourceValidator.updateVenueResource, Helper.ifErrors, resourceController.updateVenue )
 router.post('/uploadVenuePicture', auth, updloadMultipleFiles, resourceController.multerVenuePicUpload, resourceController.venuePicture)
+router.post('/deleteVenuePicture', auth, ResourceValidator.deleteVenuePicture, resourceController.deleteVenuePicture)
 
 router.post('/createManpower', auth, ResourceValidator.createManpowerResource, Helper.ifErrors, resourceController.createManpower )
 router.post('/updateManpower', auth, ResourceValidator.updateManpowerResource, Helper.ifErrors, resourceController.updateManpower )
@@ -39,6 +40,8 @@ router.post('/updateManpower', auth, ResourceValidator.updateManpowerResource, H
 router.post('/createKnowledge', auth, ResourceValidator.createKnowledgeResource, Helper.ifErrors, resourceController.createKnowledge )
 router.post('/updateKnowledge', auth, ResourceValidator.updateKnowledgeResource, Helper.ifErrors, resourceController.updateKnowledge )
 router.post('/updateKnowledgeOwner', auth, ResourceValidator.updateKnowledgeResourceOwner, Helper.ifErrors, resourceController.updateKnowledgeOwner )
+router.post('/addKnowledgeOwner', auth, ResourceValidator.addKnowledgeResourceOwner, Helper.ifErrors, resourceController.addKnowledgeOwner )
+router.post('/deleteKnowledgeOwner', auth, ResourceValidator.deleteKnowledgeResourceOwner, Helper.ifErrors, resourceController.deleteKnowledgeOwner )
 router.post('/uploadKnowledgeAttachment', auth, resourceController.multerIPUpload, resourceController.IPupload)
 
 router.post('/activate/item', auth, ResourceValidator.activateItem, Helper.ifErrors, resourceController.activateItem)
