@@ -39,6 +39,8 @@ router.post('/updateManpower', auth, ResourceValidator.updateManpowerResource, H
 router.post('/createKnowledge', auth, ResourceValidator.createKnowledgeResource, Helper.ifErrors, resourceController.createKnowledge )
 router.post('/updateKnowledge', auth, ResourceValidator.updateKnowledgeResource, Helper.ifErrors, resourceController.updateKnowledge )
 router.post('/updateKnowledgeOwner', auth, ResourceValidator.updateKnowledgeResourceOwner, Helper.ifErrors, resourceController.updateKnowledgeOwner )
+router.post('/addKnowledgeOwner', auth, ResourceValidator.addKnowledgeResourceOwner, Helper.ifErrors, resourceController.addKnowledgeOwner )
+router.post('/deleteKnowledgeOwner', auth, ResourceValidator.deleteKnowledgeResourceOwner, Helper.ifErrors, resourceController.deleteKnowledgeOwner )
 router.post('/uploadKnowledgeAttachment', auth, resourceController.multerIPUpload, resourceController.IPupload)
 
 router.post('/activate/item', auth, ResourceValidator.activateItem, Helper.ifErrors, resourceController.activateItem)

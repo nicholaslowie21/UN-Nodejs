@@ -87,6 +87,17 @@ exports.updateKnowledgeResourceOwner = [
     body('owners').exists()
 ]
 
+exports.addKnowledgeResourceOwner = [
+    body('knowledgeId').exists(),
+    body('userId').exists()
+]
+
+exports.deleteKnowledgeResourceOwner = [
+    body('knowledgeId').exists(),
+    body('targetId').exists(),
+    body('targetType').exists()
+]
+
 exports.updateManpowerResource = [
     body('manpowerId').exists(),
     body('title').exists(),
