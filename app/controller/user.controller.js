@@ -348,6 +348,50 @@ exports.viewUser = async function (req, res) {
 
 }
 
+exports.viewUserById = async function (req, res) {
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+    
+    var theUser = {
+        "id":user.id,
+        "name": user.name,
+        "username": user.username,
+        "email": user.email,
+        "bio": user.bio || '',
+        "role": user.role,
+        "status": user.status,
+        "occupation": user.occupation || '',
+        "isVerified": user.isVerified,
+        "profilePic": user.profilePic,
+        "country": user.country,
+        "website": user.website || '',
+        "points": user.points,
+        "salutation": user.salutation || '',
+        "skills": user.skills,
+        "institutionIds": user.institutionIds,
+        "projects": user.projects,
+        "badges": user.badges,
+        "SDGs": user.SDGs,
+        "wallet": user.wallet,
+        "ionicImg": user.ionicImg || ''
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'User profile successfully retrieved',
+        data: { targetUser: theUser }
+    });
+
+}
+
 exports.getBadges = async function (req, res) {
     const user = await Users.findOne({ '_id': req.query.userId }, function (err) {
         if (err)

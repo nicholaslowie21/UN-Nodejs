@@ -27,6 +27,8 @@ router.post('/membersCSV', auth, institutionController.csvMulter, institutionCon
 
 router.get('/viewInstitution', InstitutionValidator.viewInstitution , InstitutionValidator.ifErrors, institutionController.viewInstitution)
 
+router.get('/viewInstitutionById', InstitutionValidator.viewInstitutionById , InstitutionValidator.ifErrors, institutionController.viewInstitutionById)
+
 router.get('/badges', auth, InstitutionValidator.currProject, InstitutionValidator.ifErrors, institutionController.getBadges)
 
 router.get('/searchUsers', auth, InstitutionValidator.searchUsers, InstitutionValidator.ifErrors, institutionController.searchUsers)
