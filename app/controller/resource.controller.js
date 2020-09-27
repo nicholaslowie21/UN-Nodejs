@@ -1522,6 +1522,237 @@ exports.updateKnowledgeOwner = async function (req, res) {
     });
 }
 
+exports.addKnowledgeOwner = async function (req, res) {
+    var theOwner    
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this knowledge resource',
+        data: {}
+    });
+
+    const targetuser = await User.findOne({ '_id': req.body.userId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!targetuser)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong! User does not exists! ',
+        data: {}
+    });
+
+    valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(targetuser.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are already inside the list of owner',
+        data: {}
+    });
+
+    knowledge.owner.push({theId: targetuser.id, ownerType:"user"});
+    
+    knowledge.save(knowledge)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge Resource owners successfully added',
+            data: { knowledge: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteKnowledgeOwner = async function (req, res) {
+    var theOwner    
+    if (req.body.type === "user") {
+        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const knowledge = await Knowledge.findOne({ '_id': req.body.knowledgeId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    if(!knowledge)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+
+    var valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(theOwner.id === knowledge.owner[i].theId) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this knowledge resource',
+        data: {}
+    });
+
+    var target;
+
+    if(req.body.targetType === "user") {
+        target = await User.findOne({ '_id': req.body.targetId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if(req.body.targetType === "institution") {
+        target = await Institution.findOne({ '_id': req.body.targetId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+
+    if(!target)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong! Account does not exists! ',
+        data: {}
+    });
+
+    valid = false;
+    for(var i = 0; i < knowledge.owner.length; i++) {
+        if(target.id === knowledge.owner[i].theId && req.body.targetType === knowledge.owner[i].ownerType ) {
+            valid = true;
+            break;
+        }
+    }
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The user is not inside the list of owner',
+        data: {}
+    });
+
+    Knowledge.findOneAndUpdate(
+        { _id: knowledge.id },
+        { $pull: { owner: { "theId": target.id, "ownerType": req.body.targetType} } },
+        { new: true },
+        function(err, data) {
+            if (err) 
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+
+            return res.status(200).json({
+                status: 'success',
+                msg: 'Knowledge Resource owners successfully deleted',
+                data: { knowledge: data }
+            });
+            
+        }
+    )
+}
+
 var venueStorage = multer.diskStorage({
     destination: (req, file, callback) => {
         let dir = 'public/uploads/resources/venue'
@@ -1641,7 +1872,111 @@ var venueStorage = multer.diskStorage({
         data: {}
     });
 
-    venue.imgPath = req.thePath;
+    venue.imgPath = venue.imgPath.concat(req.thePath);
+
+    venue.save(venue)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Venue picture successfully updated',
+            data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteVenuePicture = async function (req, res){
+    if(!req.body.venueId) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Venue id is empty! ',
+            data: {}
+        });
+    }
+
+    const venue = await Venue.findOne({ '_id': req.body.venueId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such venue resource!',
+            data: {}
+        });
+    });
+
+    if(!venue)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Venue does not exists!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(req.type === "institution") {
+        const institution = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform this action right now!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (req.type === "user") {
+        const user = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    if(theOwner.id!=venue.owner)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to perform this action!',
+        data: {}
+    });
+
+    var oldList = venue.imgPath
+    var toDelete = req.body.indexes
+    var newList = []
+
+    for(var i = 0; i < oldList.length; i++) {
+        if(!toDelete.includes(i))
+            newList.push(oldList[i])
+    }
+    venue.imgPath = newList;
 
     venue.save(venue)
     .then(data => {

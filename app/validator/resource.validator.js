@@ -87,6 +87,17 @@ exports.updateKnowledgeResourceOwner = [
     body('owners').exists()
 ]
 
+exports.addKnowledgeResourceOwner = [
+    body('knowledgeId').exists(),
+    body('userId').exists()
+]
+
+exports.deleteKnowledgeResourceOwner = [
+    body('knowledgeId').exists(),
+    body('targetId').exists(),
+    body('targetType').exists()
+]
+
 exports.updateManpowerResource = [
     body('manpowerId').exists(),
     body('title').exists(),
@@ -119,4 +130,9 @@ exports.updateVenueResource = [
             return Promise.reject('Country is not valid');
     }),
     body('address').exists()
+]
+
+exports.deleteVenuePicture = [
+    body('venueId').exists(),
+    body('indexes').exists()
 ]
