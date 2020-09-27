@@ -40,4 +40,6 @@ router.get('/resourceNeeds', ProjectValidator.getResourceNeeds, Helper.ifErrors,
 
 router.get('/contributions', ProjectValidator.getContributions, Helper.ifErrors, projectController.getContributions )
 
+router.get('/accountNewsFeed', auth, projectController.getAccNewsFeed )
+
 module.exports = router;

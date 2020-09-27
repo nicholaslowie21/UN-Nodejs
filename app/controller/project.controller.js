@@ -1964,6 +1964,96 @@ async function getResourceInfo(contributionItem) {
         contributionItem.resourceTitle = '$'+resource.sum+' contributed';
 }
 
+exports.getAccNewsFeed = async function (req, res){
+    var account;
+    if (req.body.type === "user") {
+        account = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving the account!' + err.message,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        account = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving the account!' + err.message,
+                data: {}
+            });
+        });
+    }
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no contributions or something went wrong!',
+        data: {}
+    });
+
+    var accSDGs = account.SDGs;
+    var theList = []
+    
+    var projects = await Projects.find({ 'status': "ongoing" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an error retrieving the account!' + err.message,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < projects.length; i++) {
+        var projectItem = {
+            "title": "",
+            "desc": "",
+            "host": "",
+            "hostType": "",
+            "status": "",
+            "rating": "",
+            "country": "",
+            "code": "",
+            "imgPath":"",
+            "admins":[],
+            "SDGs":[],
+            "matchPoint":0
+        }
+
+        if(account.projects.includes(projects[i].id)) continue
+
+        projectItem.id = projects[i].id
+        projectItem.title = projects[i].title
+        projectItem.desc = projects[i].desc
+        projectItem.host = projects[i].host
+        projectItem.hostType = projects[i].hostType
+        projectItem.status = projects[i].status
+        projectItem.rating = projects[i].rating
+        projectItem.country = projects[i].country
+        projectItem.code = projects[i].code
+        projectItem.imgPath = projects[i].imgPath
+        projectItem.admins = projects[i].admins
+        projectItem.SDGs = projects[i].SDGs
+
+        var tempSDGs = projectItem.SDGs
+        for(var j = 0; j < projectItem.SDGs.length; j++) {
+            if(accSDGs.includes(tempSDGs[j]))
+                projectItem.matchPoint += 10;
+        }
+
+        theList.push(projectItem)
+    }
+
+    theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Projects for News Feed successfully retrieved!',
+        data: { newsfeeds: theList }
+    });
+
+}
 
 handleError = (err) => {
     console.log("handleError :"+ err)
