@@ -15,6 +15,7 @@ module.exports = mongoose => {
         salt: String,
         website: String,
         ionicImg: String,
+        verifyFilePath: String,
         members: [String],
         projects: [String],
         SDGs: [Number]

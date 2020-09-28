@@ -10,7 +10,7 @@ const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
 const nodeCountries =  require("node-countries")
-
+const Helper = require("../service/helper.service")
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -913,6 +913,13 @@ exports.createItem = async function (req, res) {
             data: {}
         });
     });
+
+    title = "Item Resource"
+    desc = "Offered an item resource: " + item.title
+    accountId = theOwner.id
+    accountType = req.body.type
+        
+    Helper.createProfileFeed(title,desc,accountId,accountType)
 }
 
 exports.createVenue = async function (req, res) {
@@ -972,6 +979,13 @@ exports.createVenue = async function (req, res) {
             data: {}
         });
     });
+
+    title = "Venue Resource"
+    desc = "Offered an venue resource: " + venue.title
+    accountId = theOwner.id
+    accountType = req.body.type
+        
+    Helper.createProfileFeed(title,desc,accountId,accountType)
 }
 
 exports.createManpower = async function (req, res) {
@@ -1027,6 +1041,13 @@ exports.createManpower = async function (req, res) {
             data: {}
         });
     });
+
+    title = "Manpower Resource"
+    desc = "Offered a manpower resource: " + manpower.title
+    accountId = theOwner.id
+    accountType = req.body.type
+        
+    Helper.createProfileFeed(title,desc,accountId,accountType)
 }
 
 exports.createKnowledge = async function (req, res) {
@@ -1080,6 +1101,13 @@ exports.createKnowledge = async function (req, res) {
             data: {}
         });
     });
+
+    title = "Knowledge Resource"
+    desc = "Offered a knowledge resource: " + knowledge.title
+    accountId = theOwner.id
+    accountType = req.body.type
+        
+    Helper.createProfileFeed(title,desc,accountId,accountType)
 }
 
 exports.updateItem = async function (req, res) {

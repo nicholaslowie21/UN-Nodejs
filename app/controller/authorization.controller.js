@@ -23,6 +23,78 @@ exports.postTest = async function (req, res, next) {
     });
 }
 
+var InstitutionVerifyStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/verificationInstitution'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = extentsion[0]+"-"+req.body.username+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var institutionSignUp = multer({ storage: InstitutionVerifyStorage  })
+
+exports.multerInstitutionSignUp = institutionSignUp.single('verifyDoc');
+
+exports.institutionSignUpMulter = async function (req, res){
+    if(!req.file) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No file uploaded! ',
+            data: {}
+        });
+    }
+
+    let randomString = randomstring.generate({ length: 8 });
+    let saltedHashPassword = saltedMd5(randomString, req.body.password);
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
+    
+    const institution = new Institution({
+		name: req.body.name,
+		username: req.body.username.toLowerCase(),
+		email: req.body.email.toLowerCase(),
+		password: saltedHashPassword,
+		status: 'pending',
+        bio: '',
+        phone: '',
+        address: '',
+        isVerified: false,
+        profilePic: '',
+        country: req.body.country,
+        salt: randomString,
+        verifyFilePath: "/public/uploads/resources/IP/"+req.thePath
+    });
+    
+    let token = TokenSign(institution.id, "institution", 'institution');
+
+    institution.save(institution)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Account successfully created',
+            data: { token: token, user: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
 exports.postSignup = async function (req, res, next) {
     let randomString = randomstring.generate({ length: 8 });
     let saltedHashPassword = saltedMd5(randomString, req.body.password);

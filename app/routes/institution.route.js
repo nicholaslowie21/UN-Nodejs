@@ -35,4 +35,6 @@ router.get('/searchUsers', auth, InstitutionValidator.searchUsers, InstitutionVa
 
 router.get('/shareProfile', auth, institutionController.shareProfile)
 
+router.get('/profileFeed', InstitutionValidator.viewInstitutionById , InstitutionValidator.ifErrors, institutionController.getFeeds)
+
 module.exports = router;
