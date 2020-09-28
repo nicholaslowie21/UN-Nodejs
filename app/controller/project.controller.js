@@ -357,6 +357,13 @@ exports.createProject = async function (req, res){
         });
     });
 
+    title = "Project Created"
+    desc = "Created a project with title " + project.title
+    accountId = host
+    accountType = hostType 
+    
+    Helper.createProfileFeed(title,desc,accountId,accountType)
+
 }
 
 exports.postUpdateProject = async function (req, res) {
@@ -389,7 +396,7 @@ exports.postUpdateProject = async function (req, res) {
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -498,6 +505,13 @@ exports.completeProject = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    title = "Project Completion"
+    desc = "Completed a project with the title " + project.title + " which was started by this account :)"
+    accountId = targetHost.id
+    accountType = project.hostType
+        
+    Helper.createProfileFeed(title,desc,accountId,accountType)
 }
 
 exports.deleteProject = async function (req, res) {
@@ -877,6 +891,13 @@ exports.addAdmin = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    title = "Project Admin"
+    desc = "Assigned as a project admin for the project " + project.title
+    accountId = user.id
+    accountType = "user"
+        
+    Helper.createProfileFeed(title,desc,accountId,accountType)
 }
 
 exports.deleteAdmin = async function (req, res) {
@@ -1391,7 +1412,7 @@ exports.createResourceNeed = async function (req, res){
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -1536,7 +1557,7 @@ exports.editResourceNeed = async function (req, res){
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -1691,7 +1712,7 @@ exports.deleteResourceNeed = async function (req, res){
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -1716,6 +1737,155 @@ exports.deleteResourceNeed = async function (req, res){
             status: 'success',
             msg: 'Resource need successfully deleted!',
             data: { resourceneed: resourceneed, project: project }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    const contributions = await Contribution.find({ 'needId': resourceneed.id }, function (err) {
+        if (err) console.log("Something went wrong while trying to remove contributions in deleting resource need"+ err.message);
+    });
+
+    for(var i = 0; i < contributions.length; i++) {
+        contributions[i].status = "closed"
+        contributions[i].save()
+    }
+
+}
+
+exports.removeContribution = async function (req, res){
+    let actor
+
+    const contribution = await Contribution.findOne({ '_id': req.body.contributionId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!contribution)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such contribution!',
+        data: {}
+    });
+
+    if(req.type === "institution") {
+        const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
+        actor = institution
+    } else if (req.type === "user") {
+        const user = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(user.isVerified != "true")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account not authorized to create project! Not verified yet.',
+            data: {}
+        });
+
+        actor = user
+    }
+
+    if(!actor)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': contribution.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host === req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this contribution!',
+        data: {}
+    });
+
+    if(contribution.status === "closed")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You have deleted this contribution!',
+        data: {}
+    });
+
+    contribution.status = "closed"
+
+    contribution.save(contribution)
+    .then(data => {
+
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Contribution successfully removed!',
+            data: { project: project, contribution: contribution }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -1772,6 +1942,7 @@ exports.getContributions = async function (req, res){
 
     for(var i = 0; i < contributions.length; i++) {
         var contributionItem = {
+            "contributionId":"",
             "projectId": "",
             "needId": "",
             "requestId": "",
@@ -1788,6 +1959,7 @@ exports.getContributions = async function (req, res){
             "contributorName":""
         }
 
+        contributionItem.contributionId = contributions[i].id
         contributionItem.projectId = contributions[i].projectId
         contributionItem.needId = contributions[i].needId
         contributionItem.requestId = contributions[i].requestId
@@ -1809,6 +1981,142 @@ exports.getContributions = async function (req, res){
         status: 'success',
         msg: 'Contributions successfully retrieved!',
         data: { contributions: theList }
+    });
+
+}
+
+exports.getContributors = async function (req, res){
+    const contributions = await Contribution.find({ 'projectId': req.query.projectId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an error retrieving contributions!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!contributions)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no contributions or something went wrong!',
+        data: {}
+    });
+
+    var theList = []
+
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an error retrieving project!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such project or something went wrong!',
+        data: {}
+    });
+
+    var host;
+
+    var contributionItem = {
+        "contributor": "",
+        "contributorType": "",
+        "contributorUsername":"",
+        "contributorName":"",
+        "contributionType":""
+    }
+
+    if(project.hostType === "institution") {
+        const institution = await Institutions.findOne({ '_id': project.host }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        host = institution;
+        contributionItem.contributorType = "institution"
+    } else if (project.hostType === "user") {
+        const user = await Users.findOne({ '_id': project.host }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        host = user
+        contributionItem.contributorType = "user"
+    }
+
+    contributionItem.contributor = host.id
+    contributionItem.contributorUsername = host.username
+    contributionItem.contributorName = host.name
+    contributionItem.contributionType = "host"
+   
+    theList.push(contributionItem)
+
+    var admins = project.admins
+
+    for(var i = 0; i < admins.length; i++) {
+        var contributionItem = {
+            "contributor": "",
+            "contributorType": "",
+            "contributorUsername":"",
+            "contributorName":"",
+            "contributionType":""
+        }
+
+        contributionItem.contributor = admins[i]
+        contributionItem.contributorType = "user"
+        contributionItem.contributionType = "admin"
+        await getContributorInfo(contributionItem)
+        
+        theList.push(contributionItem)
+    }
+
+    for(var i = 0; i < contributions.length; i++) {
+        var contributionItem = {
+            "contributor": "",
+            "contributorType": "",
+            "contributorUsername":"",
+            "contributorName":"",
+            "contributionType":""
+        }
+
+        contributionItem.contributor = contributions[i].contributor
+        contributionItem.contributorType = contributions[i].contributorType
+        contributionItem.contributionType = "contributor"
+        await getContributorInfo(contributionItem)
+        
+        theList.push(contributionItem)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Contributors successfully retrieved!',
+        data: { contributors: theList }
     });
 
 }

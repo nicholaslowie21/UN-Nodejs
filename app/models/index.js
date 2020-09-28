@@ -23,5 +23,6 @@ db.resourceneed = require("./resourceneed.model")(mongoose);
 db.contribution = require("./contribution.model")(mongoose);
 db.projectreq = require("./projectreq.model")(mongoose);
 db.resourcereq = require("./resourcereq.model")(mongoose);
+db.profilefeed = require("./profilefeed.model")(mongoose);
 
 module.exports = db;

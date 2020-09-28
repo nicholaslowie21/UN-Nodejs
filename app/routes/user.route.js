@@ -27,4 +27,6 @@ router.get('/affiliations', UserValidator.getAffiliations, UserValidator.ifError
 
 router.get('/shareProfile', auth, userController.shareProfile)
 
+router.get('/profileFeed', UserValidator.viewUserById, UserValidator.ifErrors , userController.getFeeds)
+
 module.exports = router;

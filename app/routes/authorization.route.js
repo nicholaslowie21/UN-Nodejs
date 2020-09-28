@@ -13,7 +13,10 @@ router.post('/user/signup', UserValidator.userSignup, UserValidator.ifErrors, au
 router.post('/user/changePassword', auth, UserValidator.userChangePassword, UserValidator.ifErrors, authorizationController.userChangePassword);
 
 /* POST register institution. */
-router.post('/institution/signup', InstitutionValidator.signUp, InstitutionValidator.ifErrors, authorizationController.postInstitutionSignup);
+// router.post('/institution/signup', InstitutionValidator.signUp, InstitutionValidator.ifErrors, authorizationController.postInstitutionSignup);
+
+router.post('/institution/signup', authorizationController.multerInstitutionSignUp, InstitutionValidator.signUp, InstitutionValidator.ifErrors, authorizationController.institutionSignUpMulter)
+
 
 /* POST user change password. */
 router.post('/institution/changePassword', auth, UserValidator.userChangePassword, UserValidator.ifErrors, authorizationController.institutionChangePassword);

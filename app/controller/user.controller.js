@@ -4,6 +4,7 @@ const Users = db.users;
 const Projects = db.project;
 const Badges = db.badge;
 const Institutions = db.institution;
+const Feed = db.profilefeed
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
@@ -388,6 +389,31 @@ exports.viewUserById = async function (req, res) {
         status: 'success',
         msg: 'User profile successfully retrieved',
         data: { targetUser: theUser }
+    });
+
+}
+
+exports.getFeeds = async function (req, res) {
+    const feeds = await Feed.find({ 'accountId': req.query.userId, "accountType":"user" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong!',
+            data: {}
+        });
+    });
+
+    if(!feeds) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Feeds not found!',
+        data: {}
+    });
+    
+    return res.status(200).json({
+        status: 'success',
+        msg: 'User profile feed successfully retrieved',
+        data: { feeds: feeds }
     });
 
 }
