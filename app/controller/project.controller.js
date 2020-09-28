@@ -389,7 +389,7 @@ exports.postUpdateProject = async function (req, res) {
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -1391,7 +1391,7 @@ exports.createResourceNeed = async function (req, res){
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -1536,7 +1536,7 @@ exports.editResourceNeed = async function (req, res){
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -1691,7 +1691,7 @@ exports.deleteResourceNeed = async function (req, res){
                 break;
             }
         }
-    } else valid = true;
+    } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
     return res.status(500).json({
@@ -1716,6 +1716,146 @@ exports.deleteResourceNeed = async function (req, res){
             status: 'success',
             msg: 'Resource need successfully deleted!',
             data: { resourceneed: resourceneed, project: project }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+}
+
+exports.removeContribution = async function (req, res){
+    let actor
+
+    const contribution = await Contribution.findOne({ '_id': req.body.contributionId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!contribution)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such contribution!',
+        data: {}
+    });
+
+    if(req.type === "institution") {
+        const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
+        actor = institution
+    } else if (req.type === "user") {
+        const user = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(user.isVerified != "true")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account not authorized to create project! Not verified yet.',
+            data: {}
+        });
+
+        actor = user
+    }
+
+    if(!actor)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': contribution.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host === req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this contribution!',
+        data: {}
+    });
+
+    if(contribution.status === "closed")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You have deleted this contribution!',
+        data: {}
+    });
+
+    contribution.status = "closed"
+
+    contribution.save(contribution)
+    .then(data => {
+
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Contribution successfully removed!',
+            data: { project: project, contribution: contribution }
         });
     }).catch(err => {
         return res.status(500).json({

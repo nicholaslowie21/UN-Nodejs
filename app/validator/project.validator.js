@@ -136,6 +136,10 @@ exports.deleteResourceNeed = [
     body('needId').exists()
 ]
 
+exports.removeContribution = [
+    body('contributionId').exists()
+]
+
 exports.searchUsers = [
     query('username').exists()
 ]
