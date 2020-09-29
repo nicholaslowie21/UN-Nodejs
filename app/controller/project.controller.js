@@ -2027,7 +2027,9 @@ exports.getContributors = async function (req, res){
         "contributorType": "",
         "contributorUsername":"",
         "contributorName":"",
-        "contributionType":""
+        "contributionType":"",
+        "contributorImgPath":"",
+        "ionicImgPath":""
     }
 
     if(project.hostType === "institution") {
@@ -2074,7 +2076,9 @@ exports.getContributors = async function (req, res){
     contributionItem.contributorUsername = host.username
     contributionItem.contributorName = host.name
     contributionItem.contributionType = "host"
-   
+    contributionItem.contributorImgPath = host.profilePic
+    contributionItem.ionicImgPath = host.ionicImg
+
     theList.push(contributionItem)
 
     var admins = project.admins
@@ -2085,7 +2089,9 @@ exports.getContributors = async function (req, res){
             "contributorType": "",
             "contributorUsername":"",
             "contributorName":"",
-            "contributionType":""
+            "contributionType":"",
+            "contributorImgPath":"",
+            "ionicImgPath":""
         }
 
         contributionItem.contributor = admins[i]
@@ -2102,7 +2108,9 @@ exports.getContributors = async function (req, res){
             "contributorType": "",
             "contributorUsername":"",
             "contributorName":"",
-            "contributionType":""
+            "contributionType":"",
+            "contributorImgPath":"",
+            "ionicImgPath":""
         }
 
         contributionItem.contributor = contributions[i].contributor
@@ -2207,6 +2215,9 @@ async function getContributorInfo(contributionItem) {
 
     contributionItem.contributorUsername = owner.username
     contributionItem.contributorName = owner.name
+    contributionItem.contributorImgPath = owner.profilePic
+    contributionItem.ionicImgPath = owner.ionicImg
+
 }
 
 async function getResourceInfo(contributionItem) {
