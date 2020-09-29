@@ -538,6 +538,8 @@ exports.deleteProject = async function (req, res) {
         data: {}
     });
 
+    var target;
+
     if(req.type === "institution") {
         const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
             if (err)
@@ -632,7 +634,6 @@ exports.deleteProject = async function (req, res) {
 
     project.save(project)
     .then(data => {
-        
         target.save(target).catch(err => {
             return res.status(500).json({
                 status: 'error',
