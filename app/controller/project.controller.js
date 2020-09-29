@@ -2004,6 +2004,7 @@ exports.getContributors = async function (req, res){
     });
 
     var theList = []
+    var checkerList = [];
 
     const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
         if (err)
@@ -2081,6 +2082,7 @@ exports.getContributors = async function (req, res){
     contributionItem.ionicImgPath = host.ionicImg
 
     theList.push(contributionItem)
+    checkerList.push(contributionItem.contributor)
 
     var admins = project.admins
 
@@ -2101,6 +2103,7 @@ exports.getContributors = async function (req, res){
         await getContributorInfo(contributionItem)
         
         theList.push(contributionItem)
+        checkerList.push(contributionItem.contributor)
     }
 
     for(var i = 0; i < contributions.length; i++) {
@@ -2119,8 +2122,10 @@ exports.getContributors = async function (req, res){
         contributionItem.contributionType = "contributor"
         await getContributorInfo(contributionItem)
         
-        if(!theList.includes(contributionItem))
+        if(!checkerList.includes(contributionItem.contributor)) {
             theList.push(contributionItem)
+            checkerList.push(contributionItem.contributor)
+        }
     }
 
     return res.status(200).json({
