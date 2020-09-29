@@ -2119,7 +2119,8 @@ exports.getContributors = async function (req, res){
         contributionItem.contributionType = "contributor"
         await getContributorInfo(contributionItem)
         
-        theList.push(contributionItem)
+        if(!theList.includes(contributionItem))
+            theList.push(contributionItem)
     }
 
     return res.status(200).json({
