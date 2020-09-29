@@ -1,6 +1,8 @@
 const env = require('../config/env');
 const nodemailer = require('nodemailer');
 const { body, validationResult, oneOf, check } = require('express-validator');
+const db = require('../models')
+const ProfileFeed = db.profilefeed;
 
 const { networkInterfaces } = require('os');
 
@@ -35,6 +37,23 @@ exports.sendEmail = function(target, subject, message, callback) {
           callback(true, info);
         }
       });
+}
+
+exports.createProfileFeed = function(title, desc, accountId, accountType) {
+  const pf = new ProfileFeed({
+		title: title,
+    desc: desc,
+    accountId: accountId,
+    accountType: accountType
+  });
+
+  pf.save(pf).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Profile feed creation error: ' + err.message,
+            data: {}
+        });
+    });
 }
 
 // to process error from built-in express check

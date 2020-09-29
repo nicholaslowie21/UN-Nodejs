@@ -352,6 +352,13 @@ exports.acceptUserRequest = async function (req, res){
         } 
     })
 
+    title = "Account Verified"
+    desc = "This account has been verified by our admins"
+    accountId = user.id
+    accountType = "user"
+        
+    Helper.createProfileFeed(title,desc,accountId,accountType)
+
     return res.status(200).json({
         status: 'success',
         msg: 'You have successfully accepted for a user account verification request',

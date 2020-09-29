@@ -39,5 +39,7 @@ router.post('/deleteResourceNeed', auth, ProjectValidator.deleteResourceNeed, He
 router.get('/resourceNeeds', ProjectValidator.getResourceNeeds, Helper.ifErrors, projectController.getResourceNeeds )
 
 router.get('/contributions', ProjectValidator.getContributions, Helper.ifErrors, projectController.getContributions )
+router.post('/removeContribution', auth, ProjectValidator.removeContribution, Helper.ifErrors, projectController.removeContribution)
+router.get('/contributors', ProjectValidator.getContributions, Helper.ifErrors, projectController.getContributors )
 
 module.exports = router;
