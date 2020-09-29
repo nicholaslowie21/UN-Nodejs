@@ -161,10 +161,29 @@ exports.projectPicture = async function (req, res){
         target = user
     }
 
-    if(host!=project.host)
+    // if(host!=project.host)
+    // return res.status(500).json({
+    //     status: 'error',
+    //     msg: 'You are not authorized to perform this action!',
+    //     data: {}
+    // });
+
+    let valid = false;
+
+    if(project.host != req.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.id) valid = true;
+
+    if(!valid)
     return res.status(500).json({
         status: 'error',
-        msg: 'You are not authorized to perform this action!',
+        msg: 'You are not authorized to edit this project!',
         data: {}
     });
 
