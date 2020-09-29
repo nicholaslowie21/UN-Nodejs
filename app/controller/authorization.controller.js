@@ -74,7 +74,7 @@ exports.institutionSignUpMulter = async function (req, res){
         profilePic: '',
         country: req.body.country,
         salt: randomString,
-        verifyFilePath: "/public/uploads/resources/IP/"+req.thePath
+        verifyFilePath: "public/uploads/verificationInstitution"+req.thePath
     });
     
     let token = TokenSign(institution.id, "institution", 'institution');
