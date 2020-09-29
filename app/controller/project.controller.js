@@ -565,7 +565,7 @@ exports.deleteProject = async function (req, res) {
         });
 
         target = institution
-        target = target.projects.pull(project.id)
+        target.projects.pull(project.id)
     } else if (req.type === "user") {
         const user = await Users.findOne({ '_id': req.body.id }, function (err) {
             if (err)
