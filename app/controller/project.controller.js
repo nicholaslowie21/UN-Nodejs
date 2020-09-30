@@ -147,13 +147,6 @@ exports.projectPicture = async function (req, res){
             data: {}
         });
 
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
-            data: {}
-        });
-
         host = user.id
         hostType = "user"
         country = user.country
