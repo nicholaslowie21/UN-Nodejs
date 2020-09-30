@@ -1759,6 +1759,13 @@ exports.deleteKnowledgeOwner = async function (req, res) {
         data: {}
     });
 
+    if(knowledge.owner.length === 1)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are the sole owner, please delete this resource instead!',
+        data: {}
+    });
+
     Knowledge.findOneAndUpdate(
         { _id: knowledge.id },
         { $pull: { owner: { "theId": target.id, "ownerType": req.body.targetType} } },
