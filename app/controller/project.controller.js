@@ -2363,7 +2363,9 @@ exports.getAccNewsFeed = async function (req, res){
             "imgPath":"",
             "admins":[],
             "SDGs":[],
-            "matchPoint":0
+            "matchPoint":0,
+            "profilePicture":"",
+            "ionicImg":""
         }
 
         if(account.projects.includes(projects[i].id)) continue
@@ -2381,6 +2383,8 @@ exports.getAccNewsFeed = async function (req, res){
         projectItem.admins = projects[i].admins
         projectItem.SDGs = projects[i].SDGs
 
+        await getHostInfo(projectItem)
+
         var tempSDGs = projectItem.SDGs
         for(var j = 0; j < projectItem.SDGs.length; j++) {
             if(accSDGs.includes(tempSDGs[j]))
@@ -2397,6 +2401,40 @@ exports.getAccNewsFeed = async function (req, res){
         msg: 'Projects for News Feed successfully retrieved!',
         data: { newsfeeds: theList }
     });
+}
+
+async function getHostInfo(newsFeedItem) {
+    var owner;
+
+    if(newsFeedItem.hostType === "user") {
+        owner = await Users.findOne({ '_id': newsFeedItem.host }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource contributor!' + err.message,
+                data: {}
+            });
+        });
+    } else if (newsFeedItem.hostType === 'institution') {
+        owner = await Institutions.findOne({ '_id': newsFeedItem.host }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource contributor!' + err.message,
+                data: {}
+            });
+        });
+    }
+
+    if(!owner)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an issue retrieving a contributor info!',
+        data: {}
+    });
+
+    newsFeedItem.profilePic = owner.profilePic
+    newsFeedItem.ionicImg = owner.ionicImg
 
 }
 
