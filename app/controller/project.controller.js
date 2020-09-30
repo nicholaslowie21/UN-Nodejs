@@ -32,7 +32,7 @@ var storage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = 'ProjectPic-'+req.body.projectId+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = 'ProjectPic-'+req.body.projectId+Date.now()+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },
