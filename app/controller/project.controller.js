@@ -2365,7 +2365,8 @@ exports.getAccNewsFeed = async function (req, res){
             "SDGs":[],
             "matchPoint":0,
             "profilePicture":"",
-            "ionicImg":""
+            "ionicImg":"",
+            "hostName":""
         }
 
         if(account.projects.includes(projects[i].id)) continue
@@ -2435,7 +2436,7 @@ async function getHostInfo(newsFeedItem) {
 
     newsFeedItem.profilePic = owner.profilePic
     newsFeedItem.ionicImg = owner.ionicImg
-
+    newsFeedItem.hostName = owner.name
 }
 
 handleError = (err) => {
