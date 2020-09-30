@@ -1830,7 +1830,7 @@ var venueStorage = multer.diskStorage({
     }
 
     
-    if(!req.files) {
+    if(req.files.length === 0) {
         return res.status(500).json({
             status: 'error',
             msg: 'No picture uploaded! ',
