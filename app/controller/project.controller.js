@@ -1382,13 +1382,6 @@ exports.createResourceNeed = async function (req, res){
             data: {}
         });
 
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
-            data: {}
-        });
-
         actor = user
     }
 
@@ -1524,13 +1517,6 @@ exports.editResourceNeed = async function (req, res){
         return res.status(500).json({
             status: 'error',
             msg: 'There was no such account!',
-            data: {}
-        });
-
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
             data: {}
         });
 
@@ -1682,12 +1668,6 @@ exports.deleteResourceNeed = async function (req, res){
             data: {}
         });
 
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
-            data: {}
-        });
 
         actor = user
     }
@@ -1828,13 +1808,6 @@ exports.removeContribution = async function (req, res){
         return res.status(500).json({
             status: 'error',
             msg: 'There was no such account!',
-            data: {}
-        });
-
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
             data: {}
         });
 
