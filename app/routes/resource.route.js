@@ -66,4 +66,9 @@ router.get('/knowledge/details',  ResourceValidator.viewKnowledgeDetails, Helper
 router.get('/manpower/details',  ResourceValidator.viewManpowerDetails, Helper.ifErrors, resourceController.viewManpowerDetails)
 router.get('/venue/details',  ResourceValidator.viewVenueDetails, Helper.ifErrors, resourceController.viewVenueDetails)
 
+router.get('/search/item',  ResourceValidator.searchResource, Helper.ifErrors, resourceController.searchItem)
+router.get('/search/venue',  ResourceValidator.searchResource, Helper.ifErrors, resourceController.searchVenue)
+router.get('/search/manpower',  ResourceValidator.searchResource, Helper.ifErrors, resourceController.searchManpower)
+router.get('/search/knowledge',  ResourceValidator.searchResource, Helper.ifErrors, resourceController.searchKnowledge)
+
 module.exports = router;

@@ -32,7 +32,7 @@ var storage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = 'ProjectPic-'+req.body.projectId+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = 'ProjectPic-'+req.body.projectId+Date.now()+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },
@@ -147,13 +147,6 @@ exports.projectPicture = async function (req, res){
             data: {}
         });
 
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
-            data: {}
-        });
-
         host = user.id
         hostType = "user"
         country = user.country
@@ -161,10 +154,29 @@ exports.projectPicture = async function (req, res){
         target = user
     }
 
-    if(host!=project.host)
+    // if(host!=project.host)
+    // return res.status(500).json({
+    //     status: 'error',
+    //     msg: 'You are not authorized to perform this action!',
+    //     data: {}
+    // });
+
+    let valid = false;
+
+    if(project.host != req.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.id) valid = true;
+
+    if(!valid)
     return res.status(500).json({
         status: 'error',
-        msg: 'You are not authorized to perform this action!',
+        msg: 'You are not authorized to edit this project!',
         data: {}
     });
 
@@ -538,6 +550,8 @@ exports.deleteProject = async function (req, res) {
         data: {}
     });
 
+    var target;
+
     if(req.type === "institution") {
         const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
             if (err)
@@ -563,7 +577,7 @@ exports.deleteProject = async function (req, res) {
         });
 
         target = institution
-        target = target.projects.pull(project.id)
+        target.projects.pull(project.id)
     } else if (req.type === "user") {
         const user = await Users.findOne({ '_id': req.body.id }, function (err) {
             if (err)
@@ -632,7 +646,6 @@ exports.deleteProject = async function (req, res) {
 
     project.save(project)
     .then(data => {
-        
         target.save(target).catch(err => {
             return res.status(500).json({
                 status: 'error',
@@ -1369,13 +1382,6 @@ exports.createResourceNeed = async function (req, res){
             data: {}
         });
 
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
-            data: {}
-        });
-
         actor = user
     }
 
@@ -1511,13 +1517,6 @@ exports.editResourceNeed = async function (req, res){
         return res.status(500).json({
             status: 'error',
             msg: 'There was no such account!',
-            data: {}
-        });
-
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
             data: {}
         });
 
@@ -1669,12 +1668,6 @@ exports.deleteResourceNeed = async function (req, res){
             data: {}
         });
 
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
-            data: {}
-        });
 
         actor = user
     }
@@ -1815,13 +1808,6 @@ exports.removeContribution = async function (req, res){
         return res.status(500).json({
             status: 'error',
             msg: 'There was no such account!',
-            data: {}
-        });
-
-        if(user.isVerified != "true")
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Account not authorized to create project! Not verified yet.',
             data: {}
         });
 
@@ -2003,6 +1989,7 @@ exports.getContributors = async function (req, res){
     });
 
     var theList = []
+    var checkerList = [];
 
     const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
         if (err)
@@ -2027,7 +2014,9 @@ exports.getContributors = async function (req, res){
         "contributorType": "",
         "contributorUsername":"",
         "contributorName":"",
-        "contributionType":""
+        "contributionType":"",
+        "contributorImgPath":"",
+        "ionicImgPath":""
     }
 
     if(project.hostType === "institution") {
@@ -2074,8 +2063,11 @@ exports.getContributors = async function (req, res){
     contributionItem.contributorUsername = host.username
     contributionItem.contributorName = host.name
     contributionItem.contributionType = "host"
-   
+    contributionItem.contributorImgPath = host.profilePic
+    contributionItem.ionicImgPath = host.ionicImg
+
     theList.push(contributionItem)
+    checkerList.push(contributionItem.contributor)
 
     var admins = project.admins
 
@@ -2085,7 +2077,9 @@ exports.getContributors = async function (req, res){
             "contributorType": "",
             "contributorUsername":"",
             "contributorName":"",
-            "contributionType":""
+            "contributionType":"",
+            "contributorImgPath":"",
+            "ionicImgPath":""
         }
 
         contributionItem.contributor = admins[i]
@@ -2094,6 +2088,7 @@ exports.getContributors = async function (req, res){
         await getContributorInfo(contributionItem)
         
         theList.push(contributionItem)
+        checkerList.push(contributionItem.contributor)
     }
 
     for(var i = 0; i < contributions.length; i++) {
@@ -2102,7 +2097,9 @@ exports.getContributors = async function (req, res){
             "contributorType": "",
             "contributorUsername":"",
             "contributorName":"",
-            "contributionType":""
+            "contributionType":"",
+            "contributorImgPath":"",
+            "ionicImgPath":""
         }
 
         contributionItem.contributor = contributions[i].contributor
@@ -2110,7 +2107,10 @@ exports.getContributors = async function (req, res){
         contributionItem.contributionType = "contributor"
         await getContributorInfo(contributionItem)
         
-        theList.push(contributionItem)
+        if(!checkerList.includes(contributionItem.contributor)) {
+            theList.push(contributionItem)
+            checkerList.push(contributionItem.contributor)
+        }
     }
 
     return res.status(200).json({
@@ -2207,6 +2207,9 @@ async function getContributorInfo(contributionItem) {
 
     contributionItem.contributorUsername = owner.username
     contributionItem.contributorName = owner.name
+    contributionItem.contributorImgPath = owner.profilePic
+    contributionItem.ionicImgPath = owner.ionicImg
+
 }
 
 async function getResourceInfo(contributionItem) {
@@ -2272,6 +2275,135 @@ async function getResourceInfo(contributionItem) {
         contributionItem.resourceTitle = '$'+resource.sum+' contributed';
 }
 
+exports.getAccNewsFeed = async function (req, res){
+    var account;
+    if (req.body.type === "user") {
+        account = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving the account!' + err.message,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        account = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving the account!' + err.message,
+                data: {}
+            });
+        });
+    }
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no contributions or something went wrong!',
+        data: {}
+    });
+
+    var accSDGs = account.SDGs;
+    var theList = []
+    
+    var projects = await Projects.find({ 'status': "ongoing" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an error retrieving the account!' + err.message,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < projects.length; i++) {
+        var projectItem = {
+            "title": "",
+            "desc": "",
+            "host": "",
+            "hostType": "",
+            "status": "",
+            "rating": "",
+            "country": "",
+            "code": "",
+            "imgPath":"",
+            "admins":[],
+            "SDGs":[],
+            "matchPoint":0,
+            "profilePicture":"",
+            "ionicImg":"",
+            "hostName":""
+        }
+
+        if(account.projects.includes(projects[i].id)) continue
+
+        projectItem.id = projects[i].id
+        projectItem.title = projects[i].title
+        projectItem.desc = projects[i].desc
+        projectItem.host = projects[i].host
+        projectItem.hostType = projects[i].hostType
+        projectItem.status = projects[i].status
+        projectItem.rating = projects[i].rating
+        projectItem.country = projects[i].country
+        projectItem.code = projects[i].code
+        projectItem.imgPath = projects[i].imgPath
+        projectItem.admins = projects[i].admins
+        projectItem.SDGs = projects[i].SDGs
+
+        await getHostInfo(projectItem)
+
+        var tempSDGs = projectItem.SDGs
+        for(var j = 0; j < projectItem.SDGs.length; j++) {
+            if(accSDGs.includes(tempSDGs[j]))
+                projectItem.matchPoint += 10;
+        }
+
+        theList.push(projectItem)
+    }
+
+    theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Projects for News Feed successfully retrieved!',
+        data: { newsfeeds: theList }
+    });
+}
+
+async function getHostInfo(newsFeedItem) {
+    var owner;
+
+    if(newsFeedItem.hostType === "user") {
+        owner = await Users.findOne({ '_id': newsFeedItem.host }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource contributor!' + err.message,
+                data: {}
+            });
+        });
+    } else if (newsFeedItem.hostType === 'institution') {
+        owner = await Institutions.findOne({ '_id': newsFeedItem.host }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an error retrieving a resource contributor!' + err.message,
+                data: {}
+            });
+        });
+    }
+
+    if(!owner)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an issue retrieving a contributor info!',
+        data: {}
+    });
+
+    newsFeedItem.profilePic = owner.profilePic
+    newsFeedItem.ionicImg = owner.ionicImg
+    newsFeedItem.hostName = owner.name
+}
 
 handleError = (err) => {
     console.log("handleError :"+ err)

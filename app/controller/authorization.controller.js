@@ -34,7 +34,7 @@ var InstitutionVerifyStorage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = extentsion[0]+"-"+req.body.username+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = "InstitutionVerification-"+req.body.username+"-"+extentsion[0]+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },
@@ -74,7 +74,7 @@ exports.institutionSignUpMulter = async function (req, res){
         profilePic: '',
         country: req.body.country,
         salt: randomString,
-        verifyFilePath: "public/uploads/verificationInstitution"+req.thePath
+        verifyFilePath: "/public/uploads/verificationInstitution/"+req.thePath
     });
     
     let token = TokenSign(institution.id, "institution", 'institution');
@@ -603,7 +603,7 @@ var storage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = 'VerifyReq-User-'+req.id+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = 'VerifyReq-User-'+req.id+Date.now()+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },

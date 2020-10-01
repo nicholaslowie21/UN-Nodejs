@@ -42,4 +42,6 @@ router.get('/contributions', ProjectValidator.getContributions, Helper.ifErrors,
 router.post('/removeContribution', auth, ProjectValidator.removeContribution, Helper.ifErrors, projectController.removeContribution)
 router.get('/contributors', ProjectValidator.getContributions, Helper.ifErrors, projectController.getContributors )
 
+router.get('/accountNewsFeed', auth, projectController.getAccNewsFeed )
+
 module.exports = router;

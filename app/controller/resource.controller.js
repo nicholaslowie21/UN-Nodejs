@@ -23,7 +23,7 @@ var storage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = 'ItemPic-'+req.body.itemId+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = 'ItemPic-'+req.body.itemId+Date.now()+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },
@@ -67,7 +67,7 @@ var IPStorage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = extentsion[0]+"-"+req.body.knowledgeId+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = extentsion[0]+"-"+req.body.knowledgeId+Date.now()+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },
@@ -1759,6 +1759,13 @@ exports.deleteKnowledgeOwner = async function (req, res) {
         data: {}
     });
 
+    if(knowledge.owner.length === 1)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are the sole owner, please delete this resource instead!',
+        data: {}
+    });
+
     Knowledge.findOneAndUpdate(
         { _id: knowledge.id },
         { $pull: { owner: { "theId": target.id, "ownerType": req.body.targetType} } },
@@ -1823,7 +1830,7 @@ var venueStorage = multer.diskStorage({
     }
 
     
-    if(!req.files) {
+    if(req.files.length === 0) {
         return res.status(500).json({
             status: 'error',
             msg: 'No picture uploaded! ',
@@ -3155,5 +3162,117 @@ exports.viewKnowledgeDetails = async function (req, res) {
         status: 'success',
         msg: 'Knowledge resource detail successfully retrieved',
         data: { knowledge: knowledge, userOwner: userOwner, institutionOwner: institutionOwner }
+    });
+}
+
+exports.searchItem = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const items = await Item.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!items) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No item found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the items',
+        data: { items: items }
+    });
+}
+
+exports.searchVenue = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const venues = await Venue.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!venues) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No venue found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the venues',
+        data: { venues: venues }
+    });
+}
+
+exports.searchManpower = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const manpowers = await Manpower.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!manpowers) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No manpower found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the manpowers',
+        data: { manpowers: manpowers }
+    });
+}
+
+exports.searchKnowledge = async function (req, res){
+
+    var rgx = new RegExp(req.query.title, "i");
+    
+    const knowledges = await Knowledge.find({ 'title': { $regex: rgx }, "status": "active" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err.message,
+            data: {}
+        });
+    });
+
+    if(!knowledges) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No knowledge found! ',
+            data: {}
+        });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for the knowledges',
+        data: { knowledges: knowledges }
     });
 }

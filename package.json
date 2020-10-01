@@ -4,7 +4,7 @@
   "description": "this is the core back-end for our knowledge management system",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js -e ejs,js,css,html,jpg,png,scss",
+    "start": "nodemon server.js -e ejs,js,css,html,scss",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
