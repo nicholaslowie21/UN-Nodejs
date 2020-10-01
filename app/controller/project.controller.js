@@ -643,7 +643,6 @@ exports.deleteProject = async function (req, res) {
         })
     }
 
-
     project.save(project)
     .then(data => {
         target.save(target).catch(err => {
@@ -666,6 +665,38 @@ exports.deleteProject = async function (req, res) {
             data: {}
         });
     });
+
+    let subject = 'KoCoSD Project Deletion'
+    let theMessage = `
+        <h1>A project that you are currently in is deleted</h1>
+        <p>The project code ${project.code}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+
+    for(var i = 0; i < adminsArr.length; i++) {
+        Helper.sendEmail(adminsArr[i].email, subject, theMessage, function (info) {
+            if (!info) {
+                console.log('Something went wrong while trying to send email!')
+            } 
+        })    
+    }
+
+    const contributions = await Contribution.find({ 'projectId': project.id, 'status':'active' }, function (err) {
+        if (err) console.log("Error: "+err.message)
+    });
+
+    if(!contributions)
+        console.log("Something went wrong when sending email to contributors after project deletion")
+    
+    for(var i = 0 ; i < contributions.length; i++) {
+        removeContributionEmail(contributions[i],project.code)
+    }
 }
 
 exports.editAdmin = async function (req, res) {
@@ -1748,6 +1779,11 @@ exports.deleteResourceNeed = async function (req, res){
         contributions[i].save()
     }
 
+    
+    for(var i = 0 ; i < contributions.length; i++) {
+        removeContributionEmail(contributions[i],project.code)
+    }
+
 }
 
 exports.removeContribution = async function (req, res){
@@ -1881,6 +1917,41 @@ exports.removeContribution = async function (req, res){
         });
     });
 
+    removeContributionEmail(contribution, project.code)
+
+}
+
+async function removeContributionEmail(contribution, projectCode) {
+
+    var target;
+    if(contribution.contributorType === "user") {
+        target= await Users.findOne({ '_id': contribution.contributor, function (err) {
+            if (err) console.log("Error: "+err.message)
+        }});
+
+    } else if (contribution.contributorType === "institution") {
+        target= await Institutions.findOne({ '_id': contribution.contributor, function (err) {
+            if (err) console.log("Error: "+err.message)
+        }});
+    }
+
+    if(!target) {
+        console.log("target account not found")
+        return;
+    }
+
+    let subject = 'KoCoSD Project Deletion'
+    let theMessage = `
+        <h1>A project that you are currently in is deleted.</h1>
+        <p>The project code ${projectCode}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.getResourceNeeds = async function (req, res){
