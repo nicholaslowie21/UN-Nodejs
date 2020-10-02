@@ -1940,9 +1940,9 @@ async function removeContributionEmail(contribution, projectCode) {
         return;
     }
 
-    let subject = 'KoCoSD Project Deletion'
+    let subject = 'KoCoSD Contribution Deletion'
     let theMessage = `
-        <h1>A project that you are currently in is deleted.</h1>
+        <h1>A project resource need/contribution of yours is deleted.</h1>
         <p>The project code ${projectCode}<p>
         <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
     `
