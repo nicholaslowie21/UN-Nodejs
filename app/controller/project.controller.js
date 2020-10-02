@@ -2205,19 +2205,17 @@ async function getNeedInfo(contributionItem) {
         });
     });
 
-    if(!need)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an error retrieving a resource need!' + err.message,
-        data: {}
-    });
+    if(!need) {
+        console.log("Error: Something went wrong when retrieving needs")
+        return
+    }
 
     contributionItem.needTitle = need.title;
 }
 
 async function getRequestInfo(contributionItem) {
     var request;
-    console.log(contributionItem)
+    
     if(contributionItem.requestType === "project") {
         request = await ProjectReq.findOne({ '_id': contributionItem.requestId }, function (err) {
             if (err)
@@ -2269,12 +2267,10 @@ async function getContributorInfo(contributionItem) {
         });
     }
 
-    if(!owner)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an issue retrieving a contributor info!',
-        data: {}
-    });
+    if(!owner) {
+        console.log("Error: Something went wrong when retrieving owner")
+        return
+    }
 
     contributionItem.contributorUsername = owner.username
     contributionItem.contributorName = owner.name
@@ -2285,8 +2281,6 @@ async function getContributorInfo(contributionItem) {
 
 async function getResourceInfo(contributionItem) {
     var resource;
-
-    console.log(contributionItem)
 
     if(contributionItem.resType === 'manpower') {
         resource = await Manpower.findOne({ '_id': contributionItem.resourceId }, function (err) {
@@ -2335,13 +2329,9 @@ async function getResourceInfo(contributionItem) {
         });    
     }
     
-    if(!resource)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an error retrieving a resource!' + err.message,
-        data: {}
-    });
-
+    if(!resource){
+        console.log("Error: Something went wrong when retrieving resources")
+    }
     if(contributionItem.resType!= 'money')
         contributionItem.resourceTitle = resource.title;
     else
