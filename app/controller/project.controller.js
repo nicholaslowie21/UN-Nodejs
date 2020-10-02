@@ -2087,7 +2087,8 @@ exports.getContributors = async function (req, res){
         "contributorName":"",
         "contributionType":"",
         "contributorImgPath":"",
-        "ionicImgPath":""
+        "ionicImgPath":"",
+        "resourceId":""
     }
 
     if(project.hostType === "institution") {
@@ -2150,7 +2151,8 @@ exports.getContributors = async function (req, res){
             "contributorName":"",
             "contributionType":"",
             "contributorImgPath":"",
-            "ionicImgPath":""
+            "ionicImgPath":"",
+            "resourceId":""
         }
 
         contributionItem.contributor = admins[i]
@@ -2170,7 +2172,8 @@ exports.getContributors = async function (req, res){
             "contributorName":"",
             "contributionType":"",
             "contributorImgPath":"",
-            "ionicImgPath":""
+            "ionicImgPath":"",
+            "resourceId":""
         }
 
         contributionItem.contributor = contributions[i].contributor
@@ -2214,7 +2217,7 @@ async function getNeedInfo(contributionItem) {
 
 async function getRequestInfo(contributionItem) {
     var request;
-
+    console.log(contributionItem)
     if(contributionItem.requestType === "project") {
         request = await ProjectReq.findOne({ '_id': contributionItem.requestId }, function (err) {
             if (err)
@@ -2235,13 +2238,10 @@ async function getRequestInfo(contributionItem) {
         });
     }
 
-    if(!request)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an issue retrieving request info!',
-        data: {}
-    });
-
+    if(!request) {
+        console.log("error: request not found")
+        return
+    }
     contributionItem.resourceId = request.resourceId
     contributionItem.desc = request.desc
 }
@@ -2285,6 +2285,8 @@ async function getContributorInfo(contributionItem) {
 
 async function getResourceInfo(contributionItem) {
     var resource;
+
+    console.log(contributionItem)
 
     if(contributionItem.resType === 'manpower') {
         resource = await Manpower.findOne({ '_id': contributionItem.resourceId }, function (err) {
