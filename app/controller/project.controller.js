@@ -2134,7 +2134,7 @@ exports.getContributors = async function (req, res){
     contributionItem.contributor = host.id
     contributionItem.contributorUsername = host.username
     contributionItem.contributorName = host.name
-    contributionItem.contributionType = "host"
+    contributionItem.contributionType = "founder"
     contributionItem.contributorImgPath = host.profilePic
     contributionItem.ionicImgPath = host.ionicImg
 
