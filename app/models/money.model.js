@@ -20,11 +20,11 @@ module.exports = mongoose => {
     const Money = mongoose.model("Money", schema);
 
     //to create a dummy money resource
-    Money.find({title: 'dummy'}).then(function (docs) {
-        if (docs.length === 0) {
-            Money.create({ title: 'dummy', status:'active'});
-        }
-      });
+    // Money.find({title: 'dummy'}).then(function (docs) {
+    //     if (docs.length === 0) {
+    //         Money.create({ title: 'dummy', status:'active'});
+    //     }
+    //   });
 
     return Money;
   };

@@ -36,11 +36,11 @@ module.exports = mongoose => {
 
     //to create a super user
     // //password: SuperAdminPass@123
-    User.find({username: 'superadmin'}).then(function (docs) {
-      if (docs.length === 0) {
-          User.create({ username: 'superadmin', name:'superadmin', email:'superadmin@email.com', bio: '', occupation:'', isVerified:'false', profilePic: '', country: '',points:0, wallet:0, gender:'', website:'' ,status:'active' ,password: '1601c7d4ebcaa72ae9abc3a1eec24196', salt: 'UH1GR6hl', role:'adminlead' });
-      }
-    });
+    // User.find({username: 'superadmin'}).then(function (docs) {
+    //   if (docs.length === 0) {
+    //       User.create({ username: 'superadmin', name:'superadmin', email:'superadmin@email.com', bio: '', occupation:'', isVerified:'false', profilePic: '', country: '',points:0, wallet:0, gender:'', website:'' ,status:'active' ,password: '1601c7d4ebcaa72ae9abc3a1eec24196', salt: 'UH1GR6hl', role:'adminlead' });
+    //   }
+    // });
 
     return User;
   };

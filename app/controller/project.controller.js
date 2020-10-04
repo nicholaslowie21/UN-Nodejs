@@ -643,7 +643,6 @@ exports.deleteProject = async function (req, res) {
         })
     }
 
-
     project.save(project)
     .then(data => {
         target.save(target).catch(err => {
@@ -666,6 +665,38 @@ exports.deleteProject = async function (req, res) {
             data: {}
         });
     });
+
+    let subject = 'KoCoSD Project Deletion'
+    let theMessage = `
+        <h1>A project that you are currently in is deleted</h1>
+        <p>The project code ${project.code}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+
+    for(var i = 0; i < adminsArr.length; i++) {
+        Helper.sendEmail(adminsArr[i].email, subject, theMessage, function (info) {
+            if (!info) {
+                console.log('Something went wrong while trying to send email!')
+            } 
+        })    
+    }
+
+    const contributions = await Contribution.find({ 'projectId': project.id, 'status':'active' }, function (err) {
+        if (err) console.log("Error: "+err.message)
+    });
+
+    if(!contributions)
+        console.log("Something went wrong when sending email to contributors after project deletion")
+    
+    for(var i = 0 ; i < contributions.length; i++) {
+        removeContributionEmail(contributions[i],project.code)
+    }
 }
 
 exports.editAdmin = async function (req, res) {
@@ -1748,6 +1779,11 @@ exports.deleteResourceNeed = async function (req, res){
         contributions[i].save()
     }
 
+    
+    for(var i = 0 ; i < contributions.length; i++) {
+        removeContributionEmail(contributions[i],project.code)
+    }
+
 }
 
 exports.removeContribution = async function (req, res){
@@ -1881,6 +1917,41 @@ exports.removeContribution = async function (req, res){
         });
     });
 
+    removeContributionEmail(contribution, project.code)
+
+}
+
+async function removeContributionEmail(contribution, projectCode) {
+
+    var target;
+    if(contribution.contributorType === "user") {
+        target= await Users.findOne({ '_id': contribution.contributor, function (err) {
+            if (err) console.log("Error: "+err.message)
+        }});
+
+    } else if (contribution.contributorType === "institution") {
+        target= await Institutions.findOne({ '_id': contribution.contributor, function (err) {
+            if (err) console.log("Error: "+err.message)
+        }});
+    }
+
+    if(!target) {
+        console.log("target account not found")
+        return;
+    }
+
+    let subject = 'KoCoSD Contribution Deletion'
+    let theMessage = `
+        <h1>A project resource need/contribution of yours is deleted.</h1>
+        <p>The project code ${projectCode}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
 }
 
 exports.getResourceNeeds = async function (req, res){
@@ -2016,7 +2087,8 @@ exports.getContributors = async function (req, res){
         "contributorName":"",
         "contributionType":"",
         "contributorImgPath":"",
-        "ionicImgPath":""
+        "ionicImgPath":"",
+        "resourceId":""
     }
 
     if(project.hostType === "institution") {
@@ -2062,7 +2134,7 @@ exports.getContributors = async function (req, res){
     contributionItem.contributor = host.id
     contributionItem.contributorUsername = host.username
     contributionItem.contributorName = host.name
-    contributionItem.contributionType = "host"
+    contributionItem.contributionType = "founder"
     contributionItem.contributorImgPath = host.profilePic
     contributionItem.ionicImgPath = host.ionicImg
 
@@ -2079,7 +2151,8 @@ exports.getContributors = async function (req, res){
             "contributorName":"",
             "contributionType":"",
             "contributorImgPath":"",
-            "ionicImgPath":""
+            "ionicImgPath":"",
+            "resourceId":""
         }
 
         contributionItem.contributor = admins[i]
@@ -2099,7 +2172,8 @@ exports.getContributors = async function (req, res){
             "contributorName":"",
             "contributionType":"",
             "contributorImgPath":"",
-            "ionicImgPath":""
+            "ionicImgPath":"",
+            "resourceId":""
         }
 
         contributionItem.contributor = contributions[i].contributor
@@ -2131,19 +2205,17 @@ async function getNeedInfo(contributionItem) {
         });
     });
 
-    if(!need)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an error retrieving a resource need!' + err.message,
-        data: {}
-    });
+    if(!need) {
+        console.log("Error: Something went wrong when retrieving needs")
+        return
+    }
 
     contributionItem.needTitle = need.title;
 }
 
 async function getRequestInfo(contributionItem) {
     var request;
-
+    
     if(contributionItem.requestType === "project") {
         request = await ProjectReq.findOne({ '_id': contributionItem.requestId }, function (err) {
             if (err)
@@ -2164,13 +2236,10 @@ async function getRequestInfo(contributionItem) {
         });
     }
 
-    if(!request)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an issue retrieving request info!',
-        data: {}
-    });
-
+    if(!request) {
+        console.log("error: request not found")
+        return
+    }
     contributionItem.resourceId = request.resourceId
     contributionItem.desc = request.desc
 }
@@ -2198,12 +2267,10 @@ async function getContributorInfo(contributionItem) {
         });
     }
 
-    if(!owner)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an issue retrieving a contributor info!',
-        data: {}
-    });
+    if(!owner) {
+        console.log("Error: Something went wrong when retrieving owner")
+        return
+    }
 
     contributionItem.contributorUsername = owner.username
     contributionItem.contributorName = owner.name
@@ -2262,13 +2329,9 @@ async function getResourceInfo(contributionItem) {
         });    
     }
     
-    if(!resource)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an error retrieving a resource!' + err.message,
-        data: {}
-    });
-
+    if(!resource){
+        console.log("Error: Something went wrong when retrieving resources")
+    }
     if(contributionItem.resType!= 'money')
         contributionItem.resourceTitle = resource.title;
     else
