@@ -154,13 +154,6 @@ exports.projectPicture = async function (req, res){
         target = user
     }
 
-    // if(host!=project.host)
-    // return res.status(500).json({
-    //     status: 'error',
-    //     msg: 'You are not authorized to perform this action!',
-    //     data: {}
-    // });
-
     let valid = false;
 
     if(project.host != req.id) {
@@ -2438,30 +2431,24 @@ async function getHostInfo(newsFeedItem) {
 
     if(newsFeedItem.hostType === "user") {
         owner = await Users.findOne({ '_id': newsFeedItem.host }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a resource contributor!' + err.message,
-                data: {}
-            });
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
         });
     } else if (newsFeedItem.hostType === 'institution') {
         owner = await Institutions.findOne({ '_id': newsFeedItem.host }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a resource contributor!' + err.message,
-                data: {}
-            });
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
         });
     }
 
-    if(!owner)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an issue retrieving a contributor info!',
-        data: {}
-    });
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
 
     newsFeedItem.profilePic = owner.profilePic
     newsFeedItem.ionicImg = owner.ionicImg

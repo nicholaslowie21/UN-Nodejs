@@ -7,3 +7,20 @@ exports.reqResource = [
     body('desc').exists(),
     body('resType').exists()
 ]
+
+exports.reqProject = [
+    body('resourceId').exists(),
+    body('needId').exists(),
+    body('desc').exists(),
+    body('resType').exists()
+]
+
+exports.useKnowledgeResource = [
+    body('resourceId').exists(),
+    body('needId').exists(),
+    body('desc').exists()
+]
+
+exports.filterProj = [
+    body('filterSDGs').exists()
+]
