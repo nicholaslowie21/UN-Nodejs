@@ -1603,6 +1603,18 @@ exports.editResourceNeed = async function (req, res){
         data: {}
     });
 
+    if(resourceneed.type === "money") {
+        if(req.body.total < resourceneed.pendingSum+resourceneed.receivedSum)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Invalid input! The total sum is invalid. It is lower than the received sum',
+            data: {}
+        }); 
+
+        req.body.completion = req.body.receivedSum/req.body.total
+    }
+    
+
     resourceneed.title = req.body.title
     resourceneed.desc = req.body.desc
     resourceneed.total = req.body.total
@@ -1911,6 +1923,26 @@ exports.removeContribution = async function (req, res){
     });
 
     removeContributionEmail(contribution, project.code)
+
+    if(contribution.resType === "money") {
+        var need = await ResourceNeed.findOne({ '_id': contribution.needId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        var projectreq = await ProjectReq.findOne({ '_id': contribution.requestId }, function (err) {
+            if (err){ 
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        need.receivedSum = need.receivedSum - projectreq.moneySum;
+
+        need.save()
+    }
 
 }
 

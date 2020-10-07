@@ -8,6 +8,13 @@ exports.reqResource = [
     body('resType').exists()
 ]
 
+exports.reqAutoResource = [
+    body('resourceId').exists(),
+    body('projectId'),
+    body('desc').exists(),
+    body('resType').exists()
+]
+
 exports.reqProject = [
     body('resourceId').exists(),
     body('needId').exists(),
@@ -15,9 +22,21 @@ exports.reqProject = [
     body('resType').exists()
 ]
 
+exports.contributeMoney = [
+    body('needId').exists(),
+    body('desc').exists(),
+    body('moneySum').exists()
+]
+
 exports.useKnowledgeResource = [
     body('resourceId').exists(),
     body('needId').exists(),
+    body('desc').exists()
+]
+
+exports.useAutoKnowledgeResource = [
+    body('projectId').exists(),
+    body('resourceId').exists(),
     body('desc').exists()
 ]
 

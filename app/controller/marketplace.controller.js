@@ -12,6 +12,8 @@ const Project = db.project
 const Contribution = db.contribution
 const nodeCountries =  require("node-countries")
 const Helper = require('../service/helper.service')
+const { default: ShortUniqueId } = require('short-unique-id');
+const uid = new ShortUniqueId();
 
 exports.reqResource = async function (req, res) {
     var theRequester    
@@ -200,6 +202,176 @@ exports.reqResource = async function (req, res) {
     });
 }
 
+exports.reqAutoResource = async function (req, res) {
+    var theRequester    
+
+    if (req.body.type === "user") {
+        theRequester = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theRequester = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theRequester) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    var resource;
+
+    if(req.body.resType === "item") {
+        resource = await Item.findOne({ '_id': req.body.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.resType === "venue") {
+        resource = await Venue.findOne({ '_id': req.body.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.resType === "manpower") {
+        resource = await Manpower.findOne({ '_id': req.body.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!resource)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such item resource not found!',
+        data: {}
+    });
+    
+    if(resource.status != "active")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You cannot request for this resource!',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.status != "ongoing")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This project is not ongoing!',
+        data: {}
+    });
+
+    var valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this project!',
+        data: {}
+    });
+
+    const resourceneed = new ResourceNeed({
+        title: resource.title,
+        desc: "",
+        type: req.body.resType,
+        total: 0,
+        completion: 0,
+        projectId: project.id,
+        code: theRequester.username+"-"+uid(),
+        status: "progress",
+        pendingSum: 0,
+        receivedSum: 0
+    });
+
+    var theResourceNeed;
+
+    await resourceneed.save(resourceneed)
+    .then(data => {
+        console.log(data)
+        theResourceNeed = data;
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+
+    const resourcereq = new ResourceReq({
+        projectId: project.id,
+        needId: theResourceNeed.id,
+        resourceId: req.body.resourceId,
+        resType: req.body.resType,
+        status:"pending",
+        desc: req.body.desc
+    })
+
+    resourcereq.save(resourcereq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Resource request successfully created',
+            data: { resourcereq: data, resourceneed: theResourceNeed }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
 exports.useKnowledgeResource = async function (req, res) {
     var theRequester    
 
@@ -344,6 +516,179 @@ exports.useKnowledgeResource = async function (req, res) {
     const resourcereq = new ResourceReq({
         projectId: project.id,
         needId: req.body.needId,
+        resourceId: req.body.resourceId,
+        resType: "knowledge",
+        status:"completed",
+        desc: req.body.desc
+    })
+
+    var contributions = []
+
+    await resourcereq.save(resourcereq)
+    .then(data => {
+
+        for(var i = 0; i < resource.owner.length; i++) {
+            const contribution = new Contribution({
+                projectId: project.id,
+                needId: resourceneed.id,
+                requestId: data.id,
+                requestType: "resource",
+                resType: "knowledge",
+                rating: 1,
+                contributor: resource.owner[i].theId,
+                contributorType: resource.owner[i].ownerType,
+                status: 'active'
+            });
+
+            contribution.save().catch(err => {
+                console.log("error: "+err.message)
+            })
+            contributions.push(contribution)
+        }
+
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Knowledge resource successfully used',
+            data: { resourcereq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    for(var j = 0; j < contributions.length; j++) {
+        useKnowledgeEmail(contributions[j], project.code)
+    }
+
+}
+
+exports.useAutoKnowledgeResource = async function (req, res) {
+    var theRequester    
+
+    if (req.body.type === "user") {
+        theRequester = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theRequester = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theRequester) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    var resource;
+
+    resource = await Knowledge.findOne({ '_id': req.body.resourceId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });    
+
+    if(!resource)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such knowledge resource not found!',
+        data: {}
+    });
+    
+    if(resource.status != "active")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You cannot use this resource!',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.status != "ongoing")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This project is not ongoing!',
+        data: {}
+    });
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this project!',
+        data: {}
+    });
+
+    const resourceneed = new ResourceNeed({
+        title: resource.title,
+        desc: "",
+        type: "knowledge",
+        total: 0,
+        completion: 0,
+        projectId: project.id,
+        code: theRequester.username+"-"+uid(),
+        status: "progress",
+        pendingSum: 0,
+        receivedSum: 0
+    });
+
+    var theResourceNeed;
+
+    await resourceneed.save(resourceneed)
+    .then(data => {
+        theResourceNeed = data;
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    const resourcereq = new ResourceReq({
+        projectId: project.id,
+        needId: theResourceNeed.id,
         resourceId: req.body.resourceId,
         resType: "knowledge",
         status:"completed",
@@ -779,6 +1124,90 @@ exports.getProjectListFiltered = async function (req, res) {
     });
 }
 
+exports.getFundingNeeds = async function (req, res) {    
+    const fundingneeds = await ResourceNeed.find({ 'status': 'progress', 'type':'money' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    var theList = []
+
+    for(var i = 0; i < fundingneeds.length; i++) {
+        var fundingItem = {
+            id:"",
+            title: "",
+            desc: "",
+            owner: "",
+            status: "",
+            country: "",
+            imgPath: "",
+            ownerType: "",
+            ownerImg: "",
+            ownerName: "",
+            ownerUsername: "",
+            rating:"",
+            code:"",
+            SDGs:"",
+            needId:"",
+            fundingTitle: "",
+            fundingDesc: "",
+            fundingStatus: "",
+            total:0,
+            pendingSum:0,
+            receivedSum:0
+        }
+        
+        fundingItem.needId = fundingneeds[i].id
+        fundingItem.fundingTitle = fundingneeds[i].title
+        fundingItem.fundingDesc = fundingneeds[i].desc
+        fundingItem.fundingStatus = fundingneeds[i].status
+        fundingItem.total = fundingneeds[i].total
+        fundingItem.pendingSum = fundingneeds[i].pendingSum
+        fundingItem.receivedSum = fundingneeds[i].receivedSum
+        fundingItem.id = fundingneeds[i].projectId
+
+        const project = await Project.findOne({ '_id': fundingItem.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+
+        if(!project) continue;
+        if(project.status != 'ongoing') continue
+
+        fundingItem.title = project.title
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.owner
+        fundingItem.status = project.status
+        fundingItem.country = project.country
+        fundingItem.imgPath = project.imgPath                        
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.host
+        fundingItem.ownerType = project.hostType
+        fundingItem.rating = project.rating
+        fundingItem.code = project.code
+        fundingItem.SDGs = project.SDGs
+                
+        await getOwnerInfo(fundingItem)
+
+        theList.push(fundingItem)
+    }
+    
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Funding need list successfully retrieved',
+        data: { fundings: theList }
+    });
+}
+
 exports.reqProject = async function (req, res) {
     var theRequester    
 
@@ -988,6 +1417,139 @@ exports.reqProject = async function (req, res) {
             status: 'success',
             msg: 'Resource request successfully created',
             data: { resourcereq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.contributeMoney = async function (req, res) {
+    var theRequester    
+
+    if (req.body.type === "user") {
+        theRequester = await User.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if (req.body.type === "institution") {
+        theRequester = await Institution.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+    
+    if(!theRequester) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': req.body.needId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such item resource need not found!',
+        data: {}
+    });
+
+    if(resourceneed.type != "money")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Type mismatch! Resource need type is not money',
+        data: {}
+    });
+
+    if(resourceneed.status != "progress")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Your resource need status is no longer in progress',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': resourceneed.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    if(project.status != "ongoing")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This project is not ongoing!',
+        data: {}
+    });
+
+    var temp = await ProjectReq.findOne({ 'needId': resourceneed.id, "resType": "money", "status":"accepted" }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(temp)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project request have been created! ',
+        data: {}
+    }); 
+
+    if(req.body.moneySum + resourceneed.pendingSum + resourceneed.receivedSum > resourceneed.total)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The amount requested is too high! ',
+        data: {}
+    }); 
+
+    const projectreq = new ProjectReq({
+        projectId: project.id,
+        needId: req.body.needId,
+        resType: "money",
+        status: "accepted",
+        ownerId: req.body.id,
+        ownerType: req.body.type,
+        desc: req.body.desc,
+        moneySum: req.body.moneySum
+    })
+
+    projectreq.save(projectreq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Money contribution request successfully created',
+            data: { moneyreq: data }
         });
     }).catch(err => {
         return res.status(500).json({

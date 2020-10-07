@@ -9,6 +9,7 @@ module.exports = mongoose => {
         ownerId: { type: String, default: '' },
         ownerType: { type: String, default: '' },
         desc: { type: String, default: '' },
+        moneySum: { type: Number, default: 0 }
       },
       { timestamps: true }
     );
