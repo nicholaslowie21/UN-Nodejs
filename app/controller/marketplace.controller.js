@@ -1544,12 +1544,15 @@ exports.contributeMoney = async function (req, res) {
         moneySum: req.body.moneySum
     })
 
+    resourceneed.pendingSum = resourceneed.pendingSum + req.body.moneySum
+    resourceneed.save();
+
     projectreq.save(projectreq)
     .then(data => {
         return res.status(200).json({
             status: 'success',
             msg: 'Money contribution request successfully created',
-            data: { moneyreq: data }
+            data: { resourceneed: resourceneed, moneyreq: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -1558,6 +1561,7 @@ exports.contributeMoney = async function (req, res) {
             data: {}
         });
     });
+
 }
 
 async function getOwnerInfo(resourceItem) {

@@ -2222,12 +2222,9 @@ exports.getContributors = async function (req, res){
 
 async function getNeedInfo(contributionItem) {
     const need = await ResourceNeed.findOne({ '_id': contributionItem.needId }, function (err) {
-        if (err)
-        return res.status(500).json({
-            status: 'error',
-            msg: 'There was an error retrieving a resource need!' + err.message,
-            data: {}
-        });
+        if (err) {
+            console.log("The needId in your contribution is invalid! error: "+err.message)
+        }
     });
 
     if(!need) {
