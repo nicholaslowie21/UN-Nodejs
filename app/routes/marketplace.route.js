@@ -19,6 +19,9 @@ router.get('/resources/knowledge', marketController.getKnowledgeList);
 router.get('/projects', marketController.getProjectList);
 router.post('/filter/projects', MarketValidator.filterProj, Helper.ifErrors, marketController.getProjectListFiltered);
 
+router.get('/accProjects', MarketValidator.getProjects, Helper.ifErrors,  marketController.currProjects);
+
+
 router.post('/requestProject', auth, MarketValidator.reqProject, Helper.ifErrors, marketController.reqProject)
 
 router.get('/fundingNeeds', marketController.getFundingNeeds);

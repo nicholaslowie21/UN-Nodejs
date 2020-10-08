@@ -1592,3 +1592,84 @@ async function getOwnerInfo(resourceItem) {
     resourceItem.ownerName = owner.name
     resourceItem.ownerUsername = owner.username
 }
+
+exports.currProjects = async function (req, res, next) {
+
+    var theRequester
+
+    if(req.query.accountType === "user") {
+        theRequester = await User.findOne({ '_id': req.query.accountId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an issue while retrieving account! '+err.message,
+                data: {}
+            });
+
+        });
+    } else if(req.query.accountType === "institution") {
+        theRequester = await Institution.findOne({ '_id': req.query.accountId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an issue while retrieving account! '+err.message,
+                data: {}
+            });
+
+        });
+    }
+
+
+    if(!theRequester) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+    
+    let projects = theRequester.projects;
+    let currProjects = []
+   
+    for (var i = 0; i < projects.length; i++) {
+        var project = await Project.findOne({ '_id': projects[i] }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was an issue while retrieving a project! '+err.message,
+                data: {}
+            });
+        });
+        if(!project) {
+            theRequester.projects.pull(projects[i]);
+        } else if(project.status === 'ongoing') {
+            let valid = false;
+
+            if(project.host != req.query.accountId) {
+                let admins = project.admins;
+                for(var j = 0; j < admins.length; j++) {
+                    if(req.query.accountId === admins[j]) {
+                        valid = true;
+                        break;
+                    }
+                }
+            } else if (project.host=== req.query.accountId) valid = true;
+            if(valid) currProjects.push(project)
+        }
+    }
+
+    theRequester.save(theRequester)
+    .then().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });   
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Current Account Projects successfully retrieved',
+        data: { theProjects: currProjects }
+    });
+
+}
