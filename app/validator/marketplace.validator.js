@@ -43,3 +43,8 @@ exports.useAutoKnowledgeResource = [
 exports.filterProj = [
     body('filterSDGs').exists()
 ]
+
+exports.getProjects = [
+    query('accountId').exists(),
+    query('accountType').exists()
+]
