@@ -512,11 +512,18 @@ exports.completeProject = async function (req, res) {
     })
 
     title = "Project Completion"
-    desc = "Completed a project with the title " + project.title + " which was started by this account :)"
+    desc = "Completed a project :" + project.title
     accountId = targetHost.id
     accountType = project.hostType
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+
+    desc = "Completed a project :" + project.title + " as an admin."
+    
+    var theAdmins = project.admins;
+    for(var i = 0 ; i < theAdmins.length; i++) {
+        Helper.createProfileFeed(title,desc,theAdmins[i],"user")    
+    }
 }
 
 exports.deleteProject = async function (req, res) {
@@ -1611,7 +1618,9 @@ exports.editResourceNeed = async function (req, res){
             data: {}
         }); 
 
-        req.body.completion = req.body.receivedSum/req.body.total
+        req.body.completion = resourceneed.receivedSum/req.body.total
+        var tempCompletion = req.body.completion
+        req.body.completion = Math.rount((tempCompletion+Number.EPSILON)*100)/100
     }
     
 
@@ -2417,7 +2426,10 @@ exports.getAccNewsFeed = async function (req, res){
             "matchPoint":0,
             "profilePicture":"",
             "ionicImg":"",
-            "hostName":""
+            "hostName":"",
+            "hostUsername":"",
+            "createdAt":"",
+            "updatedAt":""
         }
 
         if(account.projects.includes(projects[i].id)) continue
@@ -2434,7 +2446,8 @@ exports.getAccNewsFeed = async function (req, res){
         projectItem.imgPath = projects[i].imgPath
         projectItem.admins = projects[i].admins
         projectItem.SDGs = projects[i].SDGs
-
+        projectItem.createdAt = projects[i].createdAt
+        projectItem.updatedAt = projects[i].updatedAt
         await getHostInfo(projectItem)
 
         var tempSDGs = projectItem.SDGs
@@ -2446,6 +2459,7 @@ exports.getAccNewsFeed = async function (req, res){
         theList.push(projectItem)
     }
 
+    theList.reverse()
     theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
 
     return res.status(200).json({
@@ -2482,6 +2496,8 @@ async function getHostInfo(newsFeedItem) {
     newsFeedItem.profilePic = owner.profilePic
     newsFeedItem.ionicImg = owner.ionicImg
     newsFeedItem.hostName = owner.name
+    newsFeedItem.hostUsername = owner.username
+    
 }
 
 handleError = (err) => {

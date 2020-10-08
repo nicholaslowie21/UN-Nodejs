@@ -801,7 +801,9 @@ exports.getManpowerList = async function (req, res) {
             ownerType: "",
             ownerImg: "",
             ownerName: "",
-            ownerUsername: ""
+            ownerUsername: "",
+            createdAt:"",
+            updatedAt:""
         }
 
         manpowerResource.id = manpowers[i].id
@@ -811,10 +813,16 @@ exports.getManpowerList = async function (req, res) {
         manpowerResource.status = manpowers[i].status
         manpowerResource.country = manpowers[i].country
         manpowerResource.ownerType = manpowers[i].ownerType
+        manpowerResource.createdAt = manpowers[i].createdAt
+        manpowerResource.updatedAt = manpowers[i].updatedAt
+
+
         await getOwnerInfo(manpowerResource)
 
         theList.push(manpowerResource)
     }
+
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',
@@ -854,7 +862,9 @@ exports.getItemList = async function (req, res) {
             ownerType: "",
             ownerImg: "",
             ownerName: "",
-            ownerUsername: ""
+            ownerUsername: "",
+            createdAt:"",
+            updatedAt:""
         }
 
         resourceItem.id = items[i].id
@@ -865,10 +875,15 @@ exports.getItemList = async function (req, res) {
         resourceItem.country = items[i].country
         resourceItem.ownerType = items[i].ownerType
         resourceItem.imgPath = items[i].imgPath
+        resourceItem.createdAt = items[i].createdAt
+        resourceItem.updatedAt = items[i].updatedAt
+
         await getOwnerInfo(resourceItem)
 
         theList.push(resourceItem)
     }
+
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',
@@ -908,7 +923,9 @@ exports.getVenueList = async function (req, res) {
             ownerType: "",
             ownerImg: "",
             ownerName: "",
-            ownerUsername: ""
+            ownerUsername: "",
+            createdAt:"",
+            updatedAt:""
         }
 
         resourceItem.id = venues[i].id
@@ -919,11 +936,15 @@ exports.getVenueList = async function (req, res) {
         resourceItem.country = venues[i].country
         resourceItem.ownerType = venues[i].ownerType
         resourceItem.imgPath = venues[i].imgPath
+        resourceItem.createdAt = venues[i].createdAt
+        resourceItem.updatedAt = venues[i].updatedAt
+
         await getOwnerInfo(resourceItem)
 
         theList.push(resourceItem)
     }
 
+    theList.reverse()
     return res.status(200).json({
         status: 'success',
         msg: 'Venue resource list successfully retrieved',
@@ -962,7 +983,9 @@ exports.getKnowledgeList = async function (req, res) {
             ownerType: "",
             ownerImg: "",
             ownerName: "",
-            ownerUsername: ""
+            ownerUsername: "",
+            createdAt:"",
+            updatedAt:""
         }
 
         resourceItem.id = knowledges[i].id
@@ -973,11 +996,15 @@ exports.getKnowledgeList = async function (req, res) {
         resourceItem.country = knowledges[i].country
         resourceItem.ownerType = knowledges[i].owner[0].ownerType
         resourceItem.imgPath = knowledges[i].imgPath
+        resourceItem.createdAt = knowledges[i].createdAt
+        resourceItem.updatedAt = knowledges[i].updatedAt
+
         await getOwnerInfo(resourceItem)
 
         theList.push(resourceItem)
     }
 
+    theList.reverse()
     return res.status(200).json({
         status: 'success',
         msg: 'Knowledge resource list successfully retrieved',
@@ -1019,7 +1046,9 @@ exports.getProjectList = async function (req, res) {
             ownerUsername: "",
             rating:"",
             code:"",
-            SDGs:""
+            SDGs:"",
+            createdAt:"",
+            updatedAt:""
         }
 
         projectItem.id = projects[i].id
@@ -1033,11 +1062,15 @@ exports.getProjectList = async function (req, res) {
         projectItem.rating = projects[i].rating
         projectItem.SDGs = projects[i].SDGs
         projectItem.code = projects[i].code
+        projectItem.createdAt = projects[i].createdAt
+        projectItem.updatedAt = projects[i].updatedAt
 
         await getOwnerInfo(projectItem)
 
         theList.push(projectItem)
     }
+
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',
@@ -1090,7 +1123,9 @@ exports.getProjectListFiltered = async function (req, res) {
             rating:"",
             code:"",
             SDGs:"",
-            matchPoint:0
+            matchPoint:0,
+            createdAt:"",
+            updatedAt:""
         }
 
         projectItem.id = projects[i].id
@@ -1104,6 +1139,8 @@ exports.getProjectListFiltered = async function (req, res) {
         projectItem.rating = projects[i].rating
         projectItem.SDGs = projects[i].SDGs
         projectItem.code = projects[i].code
+        projectItem.createdAt = projects[i].createdAt
+        projectItem.updatedAt = projects[i].updatedAt
 
         await getOwnerInfo(projectItem)
 
@@ -1112,9 +1149,10 @@ exports.getProjectListFiltered = async function (req, res) {
                 projectItem.matchPoint += 10
         }
 
-        theList.push(projectItem)
+        if(projectItem.matchPoint>0) theList.push(projectItem)
     }
 
+    theList.reverse()
     theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
 
     return res.status(200).json({
@@ -1510,7 +1548,7 @@ exports.contributeMoney = async function (req, res) {
         data: {}
     });
 
-    var temp = await ProjectReq.findOne({ 'needId': resourceneed.id, "resType": "money", "status":"accepted" }, function (err) {
+    var temp = await ProjectReq.findOne({ "ownerId":theRequester.id,'needId': resourceneed.id, "resType": "money", "status":"accepted" }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -1526,10 +1564,17 @@ exports.contributeMoney = async function (req, res) {
         data: {}
     }); 
 
+    if(req.body.moneySum <= 0 ) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The amount input is invalid! ',
+        data: {}
+    }); 
+
     if(req.body.moneySum + resourceneed.pendingSum + resourceneed.receivedSum > resourceneed.total)
     return res.status(500).json({
         status: 'error',
-        msg: 'The amount requested is too high! ',
+        msg: 'The amount input is too high! ',
         data: {}
     }); 
 

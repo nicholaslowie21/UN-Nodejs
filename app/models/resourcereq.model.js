@@ -7,6 +7,7 @@ module.exports = mongoose => {
         resType: { type: String, default: '' },
         status: { type: String, default: '' },
         desc: { type: String, default: '' },
+        cancelType: { type: String, default: '' }
       },
       { timestamps: true }
     );
