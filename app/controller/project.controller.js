@@ -154,13 +154,6 @@ exports.projectPicture = async function (req, res){
         target = user
     }
 
-    // if(host!=project.host)
-    // return res.status(500).json({
-    //     status: 'error',
-    //     msg: 'You are not authorized to perform this action!',
-    //     data: {}
-    // });
-
     let valid = false;
 
     if(project.host != req.id) {
@@ -1610,6 +1603,18 @@ exports.editResourceNeed = async function (req, res){
         data: {}
     });
 
+    if(resourceneed.type === "money") {
+        if(req.body.total < resourceneed.pendingSum+resourceneed.receivedSum)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Invalid input! The total sum is invalid. It is lower than the received sum',
+            data: {}
+        }); 
+
+        req.body.completion = req.body.receivedSum/req.body.total
+    }
+    
+
     resourceneed.title = req.body.title
     resourceneed.desc = req.body.desc
     resourceneed.total = req.body.total
@@ -1919,6 +1924,26 @@ exports.removeContribution = async function (req, res){
 
     removeContributionEmail(contribution, project.code)
 
+    if(contribution.resType === "money") {
+        var need = await ResourceNeed.findOne({ '_id': contribution.needId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        var projectreq = await ProjectReq.findOne({ '_id': contribution.requestId }, function (err) {
+            if (err){ 
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        need.receivedSum = need.receivedSum - projectreq.moneySum;
+
+        need.save()
+    }
+
 }
 
 async function removeContributionEmail(contribution, projectCode) {
@@ -2197,12 +2222,9 @@ exports.getContributors = async function (req, res){
 
 async function getNeedInfo(contributionItem) {
     const need = await ResourceNeed.findOne({ '_id': contributionItem.needId }, function (err) {
-        if (err)
-        return res.status(500).json({
-            status: 'error',
-            msg: 'There was an error retrieving a resource need!' + err.message,
-            data: {}
-        });
+        if (err) {
+            console.log("The needId in your contribution is invalid! error: "+err.message)
+        }
     });
 
     if(!need) {
@@ -2438,30 +2460,24 @@ async function getHostInfo(newsFeedItem) {
 
     if(newsFeedItem.hostType === "user") {
         owner = await Users.findOne({ '_id': newsFeedItem.host }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a resource contributor!' + err.message,
-                data: {}
-            });
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
         });
     } else if (newsFeedItem.hostType === 'institution') {
         owner = await Institutions.findOne({ '_id': newsFeedItem.host }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a resource contributor!' + err.message,
-                data: {}
-            });
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
         });
     }
 
-    if(!owner)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'There was an issue retrieving a contributor info!',
-        data: {}
-    });
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
 
     newsFeedItem.profilePic = owner.profilePic
     newsFeedItem.ionicImg = owner.ionicImg
