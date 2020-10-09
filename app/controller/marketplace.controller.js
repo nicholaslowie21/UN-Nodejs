@@ -1246,6 +1246,104 @@ exports.getFundingNeeds = async function (req, res) {
     });
 }
 
+exports.getFilteredFundingNeeds = async function (req, res) {    
+    var theFilter = req.body.filterSDGs
+
+    if(!theFilter.length)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The list of SDGs filter is invalid!',
+        data: {}
+    });
+    
+    const fundingneeds = await ResourceNeed.find({ 'status': 'progress', 'type':'money' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    var theList = []
+
+    for(var i = 0; i < fundingneeds.length; i++) {
+        var fundingItem = {
+            id:"",
+            title: "",
+            desc: "",
+            owner: "",
+            status: "",
+            country: "",
+            imgPath: "",
+            ownerType: "",
+            ownerImg: "",
+            ownerName: "",
+            ownerUsername: "",
+            rating:"",
+            code:"",
+            SDGs:"",
+            needId:"",
+            fundingTitle: "",
+            fundingDesc: "",
+            fundingStatus: "",
+            total:0,
+            pendingSum:0,
+            receivedSum:0,
+            matchPoint:0
+        }
+        
+        fundingItem.needId = fundingneeds[i].id
+        fundingItem.fundingTitle = fundingneeds[i].title
+        fundingItem.fundingDesc = fundingneeds[i].desc
+        fundingItem.fundingStatus = fundingneeds[i].status
+        fundingItem.total = fundingneeds[i].total
+        fundingItem.pendingSum = fundingneeds[i].pendingSum
+        fundingItem.receivedSum = fundingneeds[i].receivedSum
+        fundingItem.id = fundingneeds[i].projectId
+
+        const project = await Project.findOne({ '_id': fundingItem.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+
+        if(!project) continue;
+        if(project.status != 'ongoing') continue
+
+        fundingItem.title = project.title
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.owner
+        fundingItem.status = project.status
+        fundingItem.country = project.country
+        fundingItem.imgPath = project.imgPath                        
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.host
+        fundingItem.ownerType = project.hostType
+        fundingItem.rating = project.rating
+        fundingItem.code = project.code
+        fundingItem.SDGs = project.SDGs
+                
+        await getOwnerInfo(fundingItem)
+        for(var j = 0; j < theFilter.length; j++) {
+            if(fundingItem.SDGs.includes(theFilter[j]))
+                fundingItem.matchPoint += 10
+        }
+
+        if(fundingItem.matchPoint>0) theList.push(fundingItem)
+    }
+    
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Funding need list successfully retrieved',
+        data: { fundings: theList }
+    });
+}
+
 exports.reqProject = async function (req, res) {
     var theRequester    
 
