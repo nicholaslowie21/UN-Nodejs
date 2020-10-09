@@ -20,6 +20,7 @@ const fs = require('fs')
 const multer = require('multer')
 const nodeCountries =  require("node-countries");
 const Helper = require('../service/helper.service')
+const sharp = require('sharp')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -82,6 +83,28 @@ exports.projectPicture = async function (req, res){
             data: {}
         });
     }
+
+    sharp('./'+req.file.path).toBuffer().then(
+        (data) => {
+            sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                if(err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during image upload! ',
+                    data: {}
+                });
+            });
+        }
+    ).catch(
+        (err) => {
+            console.log(err);
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong during upload! ',
+                data: {}
+            });
+        }
+    )
 
     const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
         if (err)

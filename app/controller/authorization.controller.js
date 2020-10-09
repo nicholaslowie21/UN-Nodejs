@@ -12,6 +12,7 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
+const sharp = require('sharp')
 
 const Helper = require('../service/helper.service');
 
@@ -642,6 +643,28 @@ exports.verifyRequest = async function(req,res) {
         msg: 'No image uploaded',
         data: {}
     });
+
+    sharp('./'+req.file.path).toBuffer().then(
+        (data) => {
+            sharp(data).resize(1000).toFile('./'+req.file.path, (err,info) => {
+                if(err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during image upload! ',
+                    data: {}
+                });
+            });
+        }
+    ).catch(
+        (err) => {
+            console.log(err);
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong during upload! ',
+                data: {}
+            });
+        }
+    )
 
     if(req.type != 'user') {
         return res.status(500).json({

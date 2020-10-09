@@ -11,6 +11,7 @@ const fs = require('fs')
 const multer = require('multer')
 const nodeCountries =  require("node-countries")
 const Helper = require("../service/helper.service")
+const sharp = require('sharp')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -97,6 +98,28 @@ exports.itemPicture = async function (req, res){
             data: {}
         });
     }
+
+    sharp('./'+req.file.path).toBuffer().then(
+        (data) => {
+            sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                if(err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during image upload! ',
+                    data: {}
+                });
+            });
+        }
+    ).catch(
+        (err) => {
+            console.log(err);
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong during upload! ',
+                data: {}
+            });
+        }
+    )
 
     const item = await Item.findOne({ '_id': req.body.itemId }, function (err) {
         if (err)
@@ -1906,6 +1929,30 @@ var venueStorage = multer.diskStorage({
         msg: 'You are not authorized to perform this action!',
         data: {}
     });
+
+    for(var i = 0; i < req.files.length; i++) {
+        await sharp("./"+req.files[i].path).toBuffer().then(
+            async data => {
+                await sharp(data).resize(1000).toFile("./"+req.files[i].path, (err,info) => {
+                    if(err)
+                    return res.status(500).json({
+                        status: 'error',
+                        msg: 'Something went wrong during image upload! ',
+                        data: {}
+                    });
+                });
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during upload! ',
+                    data: {}
+                });
+            }
+        )
+    }
 
     venue.imgPath = venue.imgPath.concat(req.thePath);
 

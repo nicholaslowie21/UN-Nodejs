@@ -11,6 +11,7 @@ const multer = require('multer');
 const nodeHtmlToImage = require('node-html-to-image');
 const Helper = require('../service/helper.service');
 const path = require('path')
+const sharp = require('sharp')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -76,7 +77,27 @@ exports.profilePicture = async function (req, res){
             data: {}
         });
     }
-
+    sharp('./'+req.file.path).toBuffer().then(
+        (data) => {
+            sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                if(err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during image upload! ',
+                    data: {}
+                });
+            });
+        }
+    ).catch(
+        (err) => {
+            console.log(err);
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong during upload! ',
+                data: {}
+            });
+        }
+    )
     user.profilePic = 'https://localhost:8080/public/uploads/profilePicture/'+req.thePath;
     user.ionicImg = "/public/uploads/profilePicture/"+req.thePath;
 

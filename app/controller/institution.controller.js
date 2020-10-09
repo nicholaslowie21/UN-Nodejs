@@ -12,6 +12,7 @@ const csvtojson = require("csvtojson");
 const nodeHtmlToImage = require('node-html-to-image');
 const Helper = require('../service/helper.service');
 const path = require('path');
+const sharp = require('sharp')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -112,6 +113,36 @@ exports.profilePicture = async function (req, res){
         msg: 'Account not found!',
         data: {}
     });
+
+    if(!req.file) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No picture uploaded! ',
+            data: {}
+        });
+    }
+
+    sharp('./'+req.file.path).toBuffer().then(
+        (data) => {
+            sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                if(err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during image upload! ',
+                    data: {}
+                });
+            });
+        }
+    ).catch(
+        (err) => {
+            console.log(err);
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong during upload! ',
+                data: {}
+            });
+        }
+    )
 
     institution.profilePic = 'https://localhost:8080/public/uploads/profilePicture/'+req.thePath;
     institution.ionicImg = "/public/uploads/profilePicture/"+req.thePath;
