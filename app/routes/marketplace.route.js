@@ -25,6 +25,8 @@ router.get('/accProjects', MarketValidator.getProjects, Helper.ifErrors,  market
 router.post('/requestProject', auth, MarketValidator.reqProject, Helper.ifErrors, marketController.reqProject)
 
 router.get('/fundingNeeds', marketController.getFundingNeeds);
+router.post('/filter/fundingNeeds', MarketValidator.filterProj, Helper.ifErrors, marketController.getFilteredFundingNeeds);
+
 router.post('/contributeMoney', auth, MarketValidator.contributeMoney, Helper.ifErrors, marketController.contributeMoney)
 
 module.exports = router;
