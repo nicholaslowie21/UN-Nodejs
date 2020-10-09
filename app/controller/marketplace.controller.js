@@ -1520,7 +1520,7 @@ exports.reqProject = async function (req, res) {
         data: {}
     });
 
-    var temp = await ProjectReq.findOne({ 'needId': resourceneed.id, "resourceId": resource.id, "resType": req.body.resType, "status":"pending" }, function (err) {
+    var temp = await ProjectReq.findOne({ 'ownerId':req.body.id, 'ownerType':req.body.type, 'needId': resourceneed.id, "resourceId": resource.id, "resType": req.body.resType, "status":"pending" }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -1814,5 +1814,348 @@ exports.currProjects = async function (req, res, next) {
         msg: 'Current Account Projects successfully retrieved',
         data: { theProjects: currProjects }
     });
+}
 
+exports.getLater = async function (req, res) {    
+    const itemIds = await Item.find({ 'status': 'active', 'owner':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    }).distinct('_id');
+
+    const venueIds = await Venue.find({ 'status': 'active', 'owner':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    }).distinct('_id');
+
+    const manpowerIds = await Manpower.find({ 'status': 'active', 'owner':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    }).distinct('_id');
+
+    var resIds = [];
+    resIds = resIds.concat(itemIds)
+    resIds = resIds.concat(venueIds)
+    resIds = resIds.concat(manpowerIds)
+
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqType, 'resourceId' : { $in: resIds} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        
+                
+        
+        
+    }
+/*
+    for(var i = 0; i < fundingneeds.length; i++) {
+        var fundingItem = {
+            id:"",
+            title: "",
+            desc: "",
+            owner: "",
+            status: "",
+            country: "",
+            imgPath: "",
+            ownerType: "",
+            ownerImg: "",
+            ownerName: "",
+            ownerUsername: "",
+            rating:"",
+            code:"",
+            SDGs:"",
+            needId:"",
+            fundingTitle: "",
+            fundingDesc: "",
+            fundingStatus: "",
+            total:0,
+            pendingSum:0,
+            receivedSum:0
+        }
+        
+        fundingItem.needId = fundingneeds[i].id
+        fundingItem.fundingTitle = fundingneeds[i].title
+        fundingItem.fundingDesc = fundingneeds[i].desc
+        fundingItem.fundingStatus = fundingneeds[i].status
+        fundingItem.total = fundingneeds[i].total
+        fundingItem.pendingSum = fundingneeds[i].pendingSum
+        fundingItem.receivedSum = fundingneeds[i].receivedSum
+        fundingItem.id = fundingneeds[i].projectId
+
+        const project = await Project.findOne({ '_id': fundingItem.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+
+        if(!project) continue;
+        if(project.status != 'ongoing') continue
+
+        fundingItem.title = project.title
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.owner
+        fundingItem.status = project.status
+        fundingItem.country = project.country
+        fundingItem.imgPath = project.imgPath                        
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.host
+        fundingItem.ownerType = project.hostType
+        fundingItem.rating = project.rating
+        fundingItem.code = project.code
+        fundingItem.SDGs = project.SDGs
+                
+        await getOwnerInfo(fundingItem)
+
+        theList.push(fundingItem)
+    }
+    */
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Funding need list successfully retrieved',
+        data: { fundings: theList }
+    });
+}
+
+exports.getMyConsolidatedProjectReq = async function (req, res) {    
+    
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqStatus, 'ownerId':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: "",
+            requesterImg: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.projectId = projectReqs[i].projectId
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        await getProjectInfo(projectReqItem)
+        if(projectReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(projectReqItem)
+        if(projectReqItem.needTitle === "") continue
+        
+        await getResourceInfo(projectReqItem)
+        if(projectReqItem.resourceTitle === "") continue
+        
+        await getAccountInfo(projectReqItem)
+        if(projectReqItem.requesterName === "") continue
+
+        theList.push(projectReqItem)
+        
+    }
+
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My Submitted Project Request list successfully retrieved',
+        data: { projectReqs: theList }
+    });
+}
+
+async function getProjectInfo(theItem) {
+    const project = await Project.findOne({ '_id': theItem.projectId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!project) return
+    if(project.status != 'ongoing') return
+
+    theItem.projectTitle = project.title
+    theItem.projectSDGs = project.SDGs
+
+}
+
+async function getNeedInfo(theItem) {
+    const resourceneed = await ResourceNeed.findOne({ '_id': theItem.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed) return
+    if(resourceneed.status != 'progress') return
+
+    theItem.needTitle = resourceneed.title
+    theItem.needDesc = resourceneed.desc
+
+}
+
+async function getResourceInfo(theItem) {
+
+    var resource;
+
+    if(theItem.resType === "item") {
+        resource = await Item.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "knowledge") {
+        resource = await Knowledge.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "venue") {
+        resource = await Venue.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "manpower") {
+        resource = await Manpower.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "money") {
+        resource = await Money.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!resource) return
+    if(resource.status != 'active') return
+
+    if(theItem.resType != "money")
+        theItem.resourceTitle = resource.title
+    else
+        theItem.resourceTitle = "Money"
+
+}
+
+async function getAccountInfo(theItem) {
+    var owner;
+
+    if(theItem.ownerType === "user") {
+        owner = await User.findOne({ '_id': theItem.ownerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.ownerType === 'institution') {
+        owner = await Institution.findOne({ '_id': theItem.ownerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
+
+    theItem.requesterName = owner.name
+    theItem.requesterUsername = owner.username
+    theItem.requesterImg = owner.ionicImg
+    
 }

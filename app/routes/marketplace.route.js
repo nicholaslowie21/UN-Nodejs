@@ -21,12 +21,13 @@ router.post('/filter/projects', MarketValidator.filterProj, Helper.ifErrors, mar
 
 router.get('/accProjects', MarketValidator.getProjects, Helper.ifErrors,  marketController.currProjects);
 
-
 router.post('/requestProject', auth, MarketValidator.reqProject, Helper.ifErrors, marketController.reqProject)
 
 router.get('/fundingNeeds', marketController.getFundingNeeds);
 router.post('/filter/fundingNeeds', MarketValidator.filterProj, Helper.ifErrors, marketController.getFilteredFundingNeeds);
 
 router.post('/contributeMoney', auth, MarketValidator.contributeMoney, Helper.ifErrors, marketController.contributeMoney)
+
+router.get('/myConsolidatedProjectReq', auth, MarketValidator.consolidatedPage, Helper.ifErrors, marketController.getMyConsolidatedProjectReq);
 
 module.exports = router;

@@ -22,6 +22,10 @@ exports.reqProject = [
     body('resType').exists()
 ]
 
+exports.consolidatedPage = [
+    query('reqStatus').exists()
+]
+
 exports.contributeMoney = [
     body('needId').exists(),
     body('desc').exists(),
