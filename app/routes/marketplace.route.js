@@ -30,4 +30,10 @@ router.post('/contributeMoney', auth, MarketValidator.contributeMoney, Helper.if
 
 router.get('/myConsolidatedProjectReq', auth, MarketValidator.consolidatedPage, Helper.ifErrors, marketController.getMyConsolidatedProjectReq);
 
+router.get('/resource/detail/projectReq', auth, MarketValidator.resourceDetailPageProjectReq, Helper.ifErrors, marketController.getResourceDetailProjectReq);
+router.get('/resource/detail/resourceReq', auth, MarketValidator.resourceDetailPageResourceReq, Helper.ifErrors, marketController.getResourceDetailResourceReq);
+
+router.get('/project/projectReq', auth, MarketValidator.projectPageReq, Helper.ifErrors, marketController.getProjectPageProjectReq);
+router.get('/project/resourceReq', auth, MarketValidator.projectPageReq, Helper.ifErrors, marketController.getProjectPageResourceReq);
+
 module.exports = router;

@@ -1238,6 +1238,7 @@ exports.getFundingNeeds = async function (req, res) {
         theList.push(fundingItem)
     }
     
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',
@@ -1809,6 +1810,8 @@ exports.currProjects = async function (req, res, next) {
         });
     });   
 
+    currProjects.reverse()
+
     return res.status(200).json({
         status: 'success',
         msg: 'Current Account Projects successfully retrieved',
@@ -2039,6 +2042,7 @@ exports.getMyConsolidatedProjectReq = async function (req, res) {
         
     }
 
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',
@@ -2046,6 +2050,285 @@ exports.getMyConsolidatedProjectReq = async function (req, res) {
         data: { projectReqs: theList }
     });
 }
+
+exports.getResourceDetailProjectReq = async function (req, res) {    
+    
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqStatus, 'resourceId':req.query.resourceId ,'ownerId':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: "",
+            requesterImg: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.projectId = projectReqs[i].projectId
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        await getProjectInfo(projectReqItem)
+        if(projectReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(projectReqItem)
+        if(projectReqItem.needTitle === "") continue
+        
+        await getResourceInfo(projectReqItem)
+        if(projectReqItem.resourceTitle === "") continue
+        
+        await getAccountInfo(projectReqItem)
+        if(projectReqItem.requesterName === "") continue
+
+        theList.push(projectReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My Resource Project Request list successfully retrieved',
+        data: { resourceProjectReqs: theList }
+    });
+}
+
+exports.getResourceDetailResourceReq = async function (req, res) {    
+    
+    const resourceReqs = await ResourceReq.find({ 'status': req.query.reqStatus, 'resourceId':req.query.resourceId, 'resType':req.query.resType }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < resourceReqs.length; i++) {
+        var resourceReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            desc: "",
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: ""
+        }
+
+        resourceReqItem.id = resourceReqs[i].id
+        resourceReqItem.projectId = resourceReqs[i].projectId
+        resourceReqItem.needId = resourceReqs[i].needId
+        resourceReqItem.resourceId = resourceReqs[i].resourceId
+        resourceReqItem.resType = resourceReqs[i].resType
+        resourceReqItem.status = resourceReqs[i].status
+        resourceReqItem.cancelType = resourceReqs[i].cancelType
+        resourceReqItem.createdAt = resourceReqs[i].createdAt
+        resourceReqItem.desc = resourceReqs[i].desc
+        
+        await getProjectInfo(resourceReqItem)
+        if(resourceReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(resourceReqItem)
+        if(resourceReqItem.needTitle === "") continue
+        
+        await getResourceInfo(resourceReqItem)
+        if(resourceReqItem.resourceTitle === "") continue
+        
+        
+        theList.push(resourceReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My Resource\'s Resource Request list successfully retrieved',
+        data: { resourceResourceReqs: theList }
+    });
+}
+
+exports.getProjectPageProjectReq = async function (req, res) {    
+    
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqStatus, 'projectId':req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: "",
+            requesterImg: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.projectId = projectReqs[i].projectId
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        await getProjectInfo(projectReqItem)
+        if(projectReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(projectReqItem)
+        if(projectReqItem.needTitle === "") continue
+        
+        await getResourceInfo(projectReqItem)
+        if(projectReqItem.resourceTitle === "") continue
+        
+        await getAccountInfo(projectReqItem)
+        if(projectReqItem.requesterName === "") continue
+
+        theList.push(projectReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Page Project Request list successfully retrieved',
+        data: { projectPageProjectReqs: theList }
+    });
+}
+
+exports.getProjectPageResourceReq = async function (req, res) {    
+    
+    const resourceReqs = await ResourceReq.find({ 'status': req.query.reqStatus, 'projectId':req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < resourceReqs.length; i++) {
+        var resourceReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            desc: "",
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: ""
+        }
+
+        resourceReqItem.id = resourceReqs[i].id
+        resourceReqItem.projectId = resourceReqs[i].projectId
+        resourceReqItem.needId = resourceReqs[i].needId
+        resourceReqItem.resourceId = resourceReqs[i].resourceId
+        resourceReqItem.resType = resourceReqs[i].resType
+        resourceReqItem.status = resourceReqs[i].status
+        resourceReqItem.cancelType = resourceReqs[i].cancelType
+        resourceReqItem.createdAt = resourceReqs[i].createdAt
+        resourceReqItem.desc = resourceReqs[i].desc
+        
+        await getProjectInfo(resourceReqItem)
+        if(resourceReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(resourceReqItem)
+        if(resourceReqItem.needTitle === "") continue
+        
+        await getResourceInfo(resourceReqItem)
+        if(resourceReqItem.resourceTitle === "") continue
+        
+        
+        theList.push(resourceReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Page Resource Request list successfully retrieved',
+        data: { projectPageResourceReqs: theList }
+    });
+}
+
 
 async function getProjectInfo(theItem) {
     const project = await Project.findOne({ '_id': theItem.projectId }, function (err) {

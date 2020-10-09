@@ -4,6 +4,8 @@ const env = require('../config/env');
 
 module.exports = function (req, res, next) {
     try {
+        if(!req.headers['authorization']) throw new Error("JWT Token missing!")
+        
         let token = req.headers['authorization'].split(' ')[1];
         var decoded = jwt.verify(token, env.jwtSecret);
         if (decoded) {
@@ -17,7 +19,7 @@ module.exports = function (req, res, next) {
             next();
         }
     } catch (err) {
-        console.log(err);
+        console.log(err.message);
         return res.status(504).json({ status: 'error', msg: 'Unauthorized access' });
     }
 };
