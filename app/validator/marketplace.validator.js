@@ -52,6 +52,10 @@ exports.acceptProjectReq = [
     body('projectReqId').exists()
 ]
 
+exports.acceptResourceReq = [
+    body('resourceReqId').exists()
+]
+
 exports.useKnowledgeResource = [
     body('resourceId').exists(),
     body('needId').exists(),

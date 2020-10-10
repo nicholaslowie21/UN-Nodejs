@@ -38,5 +38,12 @@ router.get('/project/resourceReq', auth, MarketValidator.projectPageReq, Helper.
 
 router.post('/accept/projectReq', auth, MarketValidator.acceptProjectReq, Helper.ifErrors, marketController.acceptProjectReq)
 router.post('/decline/projectReq', auth, MarketValidator.acceptProjectReq, Helper.ifErrors, marketController.declineProjectReq)
+router.post('/cancel/projectReq', auth, MarketValidator.acceptProjectReq, Helper.ifErrors, marketController.cancelProjectReq)
+router.post('/complete/projectReq', auth, MarketValidator.acceptProjectReq, Helper.ifErrors, marketController.completeProjectReq)
+
+router.post('/accept/resourceReq', auth, MarketValidator.acceptResourceReq, Helper.ifErrors, marketController.acceptResourceReq)
+router.post('/decline/resourceReq', auth, MarketValidator.acceptResourceReq, Helper.ifErrors, marketController.declineResourceReq)
+router.post('/cancel/resourceReq', auth, MarketValidator.acceptResourceReq, Helper.ifErrors, marketController.cancelResourceReq)
+router.post('/complete/resourceReq', auth, MarketValidator.acceptResourceReq, Helper.ifErrors, marketController.completeResourceReq)
 
 module.exports = router;
