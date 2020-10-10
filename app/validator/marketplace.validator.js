@@ -48,6 +48,10 @@ exports.contributeMoney = [
     body('moneySum').exists()
 ]
 
+exports.acceptProjectReq = [
+    body('projectReqId').exists()
+]
+
 exports.useKnowledgeResource = [
     body('resourceId').exists(),
     body('needId').exists(),

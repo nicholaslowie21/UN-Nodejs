@@ -36,4 +36,7 @@ router.get('/resource/detail/resourceReq', auth, MarketValidator.resourceDetailP
 router.get('/project/projectReq', auth, MarketValidator.projectPageReq, Helper.ifErrors, marketController.getProjectPageProjectReq);
 router.get('/project/resourceReq', auth, MarketValidator.projectPageReq, Helper.ifErrors, marketController.getProjectPageResourceReq);
 
+router.post('/accept/projectReq', auth, MarketValidator.acceptProjectReq, Helper.ifErrors, marketController.acceptProjectReq)
+router.post('/decline/projectReq', auth, MarketValidator.acceptProjectReq, Helper.ifErrors, marketController.declineProjectReq)
+
 module.exports = router;
