@@ -44,4 +44,7 @@ router.get('/contributors', ProjectValidator.getContributions, Helper.ifErrors, 
 
 router.get('/accountNewsFeed', auth, projectController.getAccNewsFeed )
 
+router.post('/createPost', auth, projectController.multerCreatePost , ProjectValidator.createPost, Helper.ifErrors , projectController.createPost)
+router.post('/updatePost', auth, projectController.multerUpdatePost , ProjectValidator.updatePost, Helper.ifErrors , projectController.updatePost)
+
 module.exports = router;

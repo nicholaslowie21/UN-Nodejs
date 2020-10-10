@@ -21,6 +21,18 @@ exports.getResourceNeeds = [
     query('projectId').exists()
 ]
 
+exports.createPost = [
+    body('projectId').exists(),
+    body('title').exists(),
+    body('desc').exists()
+]
+
+exports.updatePost = [
+    body('postId').exists(),
+    body('title').exists(),
+    body('desc').exists()
+]
+
 exports.getContributions = [
     query('projectId').exists()
 ]

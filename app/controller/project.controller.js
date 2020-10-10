@@ -13,6 +13,8 @@ const Knowledge = db.knowledge
 const Item = db.item
 const Venue = db.venue
 const Money = db.money
+const ProjectPost = db.projectpost
+const PostComment = db.postcomment
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
 const path = require('path')
@@ -21,6 +23,271 @@ const multer = require('multer')
 const nodeCountries =  require("node-countries");
 const Helper = require('../service/helper.service')
 const sharp = require('sharp')
+
+var postStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/postPictures'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = "PostPicture-"+req.body.projectId+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var createPost = multer({ 
+    storage: postStorage,
+    fileFilter: function(_req, file, cb){
+        checkFileType(file, cb);
+    }   
+})
+
+var updatePostStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/postPictures'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = "PostPicture-"+req.body.postId+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var updatePost = multer({ 
+    storage: updatePostStorage,
+    fileFilter: function(_req, file, cb){
+        checkFileType(file, cb);
+    }   
+})
+
+function checkFileType(file, cb){
+    // Allowed ext
+    const filetypes = /jpeg|jpg|png/;
+    // Check ext
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // Check mime
+    const mimetype = filetypes.test(file.mimetype);
+  
+    if(mimetype && extname){
+      return cb(null,true);
+    } else {
+      cb('Error: Images Only!');
+    }
+}
+
+exports.multerCreatePost = createPost.single('postImg');
+
+exports.multerUpdatePost = updatePost.single('postImg');
+
+exports.createPost = async function (req, res){
+
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to create this project post!',
+        data: {}
+    });
+
+    var pathString = ""
+    
+    if(req.file) {
+        sharp('./'+req.file.path).toBuffer().then(
+            (data) => {
+                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                    if(err)
+                    return res.status(500).json({
+                        status: 'error',
+                        msg: 'Something went wrong during image upload! ',
+                        data: {}
+                    });
+                });
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during upload! ',
+                    data: {}
+                });
+            }
+        )
+
+        pathString = "/public/uploads/postPictures/"+req.thePath;
+    }
+
+    const projectPost = new ProjectPost({
+		title: req.body.title,
+		desc: req.body.desc,
+		accountId: req.id,
+		accountType: req.type,
+		status: 'active',
+        projectId: req.body.projectId,
+        imgPath: pathString
+    });
+    
+    projectPost.save(projectPost)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Post successfully created',
+            data: { projectPost: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.updatePost = async function (req, res){
+
+    const projectPost = await ProjectPost.findOne({ '_id': req.body.postId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!projectPost) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project post not found!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': projectPost.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this project post!',
+        data: {}
+    });
+
+
+    projectPost.title = req.body.title
+	projectPost.desc = req.body.desc
+	projectPost.accountId = req.id
+	projectPost.accountType = req.type
+		
+    
+    if(req.file) {
+        sharp('./'+req.file.path).toBuffer().then(
+            (data) => {
+                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                    if(err)
+                    return res.status(500).json({
+                        status: 'error',
+                        msg: 'Something went wrong during image upload! ',
+                        data: {}
+                    });
+                });
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during upload! ',
+                    data: {}
+                });
+            }
+        )
+        projectPost.imgPath = "/public/uploads/postPictures/"+req.thePath
+    }
+    
+    projectPost.save(projectPost)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Post successfully updated',
+            data: { projectPost: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
