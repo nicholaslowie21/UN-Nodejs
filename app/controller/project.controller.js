@@ -289,6 +289,207 @@ exports.updatePost = async function (req, res){
     });
 }
 
+exports.deletePost = async function (req, res){
+    const projectPost = await ProjectPost.findOne({ '_id': req.body.postId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!projectPost) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project post not found!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': projectPost.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this project post!',
+        data: {}
+    });
+
+    projectPost.status = "deleted"
+
+    projectPost.save(projectPost)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Post successfully deleted',
+            data: { projectPost: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deletePostPic = async function (req, res){
+    const projectPost = await ProjectPost.findOne({ '_id': req.body.postId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!projectPost) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project post not found!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': projectPost.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to edit this project post!',
+        data: {}
+    });
+
+    projectPost.imgPath = ""
+
+    projectPost.save(projectPost)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Post Picture successfully deleted',
+            data: { projectPost: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.getPosts = async function (req, res){
+    const projectPosts = await ProjectPost.find({ 'projectId': req.query.projectId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!projectPosts) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project post not found!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i =0; i < projectPosts.length; i++) {
+        var projectPost = {
+            "title": "",
+            "desc": "",
+            "accountId": "",
+            "accountType": "",
+            "status": "",
+            "projectId": "",
+            "imgPath": "",
+            "accountName":"",
+            "accountUsername":"",
+            "accountPic":"",
+            "createdAt":"",
+            "updatedAt":""
+        }
+
+        projectPost.title = projectPosts[i].title
+        projectPost.desc = projectPosts[i].desc
+        projectPost.accountId = projectPosts[i].accountId
+        projectPost.accountType = projectPosts[i].accountType
+        projectPost.status = projectPosts[i].status
+        projectPost.projectId = projectPosts[i].projectId
+        projectPost.imgPath = projectPosts[i].imgPath   
+        projectPost.createdAt = projectPosts[i].createdAt 
+        projectPost.updatedAt = projectPosts[i].updatedAt
+
+        await getAccountInfo(projectPost)
+        if(projectPost.accountName === "") continue
+
+        theList.push(projectPost)
+    }
+
+    theList.reverse();
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Posts successfully retrieved',
+        data: { projectPosts: theList }
+    });
+
+}
+
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let dir = 'public/uploads/projectPicture'
@@ -2788,6 +2989,35 @@ async function getHostInfo(newsFeedItem) {
     newsFeedItem.hostName = owner.name
     newsFeedItem.hostUsername = owner.username
     
+}
+
+async function getAccountInfo(theItem) {
+    var owner;
+
+    if(theItem.accountType === "user") {
+        owner = await Users.findOne({ '_id': theItem.accountId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.accountType === 'institution') {
+        owner = await Institutions.findOne({ '_id': theItem.accountId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
+
+    theItem.accountPic = owner.ionicImg
+    theItem.accountUsername = owner.username
+    theItem.accountName = owner.name 
 }
 
 handleError = (err) => {

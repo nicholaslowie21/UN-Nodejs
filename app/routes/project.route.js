@@ -46,5 +46,8 @@ router.get('/accountNewsFeed', auth, projectController.getAccNewsFeed )
 
 router.post('/createPost', auth, projectController.multerCreatePost , ProjectValidator.createPost, Helper.ifErrors , projectController.createPost)
 router.post('/updatePost', auth, projectController.multerUpdatePost , ProjectValidator.updatePost, Helper.ifErrors , projectController.updatePost)
+router.post('/deletePost', auth, ProjectValidator.deletePost, Helper.ifErrors , projectController.deletePost)
+router.post('/deletePostPic', auth, ProjectValidator.deletePost, Helper.ifErrors , projectController.deletePostPic)
+router.get('/posts', ProjectValidator.getPost, Helper.ifErrors , projectController.getPosts)
 
 module.exports = router;

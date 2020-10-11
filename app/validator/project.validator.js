@@ -33,6 +33,14 @@ exports.updatePost = [
     body('desc').exists()
 ]
 
+exports.deletePost = [
+    body('postId').exists()
+]
+
+exports.getPost = [
+    query('projectId').exists()
+]
+
 exports.getContributions = [
     query('projectId').exists()
 ]
