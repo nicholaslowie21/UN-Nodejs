@@ -1238,6 +1238,7 @@ exports.getFundingNeeds = async function (req, res) {
         theList.push(fundingItem)
     }
     
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',
@@ -1520,7 +1521,7 @@ exports.reqProject = async function (req, res) {
         data: {}
     });
 
-    var temp = await ProjectReq.findOne({ 'needId': resourceneed.id, "resourceId": resource.id, "resType": req.body.resType, "status":"pending" }, function (err) {
+    var temp = await ProjectReq.findOne({ 'ownerId':req.body.id, 'ownerType':req.body.type, 'needId': resourceneed.id, "resourceId": resource.id, "resType": req.body.resType, "status":"pending" }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -1551,8 +1552,8 @@ exports.reqProject = async function (req, res) {
     .then(data => {
         return res.status(200).json({
             status: 'success',
-            msg: 'Resource request successfully created',
-            data: { resourcereq: data }
+            msg: 'Project request successfully created',
+            data: { projectreq: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -1809,10 +1810,1510 @@ exports.currProjects = async function (req, res, next) {
         });
     });   
 
+    currProjects.reverse()
+
     return res.status(200).json({
         status: 'success',
         msg: 'Current Account Projects successfully retrieved',
         data: { theProjects: currProjects }
     });
+}
 
+exports.getLater = async function (req, res) {    
+    const itemIds = await Item.find({ 'status': 'active', 'owner':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    }).distinct('_id');
+
+    const venueIds = await Venue.find({ 'status': 'active', 'owner':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    }).distinct('_id');
+
+    const manpowerIds = await Manpower.find({ 'status': 'active', 'owner':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    }).distinct('_id');
+
+    var resIds = [];
+    resIds = resIds.concat(itemIds)
+    resIds = resIds.concat(venueIds)
+    resIds = resIds.concat(manpowerIds)
+
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqType, 'resourceId' : { $in: resIds} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        
+                
+        
+        
+    }
+/*
+    for(var i = 0; i < fundingneeds.length; i++) {
+        var fundingItem = {
+            id:"",
+            title: "",
+            desc: "",
+            owner: "",
+            status: "",
+            country: "",
+            imgPath: "",
+            ownerType: "",
+            ownerImg: "",
+            ownerName: "",
+            ownerUsername: "",
+            rating:"",
+            code:"",
+            SDGs:"",
+            needId:"",
+            fundingTitle: "",
+            fundingDesc: "",
+            fundingStatus: "",
+            total:0,
+            pendingSum:0,
+            receivedSum:0
+        }
+        
+        fundingItem.needId = fundingneeds[i].id
+        fundingItem.fundingTitle = fundingneeds[i].title
+        fundingItem.fundingDesc = fundingneeds[i].desc
+        fundingItem.fundingStatus = fundingneeds[i].status
+        fundingItem.total = fundingneeds[i].total
+        fundingItem.pendingSum = fundingneeds[i].pendingSum
+        fundingItem.receivedSum = fundingneeds[i].receivedSum
+        fundingItem.id = fundingneeds[i].projectId
+
+        const project = await Project.findOne({ '_id': fundingItem.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+
+        if(!project) continue;
+        if(project.status != 'ongoing') continue
+
+        fundingItem.title = project.title
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.owner
+        fundingItem.status = project.status
+        fundingItem.country = project.country
+        fundingItem.imgPath = project.imgPath                        
+        fundingItem.desc = project.desc
+        fundingItem.owner = project.host
+        fundingItem.ownerType = project.hostType
+        fundingItem.rating = project.rating
+        fundingItem.code = project.code
+        fundingItem.SDGs = project.SDGs
+                
+        await getOwnerInfo(fundingItem)
+
+        theList.push(fundingItem)
+    }
+    */
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Funding need list successfully retrieved',
+        data: { fundings: theList }
+    });
+}
+
+exports.getMyConsolidatedProjectReq = async function (req, res) {    
+    
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqStatus, 'ownerId':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: "",
+            requesterImg: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.projectId = projectReqs[i].projectId
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        await getProjectInfo(projectReqItem)
+        if(projectReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(projectReqItem)
+        if(projectReqItem.needTitle === "") continue
+        
+        await getResourceInfo(projectReqItem)
+        if(projectReqItem.resourceTitle === "") continue
+        
+        await getAccountInfo(projectReqItem)
+        if(projectReqItem.requesterName === "") continue
+
+        theList.push(projectReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My Submitted Project Request list successfully retrieved',
+        data: { projectReqs: theList }
+    });
+}
+
+exports.getResourceDetailProjectReq = async function (req, res) {    
+    
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqStatus, 'resourceId':req.query.resourceId ,'ownerId':req.body.id, 'ownerType':req.body.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: "",
+            requesterImg: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.projectId = projectReqs[i].projectId
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        await getProjectInfo(projectReqItem)
+        if(projectReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(projectReqItem)
+        if(projectReqItem.needTitle === "") continue
+        
+        await getResourceInfo(projectReqItem)
+        if(projectReqItem.resourceTitle === "") continue
+        
+        await getAccountInfo(projectReqItem)
+        if(projectReqItem.requesterName === "") continue
+
+        theList.push(projectReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My Resource Project Request list successfully retrieved',
+        data: { resourceProjectReqs: theList }
+    });
+}
+
+exports.getResourceDetailResourceReq = async function (req, res) {    
+    
+    const resourceReqs = await ResourceReq.find({ 'status': req.query.reqStatus, 'resourceId':req.query.resourceId, 'resType':req.query.resType }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < resourceReqs.length; i++) {
+        var resourceReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            desc: "",
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: ""
+        }
+
+        resourceReqItem.id = resourceReqs[i].id
+        resourceReqItem.projectId = resourceReqs[i].projectId
+        resourceReqItem.needId = resourceReqs[i].needId
+        resourceReqItem.resourceId = resourceReqs[i].resourceId
+        resourceReqItem.resType = resourceReqs[i].resType
+        resourceReqItem.status = resourceReqs[i].status
+        resourceReqItem.cancelType = resourceReqs[i].cancelType
+        resourceReqItem.createdAt = resourceReqs[i].createdAt
+        resourceReqItem.desc = resourceReqs[i].desc
+        
+        await getProjectInfo(resourceReqItem)
+        if(resourceReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(resourceReqItem)
+        if(resourceReqItem.needTitle === "") continue
+        
+        await getResourceInfo(resourceReqItem)
+        if(resourceReqItem.resourceTitle === "") continue
+        
+        
+        theList.push(resourceReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My Resource\'s Resource Request list successfully retrieved',
+        data: { resourceResourceReqs: theList }
+    });
+}
+
+exports.getProjectPageProjectReq = async function (req, res) {    
+    
+    const projectReqs = await ProjectReq.find({ 'status': req.query.reqStatus, 'projectId':req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < projectReqs.length; i++) {
+        var projectReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            ownerId: "",
+            ownerType: "",
+            desc: "",
+            moneySum: 0,
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: "",
+            requesterName: "",
+            requesterUsername: "",
+            requesterImg: ""
+        }
+
+        projectReqItem.id = projectReqs[i].id
+        projectReqItem.projectId = projectReqs[i].projectId
+        projectReqItem.needId = projectReqs[i].needId
+        projectReqItem.resourceId = projectReqs[i].resourceId
+        projectReqItem.resType = projectReqs[i].resType
+        projectReqItem.status = projectReqs[i].status
+        projectReqItem.cancelType = projectReqs[i].cancelType
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.ownerId = projectReqs[i].ownerId
+        projectReqItem.ownerType = projectReqs[i].ownerType
+        projectReqItem.desc = projectReqs[i].desc
+        projectReqItem.moneySum = projectReqs[i].moneySum
+        
+        await getProjectInfo(projectReqItem)
+        if(projectReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(projectReqItem)
+        if(projectReqItem.needTitle === "") continue
+        
+        await getResourceInfo(projectReqItem)
+        if(projectReqItem.resourceTitle === "") continue
+        
+        await getAccountInfo(projectReqItem)
+        if(projectReqItem.requesterName === "") continue
+
+        theList.push(projectReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Page Project Request list successfully retrieved',
+        data: { projectPageProjectReqs: theList }
+    });
+}
+
+exports.getProjectPageResourceReq = async function (req, res) {    
+    
+    const resourceReqs = await ResourceReq.find({ 'status': req.query.reqStatus, 'projectId':req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+    
+    var theList = []
+
+    for(var i = 0; i < resourceReqs.length; i++) {
+        var resourceReqItem = {
+            id:"",
+            projectId: "",
+            needId: "",
+            resourceId: "",
+            resType: "",
+            status: "",
+            cancelType: "",
+            createdAt: "",
+            desc: "",
+            projectTitle: "",
+            projectSDGs: "",
+            needTitle: "",
+            needDesc: "",
+            resourceTitle: ""
+        }
+
+        resourceReqItem.id = resourceReqs[i].id
+        resourceReqItem.projectId = resourceReqs[i].projectId
+        resourceReqItem.needId = resourceReqs[i].needId
+        resourceReqItem.resourceId = resourceReqs[i].resourceId
+        resourceReqItem.resType = resourceReqs[i].resType
+        resourceReqItem.status = resourceReqs[i].status
+        resourceReqItem.cancelType = resourceReqs[i].cancelType
+        resourceReqItem.createdAt = resourceReqs[i].createdAt
+        resourceReqItem.desc = resourceReqs[i].desc
+        
+        await getProjectInfo(resourceReqItem)
+        if(resourceReqItem.projectTitle === "") continue
+        
+        await getNeedInfo(resourceReqItem)
+        if(resourceReqItem.needTitle === "") continue
+        
+        await getResourceInfo(resourceReqItem)
+        if(resourceReqItem.resourceTitle === "") continue
+        
+        
+        theList.push(resourceReqItem)
+        
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Page Resource Request list successfully retrieved',
+        data: { projectPageResourceReqs: theList }
+    });
+}
+
+exports.acceptProjectReq = async function (req, res) {    
+    
+    const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId, 'status': 'pending' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!projectReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such pending Project Request ',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': projectReq.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such project',
+        data: {}
+    });
+
+    if(project.status != 'ongoing')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The project is no longer ongoing!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to accept this project request!',
+        data: {}
+    });
+
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': projectReq.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need is not found!',
+        data: {}
+    });
+
+    if(resourceneed.status != 'progress')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need completion is no longer in progress!',
+        data: {}
+    });
+
+    projectReq.status = "accepted"
+
+    projectReq.save(projectReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Request successfully accepted',
+            data: { projectReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.declineProjectReq = async function (req, res) {    
+    
+    const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId, 'status': 'pending' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!projectReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such pending Project Request ',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': projectReq.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such project',
+        data: {}
+    });
+
+    if(project.status != 'ongoing')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The project is no longer ongoing!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to decline this project request!',
+        data: {}
+    });
+
+
+    projectReq.status = "declined"
+
+    projectReq.save(projectReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Request successfully declined',
+            data: { projectReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.cancelProjectReq = async function (req, res) {    
+    
+    const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!projectReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such Project Request ',
+        data: {}
+    });
+
+    if(projectReq.status != 'pending' && projectReq.status != 'accepted')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You can no longer cancel this project request ',
+        data: {}
+    });
+
+
+    const project = await Project.findOne({ '_id': projectReq.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such project',
+        data: {}
+    });
+
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(!valid && projectReq.ownerId != req.body.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to cancel this project request!',
+        data: {}
+    });
+
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': projectReq.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need is not found!',
+        data: {}
+    });
+
+    projectReq.status = "cancelled"
+
+    if(valid) projectReq.cancelType = "project"
+    else projectReq.cancelType = "contributor"
+
+    projectReq.save(projectReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Request successfully cancelled',
+            data: { projectReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.completeProjectReq = async function (req, res) {    
+    
+    const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId, 'status': 'accepted' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!projectReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such accepted Project Request ',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': projectReq.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such project',
+        data: {}
+    });
+
+    if(project.status != 'ongoing')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The project is no longer ongoing!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to update this project request!',
+        data: {}
+    });
+
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': projectReq.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need is not found!',
+        data: {}
+    });
+
+    if(resourceneed.status != 'progress')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need completion is no longer in progress!',
+        data: {}
+    });
+
+    if(projectReq.resType === "money") {
+        resourceneed.pendingSum -= projectReq.moneySum
+        resourceneed.receivedSum += projectReq.moneySum
+        var tempCompletion = resourceneed.receivedSum/resourceneed.total
+        resourceneed.completion = Math.rount((tempCompletion+Number.EPSILON)*100)/100
+    }
+
+    resourceneed.save().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    const contribution = new Contribution({
+		projectId: projectReq.projectId,
+		needId: projectReq.needId,
+		requestId: projectReq.id,
+		requestType: "project",
+		resType: projectReq.resType,
+        rating: 1,
+        contributor: projectReq.ownerId,
+        contributorType: projectReq.ownerType,
+        status: 'active'
+    });
+
+    contribution.save().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    projectReq.status = "completed"
+
+    projectReq.save(projectReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Request successfully completed',
+            data: { projectReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.acceptResourceReq = async function (req, res) {    
+    
+    const resourceReq = await ResourceReq.findOne({ '_id': req.body.resourceReqId, 'status': 'pending' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!resourceReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such pending Resource Request ',
+        data: {}
+    });
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': resourceReq.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need is not found!',
+        data: {}
+    });
+
+    if(resourceneed.status != 'progress')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need completion is no longer in progress!',
+        data: {}
+    });
+
+    theOwner = await getResourceOwner(resourceReq)
+    var valid = false;
+    
+    if(resourceReq.resType === 'knowledge') {
+
+        for(var i = 0 ; i < theOwner.length; i++) {
+            if(req.body.id === theOwner[i].theId) {
+                valid = true;
+                break;
+            }
+        }
+    } else {
+        if(req.body.id === theOwner) valid = true
+    }
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to update this resource request!',
+        data: {}
+    });
+
+    resourceReq.status = "accepted"
+
+    resourceReq.save(resourceReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Resource Request successfully accepted',
+            data: { resourceReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.declineResourceReq = async function (req, res) {    
+    
+    const resourceReq = await ResourceReq.findOne({ '_id': req.body.resourceReqId, 'status': 'pending' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!resourceReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such pending Resource Request ',
+        data: {}
+    });
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': resourceReq.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need is not found!',
+        data: {}
+    });
+
+    if(resourceneed.status != 'progress')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need completion is no longer in progress!',
+        data: {}
+    });
+
+    theOwner = await getResourceOwner(resourceReq)
+    var valid = false;
+    
+    if(resourceReq.resType === 'knowledge') {
+
+        for(var i = 0 ; i < theOwner.length; i++) {
+            if(req.body.id === theOwner[i].theId) {
+                valid = true;
+                break;
+            }
+        }
+    } else {
+        if(req.body.id === theOwner) valid = true
+    }
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to update this resource request!',
+        data: {}
+    });
+
+    resourceReq.status = "declined"
+
+    resourceReq.save(resourceReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Resource Request successfully declined',
+            data: { resourceReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.cancelResourceReq = async function (req, res) {    
+    
+    const resourceReq = await ResourceReq.findOne({ '_id': req.body.resourceReqId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!resourceReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such Resource Request ',
+        data: {}
+    });
+
+    if(resourceReq.status != 'pending' && resourceReq.status != 'accepted')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You can no longer cancel this resource request ',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': resourceReq.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such project',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(valid) resourceReq.cancelType = "project"
+    
+    theOwner = await getResourceOwner(resourceReq)
+
+    if(resourceReq.resType === 'knowledge') {
+
+        for(var i = 0 ; i < theOwner.length; i++) {
+            if(req.body.id === theOwner[i].theId) {
+                valid = true;
+                break;
+            }
+        }
+    } else {
+        if(req.body.id === theOwner) valid = true
+    }
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to update this resource request!',
+        data: {}
+    });
+
+    resourceReq.cancelType = "contributor"
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': resourceReq.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need is not found!',
+        data: {}
+    });
+
+    resourceReq.status = "cancelled"
+
+    resourceReq.save(resourceReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Resource Request successfully cancelled',
+            data: { resourceReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.completeResourceReq = async function (req, res) {    
+    const resourceReq = await ResourceReq.findOne({ '_id': req.body.resourceReqId, 'status': 'accepted' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!resourceReq)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such accepted Resource Request ',
+        data: {}
+    });
+
+    const project = await Project.findOne({ '_id': resourceReq.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such project',
+        data: {}
+    });
+
+    if(project.status != 'ongoing')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The project is no longer ongoing!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host=== req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to update this resource request!',
+        data: {}
+    });
+
+
+    const resourceneed = await ResourceNeed.findOne({ '_id': resourceReq.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need is not found!',
+        data: {}
+    });
+
+    if(resourceneed.status != 'progress')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The resource need completion is no longer in progress!',
+        data: {}
+    });
+
+    theOwner = await getResourceOwner(resourceReq)
+
+    if(resourceReq.resType === 'knowledge') {
+
+        for(var i = 0 ; i < theOwner.length; i++) {
+            const contribution = new Contribution({
+                projectId: resourceReq.projectId,
+                needId: resourceReq.needId,
+                requestId: resourceReq.id,
+                requestType: "resource",
+                resType: resourceReq.resType,
+                rating: 1,
+                contributor: theOwner[i].theId,
+                contributorType: theOwner[i].ownerType,
+                status: 'active'
+            });
+        
+            contribution.save().catch(err => {
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong! Error: ' + err.message,
+                    data: {}
+                });
+            });
+
+        }
+    } else {
+
+        const contribution = new Contribution({
+            projectId: resourceReq.projectId,
+            needId: resourceReq.needId,
+            requestId: resourceReq.id,
+            requestType: "resource",
+            resType: resourceReq.resType,
+            rating: 1,
+            contributor: theOwner,
+            contributorType: resourceReq.ownerType,
+            status: 'active'
+        });
+    
+        contribution.save().catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        });
+        
+    }
+
+    resourceReq.status = "completed"
+
+    resourceReq.save(resourceReq)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Resource Request successfully completed',
+            data: { resourceReq: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+async function getProjectInfo(theItem) {
+    const project = await Project.findOne({ '_id': theItem.projectId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!project) return
+    if(project.status != 'ongoing') return
+
+    theItem.projectTitle = project.title
+    theItem.projectSDGs = project.SDGs
+
+}
+
+async function getNeedInfo(theItem) {
+    const resourceneed = await ResourceNeed.findOne({ '_id': theItem.needId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!resourceneed) return
+    if(resourceneed.status != 'progress') return
+
+    theItem.needTitle = resourceneed.title
+    theItem.needDesc = resourceneed.desc
+
+}
+
+async function getResourceInfo(theItem) {
+
+    var resource;
+
+    if(theItem.resType === "item") {
+        resource = await Item.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "knowledge") {
+        resource = await Knowledge.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "venue") {
+        resource = await Venue.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "manpower") {
+        resource = await Manpower.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "money") {
+        resource = await Money.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!resource) return
+    if(resource.status != 'active') return
+
+    if(theItem.resType != "money")
+        theItem.resourceTitle = resource.title
+    else
+        theItem.resourceTitle = "Money"
+
+}
+
+async function getResourceOwner(theItem) {
+
+    var resource;
+
+    if(theItem.resType === "item") {
+        resource = await Item.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "knowledge") {
+        resource = await Knowledge.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "venue") {
+        resource = await Venue.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "manpower") {
+        resource = await Manpower.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "money") {
+        resource = await Money.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!resource) return
+    theItem.ownerType = resource.ownerType
+    return resource.owner
+
+}
+
+async function getAccountInfo(theItem) {
+    var owner;
+
+    if(theItem.ownerType === "user") {
+        owner = await User.findOne({ '_id': theItem.ownerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.ownerType === 'institution') {
+        owner = await Institution.findOne({ '_id': theItem.ownerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
+
+    theItem.requesterName = owner.name
+    theItem.requesterUsername = owner.username
+    theItem.requesterImg = owner.ionicImg
+    
 }

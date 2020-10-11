@@ -21,6 +21,39 @@ exports.getResourceNeeds = [
     query('projectId').exists()
 ]
 
+exports.createPost = [
+    body('projectId').exists(),
+    body('title').exists(),
+    body('desc').exists()
+]
+
+exports.createPostComment = [
+    body('postId').exists(),
+    body('comment').exists()
+]
+
+exports.deletePostComment = [
+    body('commentId').exists()
+]
+
+exports.updatePost = [
+    body('postId').exists(),
+    body('title').exists(),
+    body('desc').exists()
+]
+
+exports.deletePost = [
+    body('postId').exists()
+]
+
+exports.getPost = [
+    query('projectId').exists()
+]
+
+exports.getComment = [
+    query('postId').exists()
+]
+
 exports.getContributions = [
     query('projectId').exists()
 ]

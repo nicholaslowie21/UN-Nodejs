@@ -24,5 +24,7 @@ db.contribution = require("./contribution.model")(mongoose);
 db.projectreq = require("./projectreq.model")(mongoose);
 db.resourcereq = require("./resourcereq.model")(mongoose);
 db.profilefeed = require("./profilefeed.model")(mongoose);
+db.projectpost = require("./projectpost.model")(mongoose);
+db.postcomment = require("./postcomment.model")(mongoose);
 
 module.exports = db;

@@ -22,10 +22,38 @@ exports.reqProject = [
     body('resType').exists()
 ]
 
+exports.consolidatedPage = [
+    query('reqStatus').exists()
+]
+
+exports.resourceDetailPageProjectReq = [
+    query('reqStatus').exists(),
+    query('resourceId').exists()
+]
+
+exports.projectPageReq = [
+    query('reqStatus').exists(),
+    query('projectId').exists()
+]
+
+exports.resourceDetailPageResourceReq = [
+    query('reqStatus').exists(),
+    query('resourceId').exists(),
+    query('resType').exists()
+]
+
 exports.contributeMoney = [
     body('needId').exists(),
     body('desc').exists(),
     body('moneySum').exists()
+]
+
+exports.acceptProjectReq = [
+    body('projectReqId').exists()
+]
+
+exports.acceptResourceReq = [
+    body('resourceReqId').exists()
 ]
 
 exports.useKnowledgeResource = [

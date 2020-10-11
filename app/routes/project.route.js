@@ -44,4 +44,14 @@ router.get('/contributors', ProjectValidator.getContributions, Helper.ifErrors, 
 
 router.get('/accountNewsFeed', auth, projectController.getAccNewsFeed )
 
+router.post('/createPost', auth, projectController.multerCreatePost , ProjectValidator.createPost, Helper.ifErrors , projectController.createPost)
+router.post('/updatePost', auth, projectController.multerUpdatePost , ProjectValidator.updatePost, Helper.ifErrors , projectController.updatePost)
+router.post('/deletePost', auth, ProjectValidator.deletePost, Helper.ifErrors , projectController.deletePost)
+router.post('/deletePostPic', auth, ProjectValidator.deletePost, Helper.ifErrors , projectController.deletePostPic)
+router.get('/posts', ProjectValidator.getPost, Helper.ifErrors , projectController.getPosts)
+
+router.post('/createPostComment', auth, ProjectValidator.createPostComment, Helper.ifErrors , projectController.createPostComment)
+router.post('/deletePostComment', auth, ProjectValidator.deletePostComment, Helper.ifErrors , projectController.deletePostComment)
+router.get('/comments', ProjectValidator.getComment, Helper.ifErrors , projectController.getComments)
+
 module.exports = router;
