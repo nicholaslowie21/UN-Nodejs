@@ -2702,7 +2702,7 @@ exports.completeProjectReq = async function (req, res) {
         resourceneed.pendingSum -= projectReq.moneySum
         resourceneed.receivedSum += projectReq.moneySum
         var tempCompletion = resourceneed.receivedSum/resourceneed.total
-        resourceneed.completion = Math.rount((tempCompletion+Number.EPSILON)*100)/100
+        resourceneed.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
     }
 
     resourceneed.save().catch(err => {
