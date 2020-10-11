@@ -50,6 +50,10 @@ exports.getPost = [
     query('projectId').exists()
 ]
 
+exports.getPostDetail = [
+    query('postId').exists()
+]
+
 exports.getComment = [
     query('postId').exists()
 ]

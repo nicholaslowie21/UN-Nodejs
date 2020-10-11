@@ -49,6 +49,7 @@ router.post('/updatePost', auth, projectController.multerUpdatePost , ProjectVal
 router.post('/deletePost', auth, ProjectValidator.deletePost, Helper.ifErrors , projectController.deletePost)
 router.post('/deletePostPic', auth, ProjectValidator.deletePost, Helper.ifErrors , projectController.deletePostPic)
 router.get('/posts', ProjectValidator.getPost, Helper.ifErrors , projectController.getPosts)
+router.get('/postDetail', ProjectValidator.getPostDetail, Helper.ifErrors , projectController.getPostDetail)
 
 router.post('/createPostComment', auth, ProjectValidator.createPostComment, Helper.ifErrors , projectController.createPostComment)
 router.post('/deletePostComment', auth, ProjectValidator.deletePostComment, Helper.ifErrors , projectController.deletePostComment)

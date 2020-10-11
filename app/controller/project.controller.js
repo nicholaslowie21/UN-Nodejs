@@ -492,6 +492,66 @@ exports.getPosts = async function (req, res){
 
 }
 
+exports.getPostDetail = async function (req, res){
+    const theprojectPost = await ProjectPost.findOne({ '_id': req.query.postId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!theprojectPost) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project post not found!',
+        data: {}
+    });
+
+    var projectPost = {
+        "id":"",
+        "title": "",
+        "desc": "",
+        "accountId": "",
+        "accountType": "",
+        "status": "",
+        "projectId": "",
+        "imgPath": "",
+        "accountName":"",
+        "accountUsername":"",
+        "accountPic":"",
+        "createdAt":"",
+        "updatedAt":""
+    }
+
+    projectPost.id = theprojectPost.id
+    projectPost.title = theprojectPost.title
+    projectPost.desc = theprojectPost.desc
+    projectPost.accountId = theprojectPost.accountId
+    projectPost.accountType = theprojectPost.accountType
+    projectPost.status = theprojectPost.status
+    projectPost.projectId = theprojectPost.projectId
+    projectPost.imgPath = theprojectPost.imgPath   
+    projectPost.createdAt = theprojectPost.createdAt 
+    projectPost.updatedAt = theprojectPost.updatedAt
+    
+    await getAccountInfo(projectPost)
+    if(projectPost.accountName === "")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an issue with retrieving the post creator!',
+        data: {}
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Post detail successfully retrieved',
+        data: { projectPost: projectPost }
+    });
+
+}
+
 exports.createPostComment = async function (req, res){
 
     const projectPost = await ProjectPost.findOne({ '_id': req.body.postId, 'status':'active' }, function (err) {
@@ -3163,6 +3223,7 @@ async function getAccountInfo(theItem) {
     theItem.accountPic = owner.ionicImg
     theItem.accountUsername = owner.username
     theItem.accountName = owner.name 
+    theItem.isVerified = owner.isVerified
 }
 
 handleError = (err) => {
