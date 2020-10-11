@@ -2255,7 +2255,7 @@ exports.editResourceNeed = async function (req, res){
 
         req.body.completion = resourceneed.receivedSum/req.body.total
         var tempCompletion = req.body.completion
-        req.body.completion = Math.rount((tempCompletion+Number.EPSILON)*100)/100
+        req.body.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
     }
     
 
