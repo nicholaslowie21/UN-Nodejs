@@ -3047,6 +3047,7 @@ exports.getAccNewsFeed = async function (req, res){
 
     for(var i = 0; i < projects.length; i++) {
         var projectItem = {
+            "id":"",
             "title": "",
             "desc": "",
             "host": "",
