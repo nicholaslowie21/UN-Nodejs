@@ -1196,7 +1196,9 @@ exports.getFundingNeeds = async function (req, res) {
             fundingStatus: "",
             total:0,
             pendingSum:0,
-            receivedSum:0
+            receivedSum:0,
+            "createdAt":"",
+            "updatedAt":""
         }
         
         fundingItem.needId = fundingneeds[i].id
@@ -1207,6 +1209,9 @@ exports.getFundingNeeds = async function (req, res) {
         fundingItem.pendingSum = fundingneeds[i].pendingSum
         fundingItem.receivedSum = fundingneeds[i].receivedSum
         fundingItem.id = fundingneeds[i].projectId
+        fundingItem.createdAt = fundingneeds[i].createdAt
+        fundingItem.updatedAt = fundingneeds[i].updatedAt
+
 
         const project = await Project.findOne({ '_id': fundingItem.id }, function (err) {
             if (err)
@@ -1291,7 +1296,9 @@ exports.getFilteredFundingNeeds = async function (req, res) {
             total:0,
             pendingSum:0,
             receivedSum:0,
-            matchPoint:0
+            matchPoint:0,
+            "createdAt":"",
+            "updatedAt":""
         }
         
         fundingItem.needId = fundingneeds[i].id
@@ -1302,6 +1309,9 @@ exports.getFilteredFundingNeeds = async function (req, res) {
         fundingItem.pendingSum = fundingneeds[i].pendingSum
         fundingItem.receivedSum = fundingneeds[i].receivedSum
         fundingItem.id = fundingneeds[i].projectId
+        fundingItem.createdAt = fundingneeds[i].createdAt
+        fundingItem.updatedAt = fundingneeds[i].updatedAt
+
 
         const project = await Project.findOne({ '_id': fundingItem.id }, function (err) {
             if (err)
