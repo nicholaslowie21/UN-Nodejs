@@ -52,6 +52,6 @@ router.get('/posts', ProjectValidator.getPost, Helper.ifErrors , projectControll
 
 router.post('/createPostComment', auth, ProjectValidator.createPostComment, Helper.ifErrors , projectController.createPostComment)
 router.post('/deletePostComment', auth, ProjectValidator.deletePostComment, Helper.ifErrors , projectController.deletePostComment)
-
+router.get('/comments', ProjectValidator.getComment, Helper.ifErrors , projectController.getComments)
 
 module.exports = router;

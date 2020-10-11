@@ -577,6 +577,63 @@ exports.deletePostComment = async function (req, res){
     });
 }
 
+exports.getComments = async function (req, res){
+    const postComments = await PostComment.find({ 'postId': req.query.postId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!postComments) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active post comments not found!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i =0; i < postComments.length; i++) {
+        var postComment = {
+            "id":"",
+            "postId":"",
+            "comment": "",
+            "accountId": "",
+            "accountType": "",
+            "status": "",
+            "accountName":"",
+            "accountUsername":"",
+            "accountPic":"",
+            "createdAt":"",
+            "updatedAt":""
+        }
+
+        postComment.id = postComments[i].id
+        postComment.postId = postComments[i].postId
+        postComment.comment = postComments[i].comment
+        postComment.accountId = postComments[i].accountId
+        postComment.accountType = postComments[i].accountType
+        postComment.status = postComments[i].status
+        postComment.createdAt = postComments[i].createdAt 
+        postComment.updatedAt = postComments[i].updatedAt
+
+        await getAccountInfo(postComment)
+        if(postComment.accountName === "") continue
+
+        theList.push(postComment)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Post Comments successfully retrieved',
+        data: { postComments: theList }
+    });
+
+}
+
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let dir = 'public/uploads/projectPicture'
