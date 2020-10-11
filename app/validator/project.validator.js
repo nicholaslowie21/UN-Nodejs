@@ -27,6 +27,15 @@ exports.createPost = [
     body('desc').exists()
 ]
 
+exports.createPostComment = [
+    body('postId').exists(),
+    body('comment').exists()
+]
+
+exports.deletePostComment = [
+    body('commentId').exists()
+]
+
 exports.updatePost = [
     body('postId').exists(),
     body('title').exists(),

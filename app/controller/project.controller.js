@@ -450,6 +450,7 @@ exports.getPosts = async function (req, res){
 
     for(var i =0; i < projectPosts.length; i++) {
         var projectPost = {
+            "id":"",
             "title": "",
             "desc": "",
             "accountId": "",
@@ -464,6 +465,7 @@ exports.getPosts = async function (req, res){
             "updatedAt":""
         }
 
+        projectPost.id = projectPosts[i].id
         projectPost.title = projectPosts[i].title
         projectPost.desc = projectPosts[i].desc
         projectPost.accountId = projectPosts[i].accountId
@@ -488,6 +490,91 @@ exports.getPosts = async function (req, res){
         data: { projectPosts: theList }
     });
 
+}
+
+exports.createPostComment = async function (req, res){
+
+    const projectPost = await ProjectPost.findOne({ '_id': req.body.postId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!projectPost) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project post not found!',
+        data: {}
+    });
+    
+    const postComment = new PostComment({
+		comment: req.body.comment,
+		postId: req.body.postId,
+		accountId: req.id,
+		accountType: req.type,
+		status: 'active'
+    });
+    
+    postComment.save(postComment)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Post comment successfully created',
+            data: { postComment: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deletePostComment = async function (req, res){
+
+    const postComment = await PostComment.findOne({ '_id': req.body.commentId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!postComment) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project post comment not found!',
+        data: {}
+    });
+
+    if(postComment.accountId != req.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this comment!',
+        data: {}
+    });
+
+    postComment.status = "deleted"
+    
+    postComment.save(postComment)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Post comment successfully deleted',
+            data: { postComment: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
 }
 
 var storage = multer.diskStorage({
