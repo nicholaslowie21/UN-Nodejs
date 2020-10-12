@@ -2032,6 +2032,7 @@ exports.getMyConsolidatedProjectReq = async function (req, res) {
             status: "",
             cancelType: "",
             createdAt: "",
+            updatedAt:"",
             ownerId: "",
             ownerType: "",
             desc: "",
@@ -2058,6 +2059,7 @@ exports.getMyConsolidatedProjectReq = async function (req, res) {
         projectReqItem.ownerType = projectReqs[i].ownerType
         projectReqItem.desc = projectReqs[i].desc
         projectReqItem.moneySum = projectReqs[i].moneySum
+        projectReqItem.updatedAt = projectReqs[i].updatedAt
         
         await getProjectInfo(projectReqItem)
         if(projectReqItem.projectTitle === "") continue
@@ -2118,7 +2120,8 @@ exports.getResourceDetailProjectReq = async function (req, res) {
             resourceTitle: "",
             requesterName: "",
             requesterUsername: "",
-            requesterImg: ""
+            requesterImg: "",
+            updatedAt:""
         }
 
         projectReqItem.id = projectReqs[i].id
@@ -2129,6 +2132,7 @@ exports.getResourceDetailProjectReq = async function (req, res) {
         projectReqItem.status = projectReqs[i].status
         projectReqItem.cancelType = projectReqs[i].cancelType
         projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.updatedAt = projectReqs[i].updatedAt
         projectReqItem.ownerId = projectReqs[i].ownerId
         projectReqItem.ownerType = projectReqs[i].ownerType
         projectReqItem.desc = projectReqs[i].desc
@@ -2187,7 +2191,8 @@ exports.getResourceDetailResourceReq = async function (req, res) {
             projectSDGs: "",
             needTitle: "",
             needDesc: "",
-            resourceTitle: ""
+            resourceTitle: "",
+            updatedAt:""
         }
 
         resourceReqItem.id = resourceReqs[i].id
@@ -2198,6 +2203,7 @@ exports.getResourceDetailResourceReq = async function (req, res) {
         resourceReqItem.status = resourceReqs[i].status
         resourceReqItem.cancelType = resourceReqs[i].cancelType
         resourceReqItem.createdAt = resourceReqs[i].createdAt
+        resourceReqItem.updatedAt = resourceReqs[i].updatedAt
         resourceReqItem.desc = resourceReqs[i].desc
         
         await getProjectInfo(resourceReqItem)
@@ -2257,7 +2263,9 @@ exports.getProjectPageProjectReq = async function (req, res) {
             resourceTitle: "",
             requesterName: "",
             requesterUsername: "",
-            requesterImg: ""
+            requesterImg: "",
+            createdAt:"",
+            updatedAt:""
         }
 
         projectReqItem.id = projectReqs[i].id
@@ -2272,7 +2280,9 @@ exports.getProjectPageProjectReq = async function (req, res) {
         projectReqItem.ownerType = projectReqs[i].ownerType
         projectReqItem.desc = projectReqs[i].desc
         projectReqItem.moneySum = projectReqs[i].moneySum
-        
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.updatedAt = projectReqs[i].updatedAt
+
         await getProjectInfo(projectReqItem)
         if(projectReqItem.projectTitle === "") continue
         
@@ -2326,7 +2336,8 @@ exports.getProjectPageResourceReq = async function (req, res) {
             projectSDGs: "",
             needTitle: "",
             needDesc: "",
-            resourceTitle: ""
+            resourceTitle: "",
+            updatedAt:""
         }
 
         resourceReqItem.id = resourceReqs[i].id
@@ -2338,6 +2349,7 @@ exports.getProjectPageResourceReq = async function (req, res) {
         resourceReqItem.cancelType = resourceReqs[i].cancelType
         resourceReqItem.createdAt = resourceReqs[i].createdAt
         resourceReqItem.desc = resourceReqs[i].desc
+        resourceReqItem.updatedAt = resourceReqs[i].updatedAt
         
         await getProjectInfo(resourceReqItem)
         if(resourceReqItem.projectTitle === "") continue
