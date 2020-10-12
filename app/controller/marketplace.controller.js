@@ -4,6 +4,7 @@ const User = db.users
 const Knowledge = db.knowledge
 const Item = db.item
 const Venue = db.venue
+const Money = db.money
 const ResourceNeed = db.resourceneed
 const Institution = db.institution
 const ResourceReq = db.resourcereq
@@ -1687,9 +1688,30 @@ exports.contributeMoney = async function (req, res) {
         data: {}
     }); 
 
+    const money = new Money({
+        sum: req.body.moneySum,
+        desc: req.body.desc,
+        owner: req.id,
+        status: "active",
+        country: theRequester.country,
+        ownerType: req.type
+    });
+
+    var moneyResId;
+    await money.save().then(data => {
+        moneyResId = data.id;
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
     const projectreq = new ProjectReq({
         projectId: project.id,
         needId: req.body.needId,
+        resourceId: moneyResId,
         resType: "money",
         status: "accepted",
         ownerId: req.body.id,
@@ -2010,6 +2032,7 @@ exports.getMyConsolidatedProjectReq = async function (req, res) {
             status: "",
             cancelType: "",
             createdAt: "",
+            updatedAt:"",
             ownerId: "",
             ownerType: "",
             desc: "",
@@ -2036,6 +2059,7 @@ exports.getMyConsolidatedProjectReq = async function (req, res) {
         projectReqItem.ownerType = projectReqs[i].ownerType
         projectReqItem.desc = projectReqs[i].desc
         projectReqItem.moneySum = projectReqs[i].moneySum
+        projectReqItem.updatedAt = projectReqs[i].updatedAt
         
         await getProjectInfo(projectReqItem)
         if(projectReqItem.projectTitle === "") continue
@@ -2096,7 +2120,8 @@ exports.getResourceDetailProjectReq = async function (req, res) {
             resourceTitle: "",
             requesterName: "",
             requesterUsername: "",
-            requesterImg: ""
+            requesterImg: "",
+            updatedAt:""
         }
 
         projectReqItem.id = projectReqs[i].id
@@ -2107,6 +2132,7 @@ exports.getResourceDetailProjectReq = async function (req, res) {
         projectReqItem.status = projectReqs[i].status
         projectReqItem.cancelType = projectReqs[i].cancelType
         projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.updatedAt = projectReqs[i].updatedAt
         projectReqItem.ownerId = projectReqs[i].ownerId
         projectReqItem.ownerType = projectReqs[i].ownerType
         projectReqItem.desc = projectReqs[i].desc
@@ -2165,7 +2191,8 @@ exports.getResourceDetailResourceReq = async function (req, res) {
             projectSDGs: "",
             needTitle: "",
             needDesc: "",
-            resourceTitle: ""
+            resourceTitle: "",
+            updatedAt:""
         }
 
         resourceReqItem.id = resourceReqs[i].id
@@ -2176,6 +2203,7 @@ exports.getResourceDetailResourceReq = async function (req, res) {
         resourceReqItem.status = resourceReqs[i].status
         resourceReqItem.cancelType = resourceReqs[i].cancelType
         resourceReqItem.createdAt = resourceReqs[i].createdAt
+        resourceReqItem.updatedAt = resourceReqs[i].updatedAt
         resourceReqItem.desc = resourceReqs[i].desc
         
         await getProjectInfo(resourceReqItem)
@@ -2235,7 +2263,9 @@ exports.getProjectPageProjectReq = async function (req, res) {
             resourceTitle: "",
             requesterName: "",
             requesterUsername: "",
-            requesterImg: ""
+            requesterImg: "",
+            createdAt:"",
+            updatedAt:""
         }
 
         projectReqItem.id = projectReqs[i].id
@@ -2250,7 +2280,9 @@ exports.getProjectPageProjectReq = async function (req, res) {
         projectReqItem.ownerType = projectReqs[i].ownerType
         projectReqItem.desc = projectReqs[i].desc
         projectReqItem.moneySum = projectReqs[i].moneySum
-        
+        projectReqItem.createdAt = projectReqs[i].createdAt
+        projectReqItem.updatedAt = projectReqs[i].updatedAt
+
         await getProjectInfo(projectReqItem)
         if(projectReqItem.projectTitle === "") continue
         
@@ -2304,7 +2336,8 @@ exports.getProjectPageResourceReq = async function (req, res) {
             projectSDGs: "",
             needTitle: "",
             needDesc: "",
-            resourceTitle: ""
+            resourceTitle: "",
+            updatedAt:""
         }
 
         resourceReqItem.id = resourceReqs[i].id
@@ -2316,6 +2349,7 @@ exports.getProjectPageResourceReq = async function (req, res) {
         resourceReqItem.cancelType = resourceReqs[i].cancelType
         resourceReqItem.createdAt = resourceReqs[i].createdAt
         resourceReqItem.desc = resourceReqs[i].desc
+        resourceReqItem.updatedAt = resourceReqs[i].updatedAt
         
         await getProjectInfo(resourceReqItem)
         if(resourceReqItem.projectTitle === "") continue
@@ -2598,7 +2632,7 @@ exports.cancelProjectReq = async function (req, res) {
 
     projectReq.status = "cancelled"
 
-    if(valid) projectReq.cancelType = "project"
+    if(valid === true) projectReq.cancelType = "project"
     else projectReq.cancelType = "contributor"
 
     projectReq.save(projectReq)
@@ -2704,9 +2738,40 @@ exports.completeProjectReq = async function (req, res) {
         resourceneed.receivedSum += projectReq.moneySum
         var tempCompletion = resourceneed.receivedSum/resourceneed.total
         resourceneed.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
+
+        // const money = new Money({
+        //     sum: projectReq.moneySum,
+        //     desc: projectReq.desc,
+        //     owner: projectReq.ownerId,
+        //     status: "active",
+        //     country: "",
+        //     ownerType: projectReq.ownerType
+        // });
+        // await getAccountCountry(money)
+        // var moneyResId;
+        // await money.save().then(data => {
+        //     moneyResId = data.id;
+        // }).catch(err => {
+        //     return res.status(500).json({
+        //         status: 'error',
+        //         msg: 'Something went wrong! Error: ' + err.message,
+        //         data: {}
+        //     });
+        // });
+
+        // projectReq.resourceId = moneyResId
+        // projectReq.resType = "money"
+        
+        // await projectReq.save().catch(err => {
+        //     return res.status(500).json({
+        //         status: 'error',
+        //         msg: 'Something went wrong! Error: ' + err.message,
+        //         data: {}
+        //     });
+        // });
     }
 
-    resourceneed.save().catch(err => {
+    await resourceneed.save().catch(err => {
         return res.status(500).json({
             status: 'error',
             msg: 'Something went wrong! Error: ' + err.message,
@@ -2726,7 +2791,7 @@ exports.completeProjectReq = async function (req, res) {
         status: 'active'
     });
 
-    contribution.save().catch(err => {
+    await contribution.save().catch(err => {
         return res.status(500).json({
             status: 'error',
             msg: 'Something went wrong! Error: ' + err.message,
@@ -2963,7 +3028,7 @@ exports.cancelResourceReq = async function (req, res) {
         }
     } else if (project.host=== req.body.id) valid = true;
 
-    if(valid) resourceReq.cancelType = "project"
+    if(valid === true) resourceReq.cancelType = "project"
     
     theOwner = await getResourceOwner(resourceReq)
 
@@ -2972,11 +3037,15 @@ exports.cancelResourceReq = async function (req, res) {
         for(var i = 0 ; i < theOwner.length; i++) {
             if(req.body.id === theOwner[i].theId) {
                 valid = true;
+                resourceReq.cancelType = "contributor"
                 break;
             }
         }
     } else {
-        if(req.body.id === theOwner) valid = true
+        if(req.body.id === theOwner) { 
+            valid = true
+            resourceReq.cancelType = "contributor"
+        }
     }
 
     if(!valid)
@@ -2986,7 +3055,7 @@ exports.cancelResourceReq = async function (req, res) {
         data: {}
     });
 
-    resourceReq.cancelType = "contributor"
+
 
     const resourceneed = await ResourceNeed.findOne({ '_id': resourceReq.needId }, function (err) {
         if (err) {
@@ -3326,5 +3395,33 @@ async function getAccountInfo(theItem) {
     theItem.requesterName = owner.name
     theItem.requesterUsername = owner.username
     theItem.requesterImg = owner.ionicImg
+    
+}
+
+async function getAccountCountry(theItem) {
+    var owner;
+
+    if(theItem.ownerType === "user") {
+        owner = await User.findOne({ '_id': theItem.owner }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.ownerType === 'institution') {
+        owner = await Institution.findOne({ '_id': theItem.owner }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
+
+    theItem.country = owner.country
     
 }

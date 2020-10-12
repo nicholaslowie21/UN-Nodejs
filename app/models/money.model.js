@@ -1,7 +1,7 @@
 module.exports = mongoose => {
     var schema = mongoose.Schema(
       {
-        sum: Number,
+        sum: { type: Number, default: 0 },
         desc: { type: String, default: '' },
         owner: { type: String, default: '' },
         status: { type: String, default: '' },
