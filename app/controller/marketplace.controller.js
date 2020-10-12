@@ -4,6 +4,7 @@ const User = db.users
 const Knowledge = db.knowledge
 const Item = db.item
 const Venue = db.venue
+const Money = db.money
 const ResourceNeed = db.resourceneed
 const Institution = db.institution
 const ResourceReq = db.resourcereq
@@ -2704,9 +2705,40 @@ exports.completeProjectReq = async function (req, res) {
         resourceneed.receivedSum += projectReq.moneySum
         var tempCompletion = resourceneed.receivedSum/resourceneed.total
         resourceneed.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
+
+        const money = new Money({
+            sum: projectReq.moneySum,
+            desc: projectReq.desc,
+            owner: projectReq.ownerId,
+            status: "active",
+            country: "",
+            ownerType: projectReq.ownerType
+        });
+        await getAccountCountry(money)
+        var moneyResId;
+        await money.save().then(data => {
+            moneyResId = data.id;
+        }).catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        });
+
+        projectReq.resourceId = moneyResId
+        projectReq.resType = "money"
+        
+        await projectReq.save().catch(err => {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: ' + err.message,
+                data: {}
+            });
+        });
     }
 
-    resourceneed.save().catch(err => {
+    await resourceneed.save().catch(err => {
         return res.status(500).json({
             status: 'error',
             msg: 'Something went wrong! Error: ' + err.message,
@@ -2726,7 +2758,7 @@ exports.completeProjectReq = async function (req, res) {
         status: 'active'
     });
 
-    contribution.save().catch(err => {
+    await contribution.save().catch(err => {
         return res.status(500).json({
             status: 'error',
             msg: 'Something went wrong! Error: ' + err.message,
@@ -3326,5 +3358,33 @@ async function getAccountInfo(theItem) {
     theItem.requesterName = owner.name
     theItem.requesterUsername = owner.username
     theItem.requesterImg = owner.ionicImg
+    
+}
+
+async function getAccountCountry(theItem) {
+    var owner;
+
+    if(theItem.ownerType === "user") {
+        owner = await User.findOne({ '_id': theItem.owner }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.ownerType === 'institution') {
+        owner = await Institution.findOne({ '_id': theItem.owner }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
+
+    theItem.country = owner.country
     
 }
