@@ -3037,11 +3037,15 @@ exports.cancelResourceReq = async function (req, res) {
         for(var i = 0 ; i < theOwner.length; i++) {
             if(req.body.id === theOwner[i].theId) {
                 valid = true;
+                resourceReq.cancelType = "contributor"
                 break;
             }
         }
     } else {
-        if(req.body.id === theOwner) valid = true
+        if(req.body.id === theOwner) { 
+            valid = true
+            resourceReq.cancelType = "contributor"
+        }
     }
 
     if(!valid)
@@ -3051,7 +3055,7 @@ exports.cancelResourceReq = async function (req, res) {
         data: {}
     });
 
-    resourceReq.cancelType = "contributor"
+
 
     const resourceneed = await ResourceNeed.findOne({ '_id': resourceReq.needId }, function (err) {
         if (err) {
