@@ -1745,6 +1745,7 @@ async function getOwnerInfo(resourceItem) {
     resourceItem.ownerImg = owner.ionicImg
     resourceItem.ownerName = owner.name
     resourceItem.ownerUsername = owner.username
+    resourceItem.ownerIsVerified = owner.isVerified
 }
 
 exports.currProjects = async function (req, res, next) {
