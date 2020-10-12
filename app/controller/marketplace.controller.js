@@ -1688,9 +1688,30 @@ exports.contributeMoney = async function (req, res) {
         data: {}
     }); 
 
+    const money = new Money({
+        sum: req.body.moneySum,
+        desc: req.body.desc,
+        owner: req.id,
+        status: "active",
+        country: theRequester.country,
+        ownerType: req.type
+    });
+
+    var moneyResId;
+    await money.save().then(data => {
+        moneyResId = data.id;
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
     const projectreq = new ProjectReq({
         projectId: project.id,
         needId: req.body.needId,
+        resourceId: moneyResId,
         resType: "money",
         status: "accepted",
         ownerId: req.body.id,
@@ -2706,36 +2727,36 @@ exports.completeProjectReq = async function (req, res) {
         var tempCompletion = resourceneed.receivedSum/resourceneed.total
         resourceneed.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
 
-        const money = new Money({
-            sum: projectReq.moneySum,
-            desc: projectReq.desc,
-            owner: projectReq.ownerId,
-            status: "active",
-            country: "",
-            ownerType: projectReq.ownerType
-        });
-        await getAccountCountry(money)
-        var moneyResId;
-        await money.save().then(data => {
-            moneyResId = data.id;
-        }).catch(err => {
-            return res.status(500).json({
-                status: 'error',
-                msg: 'Something went wrong! Error: ' + err.message,
-                data: {}
-            });
-        });
+        // const money = new Money({
+        //     sum: projectReq.moneySum,
+        //     desc: projectReq.desc,
+        //     owner: projectReq.ownerId,
+        //     status: "active",
+        //     country: "",
+        //     ownerType: projectReq.ownerType
+        // });
+        // await getAccountCountry(money)
+        // var moneyResId;
+        // await money.save().then(data => {
+        //     moneyResId = data.id;
+        // }).catch(err => {
+        //     return res.status(500).json({
+        //         status: 'error',
+        //         msg: 'Something went wrong! Error: ' + err.message,
+        //         data: {}
+        //     });
+        // });
 
-        projectReq.resourceId = moneyResId
-        projectReq.resType = "money"
+        // projectReq.resourceId = moneyResId
+        // projectReq.resType = "money"
         
-        await projectReq.save().catch(err => {
-            return res.status(500).json({
-                status: 'error',
-                msg: 'Something went wrong! Error: ' + err.message,
-                data: {}
-            });
-        });
+        // await projectReq.save().catch(err => {
+        //     return res.status(500).json({
+        //         status: 'error',
+        //         msg: 'Something went wrong! Error: ' + err.message,
+        //         data: {}
+        //     });
+        // });
     }
 
     await resourceneed.save().catch(err => {
