@@ -2632,7 +2632,7 @@ exports.cancelProjectReq = async function (req, res) {
 
     projectReq.status = "cancelled"
 
-    if(valid) projectReq.cancelType = "project"
+    if(valid === true) projectReq.cancelType = "project"
     else projectReq.cancelType = "contributor"
 
     projectReq.save(projectReq)
@@ -3028,7 +3028,7 @@ exports.cancelResourceReq = async function (req, res) {
         }
     } else if (project.host=== req.body.id) valid = true;
 
-    if(valid) resourceReq.cancelType = "project"
+    if(valid === true) resourceReq.cancelType = "project"
     
     theOwner = await getResourceOwner(resourceReq)
 
