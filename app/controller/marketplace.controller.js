@@ -16,6 +16,7 @@ const nodeCountries =  require("node-countries")
 const Helper = require('../service/helper.service')
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
+const CronJob = require('cron').CronJob;
 
 exports.reqResource = async function (req, res) {
     var theRequester    
@@ -3961,3 +3962,8 @@ async function getHostInfo(theItem) {
     theItem.hostUsername = owner.username
     
 }
+
+new CronJob('59 23 * * 0', async function () {
+    runDiscoverWeekly()
+    console.log('Discover Weekly triggered')
+  }, null, true, 'Asia/Singapore');
