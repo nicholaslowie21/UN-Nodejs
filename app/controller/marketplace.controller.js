@@ -1013,6 +1013,283 @@ exports.getKnowledgeList = async function (req, res) {
     });
 }
 
+exports.getResourceSuggestion = async function (req, res) {    
+    const resourcneed = await ResourceNeed.findOne({ '_id': req.query.needId, 'status': 'progress' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!resourcneed) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving resourceneed!',
+        data: {}
+    });
+
+    var needMap = new Map();
+    var titleElements = resourcneed.title.split(" ");
+
+    for(var i = 0; i < titleElements.length; i++) {
+        needMap.set(titleElements[i],1)
+    }
+
+    var resources = [];
+
+    if(resourcneed.type === "item") {
+        resources = await Item.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+
+    } else if(resourcneed.type === "venue") {
+        resources = await Venue.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if(resourcneed.type === "knowledge") {
+        resources = await Knowledge.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if(resourcneed.type === "manpower") {
+        resources = await Manpower.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+
+    var theList = []
+
+    for(var i = 0; i < resources.length; i++) {
+        var suggestedResource = {
+            id:"",
+            title: "",
+            desc: "",
+            owner: "",
+            status: "",
+            country: "",
+            ownerType: "",
+            ownerImg: "",
+            ownerName: "",
+            ownerUsername: "",
+            createdAt:"",
+            updatedAt:"",
+            matchPoint: 0
+        }
+        var resourceTitle = resources[i].title.split(" ")
+
+        suggestedResource.id = resources[i].id
+        suggestedResource.title = resources[i].title
+        suggestedResource.desc = resources[i].desc
+        suggestedResource.owner = resources[i].owner
+        suggestedResource.status = resources[i].status
+        suggestedResource.country = resources[i].country
+        suggestedResource.ownerType = resources[i].ownerType
+        suggestedResource.createdAt = resources[i].createdAt
+        suggestedResource.updatedAt = resources[i].updatedAt
+
+        for(var j = 0; j < resourceTitle.length; j++) {
+            if(needMap.get(resourceTitle[j])) suggestedResource.matchPoint += 10;
+        }
+
+        if(suggestedResource.matchPoint === 0) continue
+
+        await getOwnerInfo(suggestedResource)
+
+        theList.push(suggestedResource)
+    }
+
+    theList.reverse()
+    theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Suggested resource list successfully retrieved',
+        data: { suggestedResources: theList }
+    });
+}
+
+exports.getResourceNeedSuggestion = async function (req, res){
+    var resource;
+
+    if(req.query.resourceType === "item") {
+        resource = await Item.findOne({ '_id': req.query.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+
+    } else if(req.query.resourceType === "venue") {
+        resource = await Venue.findOne({ '_id': req.query.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if(req.query.resourceType === "knowledge") {
+        resource = await Knowledge.findOne({ '_id': req.query.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if(req.query.resourceType === "manpower") {
+        resource = await Manpower.findOne({ '_id': req.query.resourceId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+
+    if(!resource)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such resource not found!',
+        data: {}
+    });
+
+    var resourceMap = new Map();
+    var titleElements = resource.title.split(" ");
+
+    for(var i = 0; i < titleElements.length; i++) {
+        resourceMap.set(titleElements[i],1)
+    }
+        
+    const resourceneeds = await ResourceNeed.find({ 'type':req.query.resourceType, 'status': 'progress' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'An error occur when retrieving resource needs!',
+            data: {}
+        });
+    });
+
+    if(!resourceneeds)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was an issue retrieving resource needs!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i = 0; i < resourceneeds.length; i++) {
+        var suggestedResourceNeed = {
+            id:"",
+            title: "",
+            desc: "",
+            status: "",
+            type: "",
+            completion: 0,
+            projectId: "",
+            code: "",
+            projectTitle: "",
+            country: "",
+            projectImg: "",
+            projectSDGs: "",
+            createdAt:"",
+            updatedAt:"",
+            matchPoint: 0
+        }
+
+        suggestedResourceNeed.id = resourceneeds[i].id
+        suggestedResourceNeed.title = resourceneeds[i].title
+        suggestedResourceNeed.desc = resourceneeds[i].desc
+        suggestedResourceNeed.status = resourceneeds[i].status
+        suggestedResourceNeed.type = resourceneeds[i].type
+        suggestedResourceNeed.completion = resourceneeds[i].completion
+        suggestedResourceNeed.projectId = resourceneeds[i].projectId
+        suggestedResourceNeed.code = resourceneeds[i].code
+        suggestedResourceNeed.createdAt = resourceneeds[i].createdAt
+        suggestedResourceNeed.updatedAt = resourceneeds[i].updatedAt
+
+        await getProjectInfo(suggestedResourceNeed)
+        if(suggestedResourceNeed.projectTitle === "") continue
+
+        var needTitle = suggestedResourceNeed.title.split(" ")
+
+        for(var j = 0; j < needTitle.length; j++ ) {
+            if(resourceMap.get(needTitle[j])) suggestedResourceNeed.matchPoint += 10;
+        }
+
+        if(resource.country === suggestedResourceNeed.country) suggestedResourceNeed.matchPoint += 5;
+        if(suggestedResourceNeed.matchPoint === 0) continue
+
+        theList.push(suggestedResourceNeed)
+    }
+
+    theList.reverse()
+    theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Resource need suggestion successfully retrieved!',
+        data: { resourceneedSuggestion: theList }
+    });
+}
+
+async function runDiscoverWeekly () {
+    const users = await User.find({ 'status': 'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < users.length; i++) {
+        suggestDiscoverWeekly(users[i].id,"user")
+    }
+
+    const institutions = await Institution.find({ 'status': 'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < institutions.length; i++) {
+        suggestDiscoverWeekly(institutions[i].id,"institution")
+    }
+}
+
+async function suggestDiscoverWeekly(accountId, accountType) {
+
+}
+
 exports.getProjectList = async function (req, res) {    
     const projects = await Project.find({ 'status': 'ongoing' }, function (err) {
         if (err)
@@ -3251,7 +3528,8 @@ async function getProjectInfo(theItem) {
 
     theItem.projectTitle = project.title
     theItem.projectSDGs = project.SDGs
-
+    theItem.projectImg = project.imgPath
+    theItem.country = project.country
 }
 
 async function getNeedInfo(theItem) {
