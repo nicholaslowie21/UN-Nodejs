@@ -1013,6 +1013,122 @@ exports.getKnowledgeList = async function (req, res) {
     });
 }
 
+exports.getResourceSuggestion = async function (req, res) {    
+    const resourcneed = await ResourceNeed.findOne({ '_id': req.query.needId, 'status': 'progress' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!resourcneed) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving resourceneed!',
+        data: {}
+    });
+
+    var needMap = new Map();
+    var titleElements = resourcneed.title.split(" ");
+
+    for(var i = 0; i < titleElements.length; i++) {
+        needMap.set(titleElements[i],1)
+    }
+
+    var resources = [];
+
+    if(resourcneed.type === "item") {
+        resources = await Item.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+
+    } else if(resourcneed.type === "venue") {
+        resources = await Venue.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if(resourcneed.type === "knowledge") {
+        resources = await Knowledge.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    } else if(resourcneed.type === "manpower") {
+        resources = await Manpower.find({ 'status': 'active' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+
+    var theList = []
+
+    for(var i = 0; i < resources.length; i++) {
+        var suggestedResource = {
+            id:"",
+            title: "",
+            desc: "",
+            owner: "",
+            status: "",
+            country: "",
+            ownerType: "",
+            ownerImg: "",
+            ownerName: "",
+            ownerUsername: "",
+            createdAt:"",
+            updatedAt:"",
+            matchPoint: 0
+        }
+        var resourceTitle = resources[i].title.split(" ")
+
+        suggestedResource.id = resources[i].id
+        suggestedResource.title = resources[i].title
+        suggestedResource.desc = resources[i].desc
+        suggestedResource.owner = resources[i].owner
+        suggestedResource.status = resources[i].status
+        suggestedResource.country = resources[i].country
+        suggestedResource.ownerType = resources[i].ownerType
+        suggestedResource.createdAt = resources[i].createdAt
+        suggestedResource.updatedAt = resources[i].updatedAt
+
+        for(var j = 0; j < resourceTitle.length; j++) {
+            if(needMap.get(resourceTitle[j])) suggestedResource.matchPoint += 10;
+        }
+
+        if(suggestedResource.matchPoint === 0) continue
+
+        await getOwnerInfo(suggestedResource)
+
+        theList.push(suggestedResource)
+    }
+
+    theList.reverse()
+    theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Suggested resource list successfully retrieved',
+        data: { suggestedResources: theList }
+    });
+}
+
 exports.getProjectList = async function (req, res) {    
     const projects = await Project.find({ 'status': 'ongoing' }, function (err) {
         if (err)

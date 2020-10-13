@@ -8,6 +8,10 @@ exports.reqResource = [
     body('resType').exists()
 ]
 
+exports.suggestResource = [
+    query('needId').exists()
+]
+
 exports.reqAutoResource = [
     body('resourceId').exists(),
     body('projectId'),

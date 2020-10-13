@@ -46,4 +46,6 @@ router.post('/decline/resourceReq', auth, MarketValidator.acceptResourceReq, Hel
 router.post('/cancel/resourceReq', auth, MarketValidator.acceptResourceReq, Helper.ifErrors, marketController.cancelResourceReq)
 router.post('/complete/resourceReq', auth, MarketValidator.acceptResourceReq, Helper.ifErrors, marketController.completeResourceReq)
 
+router.get('/suggestion/resource', MarketValidator.suggestResource, Helper.ifErrors, marketController.getResourceSuggestion);
+
 module.exports = router;
