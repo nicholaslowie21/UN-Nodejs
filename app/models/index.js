@@ -26,5 +26,6 @@ db.resourcereq = require("./resourcereq.model")(mongoose);
 db.profilefeed = require("./profilefeed.model")(mongoose);
 db.projectpost = require("./projectpost.model")(mongoose);
 db.postcomment = require("./postcomment.model")(mongoose);
+db.discoverweekly = require("./discoverweekly.model")(mongoose);
 
 module.exports = db;
