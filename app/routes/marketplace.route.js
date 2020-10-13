@@ -49,4 +49,6 @@ router.post('/complete/resourceReq', auth, MarketValidator.acceptResourceReq, He
 router.get('/suggestion/resource', auth, MarketValidator.suggestResource, Helper.ifErrors, marketController.getResourceSuggestion);
 router.get('/suggestion/resourceneed', auth, MarketValidator.suggestResourceNeed, Helper.ifErrors, marketController.getResourceNeedSuggestion )
 
+router.get('/test', auth, marketController.testEndpoint)
+
 module.exports = router;

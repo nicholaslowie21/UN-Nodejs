@@ -11,6 +11,7 @@ const ResourceReq = db.resourcereq
 const ProjectReq = db.projectreq
 const Project = db.project
 const Contribution = db.contribution
+const DiscoverWeekly = db.discoverweekly
 const nodeCountries =  require("node-countries")
 const Helper = require('../service/helper.service')
 const { default: ShortUniqueId } = require('short-unique-id');
@@ -1260,19 +1261,44 @@ exports.getResourceNeedSuggestion = async function (req, res){
 
 async function runDiscoverWeekly () {
     const users = await User.find({ 'status': 'active' }, function (err) {
-        if (err)
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Something went wrong! '+err,
-            data: {}
-        });
+        if (err) console.log(err)
     });
 
     for(var i = 0; i < users.length; i++) {
-        suggestDiscoverWeekly(users[i].id,"user")
+        suggestDiscoverWeekly(users[i],"user")
     }
 
     const institutions = await Institution.find({ 'status': 'active' }, function (err) {
+        if (err) console.log(err)
+    });
+
+    for(var i = 0; i < institutions.length; i++) {
+        suggestDiscoverWeekly(institutions[i],"institution")
+    }
+}
+
+async function suggestDiscoverWeekly(account, accountType) {
+
+    var len = account.projects.length - 1
+    var titleMap = new Map()
+
+    for(var i = len; i > 0 && i > len-5; i--) {
+        var project = {
+            projectId: "",
+            projectTitle: ""
+        }
+        project.projectId = account.projects[i]
+
+        await getProjectInfo(project);
+        if(project.projectTitle === "") continue;
+
+        var titleSplit = project.projectTitle.split(" ")
+        for(var j = 0; j < titleSplit.length; j++) {
+            titleMap.set(titleSplit[j],1)
+        }
+    }
+
+    const projects = await Project.find({ 'status': 'ongoing' }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -1281,13 +1307,94 @@ async function runDiscoverWeekly () {
         });
     });
 
-    for(var i = 0; i < institutions.length; i++) {
-        suggestDiscoverWeekly(institutions[i].id,"institution")
+    var theList = []
+
+    for(var i = 0; i < projects.length; i++) {
+        var projectItem = {
+            projectId: "",
+            matchPoint: 0
+        }
+
+        projectItem.projectId = projects[i].id
+        var theTitles = projects[i].title.split(" ")
+        for(var j = 0; j < theTitles.length; j++) {
+            if(titleMap.get(theTitles[j])) projectItem.matchPoint += 10
+        }
+
+        if(projects[i].country === account.country) projectItem.matchPoint += 10
+
+        if(!account.projects.includes(projectItem.projectId))
+            theList.push(projectItem)
+    }
+    
+    theList.reverse()
+    theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+    
+
+    var theProjectIds = []
+
+    var listLen = theList.length
+    
+    for(var i = 0 ; i < 5 && i < listLen; i++ ) {
+        theProjectIds.push(theList[i].projectId)
+    }
+
+    const discoverweekly = await DiscoverWeekly.findOne({ 'accountId': account.id, 'accountType':accountType }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(discoverweekly) {
+        discoverweekly.projectIds = theProjectIds
+        await discoverweekly.save().catch(err => {
+            console.log(err)
+        });
+    } else {
+        const newDW = new DiscoverWeekly({
+            projectIds: theProjectIds,
+            accountId: account.id,
+            accountType: accountType
+        })
+
+        await newDW.save().catch(err => {
+            console.log(err)
+        });
     }
 }
 
-async function suggestDiscoverWeekly(accountId, accountType) {
+exports.testEndpoint = async function (req, res) {    
+    var actor;
+    if(req.type === "user") {
+        actor = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }else if (req.type === "institution") {
+        actor = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
 
+    await suggestDiscoverWeekly(actor,req.type)
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Test endpoint successfully retrieved',
+        data: { }
+    });
 }
 
 exports.getProjectList = async function (req, res) {    
