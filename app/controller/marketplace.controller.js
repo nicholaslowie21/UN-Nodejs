@@ -11,10 +11,12 @@ const ResourceReq = db.resourcereq
 const ProjectReq = db.projectreq
 const Project = db.project
 const Contribution = db.contribution
+const DiscoverWeekly = db.discoverweekly
 const nodeCountries =  require("node-countries")
 const Helper = require('../service/helper.service')
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
+const CronJob = require('cron').CronJob;
 
 exports.reqResource = async function (req, res) {
     var theRequester    
@@ -1260,19 +1262,44 @@ exports.getResourceNeedSuggestion = async function (req, res){
 
 async function runDiscoverWeekly () {
     const users = await User.find({ 'status': 'active' }, function (err) {
-        if (err)
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Something went wrong! '+err,
-            data: {}
-        });
+        if (err) console.log(err)
     });
 
     for(var i = 0; i < users.length; i++) {
-        suggestDiscoverWeekly(users[i].id,"user")
+        suggestDiscoverWeekly(users[i],"user")
     }
 
     const institutions = await Institution.find({ 'status': 'active' }, function (err) {
+        if (err) console.log(err)
+    });
+
+    for(var i = 0; i < institutions.length; i++) {
+        suggestDiscoverWeekly(institutions[i],"institution")
+    }
+}
+
+async function suggestDiscoverWeekly(account, accountType) {
+
+    var len = account.projects.length - 1
+    var titleMap = new Map()
+
+    for(var i = len; i > 0 && i > len-5; i--) {
+        var project = {
+            projectId: "",
+            projectTitle: ""
+        }
+        project.projectId = account.projects[i]
+
+        await getProjectInfo(project);
+        if(project.projectTitle === "") continue;
+
+        var titleSplit = project.projectTitle.split(" ")
+        for(var j = 0; j < titleSplit.length; j++) {
+            titleMap.set(titleSplit[j],1)
+        }
+    }
+
+    const projects = await Project.find({ 'status': 'ongoing' }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -1281,13 +1308,190 @@ async function runDiscoverWeekly () {
         });
     });
 
-    for(var i = 0; i < institutions.length; i++) {
-        suggestDiscoverWeekly(institutions[i].id,"institution")
+    var theList = []
+
+    for(var i = 0; i < projects.length; i++) {
+        var projectItem = {
+            projectId: "",
+            matchPoint: 0
+        }
+
+        projectItem.projectId = projects[i].id
+        var theTitles = projects[i].title.split(" ")
+        for(var j = 0; j < theTitles.length; j++) {
+            if(titleMap.get(theTitles[j])) projectItem.matchPoint += 10
+        }
+
+        if(projects[i].country === account.country) projectItem.matchPoint += 10
+
+        if(!account.projects.includes(projectItem.projectId))
+            theList.push(projectItem)
+    }
+    
+    theList.reverse()
+    theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+    
+
+    var theProjectIds = []
+
+    var listLen = theList.length
+    
+    for(var i = 0 ; i < 5 && i < listLen; i++ ) {
+        theProjectIds.push(theList[i].projectId)
+    }
+
+    const discoverweekly = await DiscoverWeekly.findOne({ 'accountId': account.id, 'accountType':accountType }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(discoverweekly) {
+        discoverweekly.projectIds = theProjectIds
+        await discoverweekly.save().catch(err => {
+            console.log(err)
+        });
+    } else {
+        const newDW = new DiscoverWeekly({
+            projectIds: theProjectIds,
+            accountId: account.id,
+            accountType: accountType
+        })
+
+        await newDW.save().catch(err => {
+            console.log(err)
+        });
     }
 }
 
-async function suggestDiscoverWeekly(accountId, accountType) {
+exports.triggerDiscoverWeekly = async function (req, res) {    
+    runDiscoverWeekly()
 
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Discover Weekly successfully manually triggered',
+        data: { }
+    });
+}
+
+exports.testEndpoint = async function (req, res) {    
+    var actor;
+    if(req.type === "user") {
+        actor = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }else if (req.type === "institution") {
+        actor = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+
+    await suggestDiscoverWeekly(actor,req.type)
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Test endpoint successfully retrieved',
+        data: { }
+    });
+}
+
+exports.getDiscoverWeekly = async function (req, res) {    
+    var actor;
+    if(req.type === "user") {
+        actor = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }else if (req.type === "institution") {
+        actor = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! '+err,
+                data: {}
+            });
+        });
+    }
+
+    if(!actor)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    var theList = []
+
+    discoverWeekly = await DiscoverWeekly.findOne({ 'accountId': req.id, 'accountType': req.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!discoverWeekly)
+    return res.status(200).json({
+        status: 'success',
+        msg: 'There is no discover weekly projects yet!',
+        data: { discoverweekly: theList }
+    });
+
+    var projectIds = discoverWeekly.projectIds;
+    for(var i = 0; i < projectIds.length; i++) {
+        var projectItem = {
+            "id":"",
+            "title": "",
+            "desc": "",
+            "host": "",
+            "hostType": "",
+            "status": "",
+            "rating": "",
+            "country": "",
+            "code": "",
+            "imgPath":"",
+            "admins":[],
+            "SDGs":[],
+            "hostImg":"",
+            "hostName":"",
+            "hostUsername":"",
+            "createdAt":"",
+            "updatedAt":""
+        }
+
+        projectItem.id = projectIds[i]
+        await getDiscoverProjectInfo(projectItem)
+        if(projectItem.title === "") continue
+
+        await getHostInfo(projectItem)
+        if(projectItem.hostName === "") continue
+
+        theList.push(projectItem)
+    }
+    
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Discover weekly projects successfully retrieved',
+        data: { discoverweekly: theList }
+    });
 }
 
 exports.getProjectList = async function (req, res) {    
@@ -3532,6 +3736,32 @@ async function getProjectInfo(theItem) {
     theItem.country = project.country
 }
 
+async function getDiscoverProjectInfo(theItem) {
+    const project = await Project.findOne({ '_id': theItem.id }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!project) return
+    if(project.status != 'ongoing') return
+
+    theItem.title = project.title
+    theItem.desc = project.desc
+    theItem.host =  project.host
+    theItem.hostType = project.hostType
+    theItem.status = project.status
+    theItem.rating = project.rating
+    theItem.country = project.country
+    theItem.code = project.code
+    theItem.imgPath = project.imgPath
+    theItem.admins = project.admins
+    theItem.SDGs = project.SDGs
+    theItem.createdAt = project.createdAt
+    theItem.updatedAt = project.updatedAt
+}
+
 async function getNeedInfo(theItem) {
     const resourceneed = await ResourceNeed.findOne({ '_id': theItem.needId }, function (err) {
         if (err) {
@@ -3701,5 +3931,39 @@ async function getAccountCountry(theItem) {
     }
 
     theItem.country = owner.country
+}
+
+async function getHostInfo(theItem) {
+    var owner;
+
+    if(theItem.hostType === "user") {
+        owner = await User.findOne({ '_id': theItem.host }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.hostType === 'institution') {
+        owner = await Institution.findOne({ '_id': theItem.host }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
+
+    theItem.hostImg = owner.ionicImg
+    theItem.hostName = owner.name
+    theItem.hostUsername = owner.username
     
 }
+
+new CronJob('59 23 * * 0', async function () {
+    runDiscoverWeekly()
+    console.log('Discover Weekly triggered')
+  }, null, true, 'Asia/Singapore');
