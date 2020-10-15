@@ -15,8 +15,11 @@ const CronJob = require('cron').CronJob;
 
 var rewardStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        let dir = 'public/uploads/rewards'
-        
+        let dir = ""
+        if(file.fieldname === "rewardImg")
+            dir = 'public/uploads/rewards'
+        else
+            dir = 'public/uploads/rewards/verification'
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
@@ -24,7 +27,11 @@ var rewardStorage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = "RewardPicture-"+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = ""
+        if(file.fieldname === "rewardImg")
+            thePath = "RewardPicture-"+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+        else 
+            thePath = "RewardFile-"+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1];
         req.thePath = thePath;
         cb(null, thePath)
     },
@@ -36,7 +43,10 @@ var rewardStorage = multer.diskStorage({
 var uploadReward = multer({ 
     storage: rewardStorage,
     fileFilter: function(_req, file, cb){
-        checkFileType(file, cb);
+        if(file.fieldname === "rewardImg")
+            checkFileType(file, cb);
+        else
+            cb(null,true)
     }   
 })
 
@@ -55,10 +65,21 @@ function checkFileType(file, cb){
     }
 }
 
-exports.multerRequestReward = uploadReward.single('rewardImg');
+exports.multerRequestReward = uploadReward.fields([{
+    name: 'rewardImg', maxCount: 1
+  }, {
+    name: 'rewardFile', maxCount: 1
+  }]);
 
 exports.requestReward = async function (req, res){
     let account; 
+
+    if(!req.files.rewardFile)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'A file is needed for verification!',
+        data: {}
+    });
 
     if(req.type === "institution") {
         account = await Institution.findOne({ '_id': req.id }, function (err) {
@@ -109,11 +130,10 @@ exports.requestReward = async function (req, res){
     }
     
     var pathString = ""
-    
-    if(req.file) {
-        sharp('./'+req.file.path).toBuffer().then(
+    if(req.files.rewardImg[0]) {
+        sharp('./'+req.files.rewardImg[0].path).toBuffer().then(
             (data) => {
-                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                sharp(data).resize(800).toFile('./'+req.files.rewardImg[0].path, (err,info) => {
                     if(err)
                     return res.status(500).json({
                         status: 'error',
@@ -133,7 +153,7 @@ exports.requestReward = async function (req, res){
             }
         )
 
-        pathString = "/public/uploads/rewards/"+req.thePath;
+        pathString = "/public/uploads/rewards/"+req.files.rewardImg[0].filename ;
     }
 
     var theDate = moment(req.body.endDate).tz('Asia/Singapore')
@@ -156,7 +176,8 @@ exports.requestReward = async function (req, res){
 		sponsorType: req.type,
 		country: req.body.country,
         minTier: req.body.minTier,
-        endDate: theDate
+        endDate: theDate,
+        verifyFile: "/public/uploads/rewards/verification/"+ req.files.rewardFile[0].filename
     });
     
     reward.save(reward)
