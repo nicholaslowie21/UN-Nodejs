@@ -9,6 +9,7 @@ const verificationRouter = require('./verification.route')
 const projectRouter = require('./project.route')
 const resourceRouter = require('./resource.route')
 const marketplaceRouter = require('./marketplace.route')
+const rewardRouter = require('./reward.route')
 
 router.use('/authorization', authorizationRouter)
 router.use('/user', userRouter)
@@ -18,5 +19,6 @@ router.use('/verification', verificationRouter)
 router.use('/project', projectRouter)
 router.use('/resource', resourceRouter)
 router.use('/marketplace', marketplaceRouter)
+router.use('/reward', rewardRouter)
 
 module.exports = router;
