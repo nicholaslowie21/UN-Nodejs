@@ -11,7 +11,6 @@ const multer = require('multer')
 const nodeCountries =  require("node-countries");
 const Helper = require('../service/helper.service')
 const sharp = require('sharp')
-const { reward } = require('../models')
 const CronJob = require('cron').CronJob;
 
 var rewardStorage = multer.diskStorage({
