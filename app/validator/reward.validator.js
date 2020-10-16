@@ -18,7 +18,10 @@ exports.requestReward = [
         if (!theCountry)
             return Promise.reject('Country is not valid');
     }),
-    body('minTier').exists()
+    body('minTier').exists().custom(async value => {
+        if(value != "gold" && value != "silver" && value != "bronze")
+            return Promise.reject('the tier is invalid!')
+    })
 ]
 
 exports.cancelReward = [
