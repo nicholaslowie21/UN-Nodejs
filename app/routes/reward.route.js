@@ -12,7 +12,11 @@ router.get('/rewardOfferingList', auth, rewardController.getRewardList)
 router.get('/rewardOfferingDetail', auth, RewardValidator.rewardDetail, rewardController.getRewardDetail)
 
 router.post('/createReward', auth, rewardController.multerCreateRequestReward, RewardValidator.createRequestReward, Helper.ifErrors, rewardController.createReward)
-router.get('/allReward', auth, rewardController.allPendingReward)
+router.get('/allReward', auth, RewardValidator.allReward, Helper.ifErrors, rewardController.allReward)
+router.get('/filteredReward', auth, RewardValidator.filteredReward, Helper.ifErrors, rewardController.filteredReward)
+router.post('/validateReward', auth, RewardValidator.validateReward, Helper.ifErrors, rewardController.validateReward)
+router.post('/updateReward', auth, rewardController.multerCreateRequestReward, RewardValidator.updateReward, Helper.ifErrors, rewardController.updateReward)
+router.post('/deleteReward', auth, RewardValidator.deleteReward, Helper.ifErrors, rewardController.deleteReward)
 
 router.post('/rewardClearing', rewardController.manualRewardClearing)
 

@@ -47,10 +47,59 @@ exports.createRequestReward = [
     })
 ]
 
+exports.updateReward = [
+    body('rewardId').exists(),
+    body('title').exists(),
+    body('desc').exists(),
+    body('point').exists().custom(async value => {
+        if(value<=0)
+            return Promise.reject('Point is invalid')
+    }),
+    body('quota').exists().custom(async value => {
+        if(value<=0)
+            return Promise.reject('Quota is invalid')
+    }),
+    body('endDate').exists(),
+    body('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    }),
+    body('minTier').exists().custom(async value => {
+        if(value != "gold" && value != "silver" && value != "bronze")
+            return Promise.reject('the tier is invalid!')
+    })
+]
+
 exports.cancelReward = [
     body('rewardId').exists()
 ]
 
 exports.rewardDetail = [
     query('rewardId').exists()
+]
+
+exports.filteredReward = [
+    query('country').exists().custom(async value => {
+        let theCountry = nodeCountries.getCountryByName(value);
+        if (!theCountry)
+            return Promise.reject('Country is not valid');
+    }),
+    query('status').exists()
+]
+
+exports.allReward = [
+    query('status').exists()
+]
+
+exports.validateReward = [
+    body('rewardId').exists(),
+    body('action').exists().custom(async value => {
+        if(value != "approve" && value !="reject")
+            return Promise.reject('Invalid action!')
+    })
+]
+
+exports.deleteReward = [
+    body('rewardId').exists()
 ]

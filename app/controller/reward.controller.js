@@ -11,6 +11,7 @@ const multer = require('multer')
 const nodeCountries =  require("node-countries");
 const Helper = require('../service/helper.service')
 const sharp = require('sharp')
+const { reward } = require('../models')
 const CronJob = require('cron').CronJob;
 
 var rewardStorage = multer.diskStorage({
@@ -467,7 +468,121 @@ exports.createReward = async function (req, res){
     });
 }
 
-exports.allPendingReward = async function (req, res){
+exports.updateReward = async function (req, res){
+    let account; 
+
+    let theCountry = nodeCountries.getCountryByName(req.body.country);
+    req.body.country = theCountry.name;
+
+    account = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    if(account.role === "user")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Only admin is authorized to perform this!',
+        data: {}
+    });
+
+    var reward = await Reward.findOne({ '_id': req.body.rewardId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!reward)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such reward!',
+        data: {}
+    });
+    
+    var pathString = ""
+    if(req.file) {
+        sharp('./'+req.file.path).toBuffer().then(
+            (data) => {
+                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                    if(err)
+                    return res.status(500).json({
+                        status: 'error',
+                        msg: 'Something went wrong during image upload! ',
+                        data: {}
+                    });
+                });
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during upload! ',
+                    data: {}
+                });
+            }
+        )
+
+        pathString = "/public/uploads/rewards/"+req.thePath ;
+    }
+
+    var theDate = moment(req.body.endDate).tz('Asia/Singapore')
+    
+    if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The end date is invalid! ',
+        data: {}
+    });
+
+    if(req.body.quota < reward.claimedSum)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The new quota is invalid! It is lower than the claimed number.',
+        data: {}
+    });
+
+		reward.title = req.body.title
+        reward.desc = req.body.desc
+        reward.imgPath = pathString
+        reward.point = req.body.point
+        reward.quota = req.body.quota
+		reward.country = req.body.country
+        reward.minTier = req.body.minTier
+        reward.endDate = theDate
+
+    
+    reward.save(reward)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Reward offer successfully updated',
+            data: { reward: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.allReward = async function (req, res){
     let account; 
 
     account = await User.findOne({ '_id': req.id }, function (err) {
@@ -493,7 +608,7 @@ exports.allPendingReward = async function (req, res){
         data: {}
     });
     
-    const rewards = await Reward.find({ 'status': 'pending' }, function (err) {
+    const rewards = await Reward.find({ 'status': req.query.status }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -505,7 +620,7 @@ exports.allPendingReward = async function (req, res){
     if(!rewards) 
     return res.status(500).json({
         status: 'error',
-        msg: 'There was no rewards!',
+        msg: 'There was no such rewards!',
         data: {}
     });
 
@@ -546,21 +661,239 @@ exports.allPendingReward = async function (req, res){
         reward.verifyFile = rewards[i].verifyFile
 
         await getRequesterInfo(reward)
-        if(reward.accountName === "") continue
+        if(reward.accountName === "" && reward.sponsorType != "external") continue
 
         theList.push(reward)
     }
     
     return res.status(200).json({
         status: 'success',
-        msg: 'Reward pending offer successfully retrieved',
+        msg: 'Reward offer successfully retrieved',
         data: { rewards: theList }
+    });
+}
+
+exports.filteredReward = async function (req, res){
+    let account; 
+
+    let theCountry = nodeCountries.getCountryByName(req.query.country);
+    req.query.country = theCountry.name;
+
+    account = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    if(account.role === "user")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Only admin is authorized to perform this!',
+        data: {}
+    });
+    
+    const rewards = await Reward.find({ 'status': req.query.status, 'country': req.query.country }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving rewards!',
+            data: {}
+        });
+    });
+
+    if(!rewards) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such rewards!',
+        data: {}
+    });
+
+    var theList = [];
+
+    for(var i = 0; i < rewards.length; i++) {
+        var reward = {
+            id:"",
+            title: "",
+            desc: "",
+            imgPath: "",
+            point: "",
+            quota: "",
+            status: "",
+            sponsorId: "",
+            sponsorType: "",
+            country: "",
+            minTier: "",
+            endDate: "",
+            verifyFile: "",
+            accountName: "",
+            accountUsername: "",
+            accountImgPath: ""
+        }
+
+        reward.id = rewards[i].id
+        reward.title = rewards[i].title
+        reward.desc = rewards[i].desc
+        reward.imgPath = rewards[i].imgPath
+        reward.point = rewards[i].point
+        reward.quota = rewards[i].quota
+        reward.status = rewards[i].status
+        reward.sponsorId = rewards[i].sponsorId
+        reward.sponsorType = rewards[i].sponsorType
+        reward.country = rewards[i].country
+        reward.minTier = rewards[i].minTier
+        reward.endDate = rewards[i].endDate
+        reward.verifyFile = rewards[i].verifyFile
+
+        await getRequesterInfo(reward)
+        if(reward.accountName === "" && reward.sponsorType != "external") continue
+
+        theList.push(reward)
+    }
+    
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Filtered reward offer successfully retrieved',
+        data: { rewards: theList }
+    });
+}
+
+exports.validateReward = async function (req, res){
+    let account; 
+
+    account = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    if(account.role === "user")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Only admin is authorized to perform this!',
+        data: {}
+    });
+    
+    const reward = await Reward.findOne({ '_id': req.body.rewardId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving rewards!',
+            data: {}
+        });
+    });
+
+    if(!reward) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such reward!',
+        data: {}
+    });
+
+    if(req.body.action === "approve")
+        reward.status = "open"
+    else
+        reward.status = "rejected"
+
+    reward.save(reward)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Reward offer successfully validated',
+            data: { reward: data }
+        });
+     }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteReward = async function (req, res){
+    let account; 
+
+    account = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    if(account.role === "user")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Only admin is authorized to perform this!',
+        data: {}
+    });
+    
+    const reward = await Reward.findOne({ '_id': req.body.rewardId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving rewards!',
+            data: {}
+        });
+    });
+
+    if(!reward) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such reward!',
+        data: {}
+    });
+
+    reward.status = "deleted"
+
+    reward.save(reward)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Reward offer successfully deleted',
+            data: { reward: data }
+        });
+     }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
     });
 }
 
 async function getRequesterInfo(theItem) {
     var owner;
 
+    if(theItem.sponsorType === "external") return
     if(theItem.sponsorType === "user") {
         owner = await User.findOne({ '_id': theItem.sponsorId }, function (err) {
             if (err) {
