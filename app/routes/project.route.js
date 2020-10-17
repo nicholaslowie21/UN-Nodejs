@@ -41,6 +41,7 @@ router.get('/resourceNeeds', ProjectValidator.getResourceNeeds, Helper.ifErrors,
 router.get('/contributions', ProjectValidator.getContributions, Helper.ifErrors, projectController.getContributions )
 router.post('/removeContribution', auth, ProjectValidator.removeContribution, Helper.ifErrors, projectController.removeContribution)
 router.get('/contributors', ProjectValidator.getContributions, Helper.ifErrors, projectController.getContributors )
+router.post('/updateContributionRating', auth, ProjectValidator.updateContributionRating, Helper.ifErrors, projectController.updateContributionRating)
 
 router.get('/accountNewsFeed', auth, projectController.getAccNewsFeed )
 

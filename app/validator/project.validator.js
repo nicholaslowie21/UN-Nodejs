@@ -177,6 +177,14 @@ exports.removeContribution = [
     body('contributionId').exists()
 ]
 
+exports.updateContributionRating = [
+    body('contributionId').exists(),
+    body('theRating').exists().custom(async value => {
+        if(value < 1 || value > 5)
+            return Promise.reject('The rating is invalid')
+    })
+]
+
 exports.searchUsers = [
     query('username').exists()
 ]
