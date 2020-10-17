@@ -162,7 +162,7 @@ exports.requestReward = async function (req, res){
     }
     
     var pathString = ""
-    if(req.files.rewardImg[0]) {
+    if(req.files.rewardImg && req.files.rewardImg[0]) {
         sharp('./'+req.files.rewardImg[0].path).toBuffer().then(
             (data) => {
                 sharp(data).resize(800).toFile('./'+req.files.rewardImg[0].path, (err,info) => {
