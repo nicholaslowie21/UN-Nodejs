@@ -428,7 +428,6 @@ exports.createReward = async function (req, res){
     }
 
     var theDate = moment().tz(req.body.endDate,'Asia/Singapore')
-    
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
     return res.status(500).json({
         status: 'error',
