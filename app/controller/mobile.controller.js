@@ -260,6 +260,7 @@ exports.contactList = async function (req, res){
             accountWebsite:"",
             accountCountry:"",
             accountSDGs:[],
+            accountAddress:"",
             createdAt:""    
         }
 
@@ -320,6 +321,8 @@ async function getAccountInfo(theItem) {
 
     if(theItem.targetType === "user") {
         theItem.accountOccupation = owner.occupation
+    }else if(theItem.targetType === "institution") {
+        theItem.accountAddress = owner.address
     }
 }
 
