@@ -3182,48 +3182,38 @@ async function getResourceInfo(contributionItem) {
 
     if(contributionItem.resType === 'manpower') {
         resource = await Manpower.findOne({ '_id': contributionItem.resourceId }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a manpower resource!' + err.message,
-                data: {}
-            });
+            if (err){
+                console.log("error: "+err.message)
+                return
+            }
         });    
     } else if(contributionItem.resType === 'venue') {
         resource = await Venue.findOne({ '_id': contributionItem.resourceId }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a venue resource!' + err.message,
-                data: {}
-            });
+            if (err){
+                console.log("error: "+err.message)
+                return
+            }
         });    
     } else if(contributionItem.resType === 'money') {
         resource = await Money.findOne({ '_id': contributionItem.resourceId }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a money resource!' + err.message,
-                data: {}
-            });
+            if (err){
+                console.log("error: "+err.message)
+                return
+            }
         });    
     } else if(contributionItem.resType === 'knowledge') {
         resource = await Knowledge.findOne({ '_id': contributionItem.resourceId }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving a knowledge resource!' + err.message,
-                data: {}
-            });
+            if (err){
+                console.log("error: "+err.message)
+                return
+            }
         });    
     } else if(contributionItem.resType === 'item') {
         resource = await Item.findOne({ '_id': contributionItem.resourceId }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'There was an error retrieving an item resource!' + err.message,
-                data: {}
-            });
+            if (err){
+                console.log("error: "+err.message)
+                return
+            }
         });    
     }
     

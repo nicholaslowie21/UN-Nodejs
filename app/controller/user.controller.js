@@ -382,34 +382,10 @@ exports.viewUserById = async function (req, res) {
         data: {}
     });
     
-    var theUser = {
-        "id":user.id,
-        "name": user.name,
-        "username": user.username,
-        "email": user.email,
-        "bio": user.bio || '',
-        "role": user.role,
-        "status": user.status,
-        "occupation": user.occupation || '',
-        "isVerified": user.isVerified,
-        "profilePic": user.profilePic,
-        "country": user.country,
-        "website": user.website || '',
-        "points": user.points,
-        "salutation": user.salutation || '',
-        "skills": user.skills,
-        "institutionIds": user.institutionIds,
-        "projects": user.projects,
-        "badges": user.badges,
-        "SDGs": user.SDGs,
-        "wallet": user.wallet,
-        "ionicImg": user.ionicImg || ''
-    }
-
     return res.status(200).json({
         status: 'success',
         msg: 'User profile successfully retrieved',
-        data: { targetUser: theUser }
+        data: { targetUser: user }
     });
 
 }
