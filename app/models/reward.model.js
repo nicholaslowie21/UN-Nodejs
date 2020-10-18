@@ -12,7 +12,8 @@ module.exports = mongoose => {
         minTier: { type: String, default: '' },
         sponsorId: { type: String, default: '' },
         sponsorType: { type: String, default: '' },
-        claimedNum: { type: Number, default: 0 }
+        claimedNum: { type: Number, default: 0 },
+        verifyFile: { type: String, default: '' }
       },
       { timestamps: true }
     );

@@ -2491,6 +2491,8 @@ exports.deleteResourceNeed = async function (req, res){
     
     for(var i = 0 ; i < contributions.length; i++) {
         removeContributionEmail(contributions[i],project.code)
+        if(checkRemoveProjectIds(project,contributions[i]) === true)
+            removeProjectIds(project.id, contributions[i])
     }
 
 }
@@ -2627,6 +2629,8 @@ exports.removeContribution = async function (req, res){
     });
 
     removeContributionEmail(contribution, project.code)
+    if(checkRemoveProjectIds(project,contribution) === true)
+        removeProjectIds(project.id, contribution)
 
     if(contribution.resType === "money") {
         var need = await ResourceNeed.findOne({ '_id': contribution.needId }, function (err) {
@@ -2647,6 +2651,141 @@ exports.removeContribution = async function (req, res){
 
         need.save()
     }
+
+}
+
+exports.updateContributionRating = async function (req, res){
+    let actor
+
+    const contribution = await Contribution.findOne({ '_id': req.body.contributionId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!contribution)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such contribution!',
+        data: {}
+    });
+
+    if(req.type === "institution") {
+        const institution = await Institutions.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform project creation right now!',
+            data: {}
+        });
+
+        actor = institution
+    } else if (req.type === "user") {
+        const user = await Users.findOne({ '_id': req.body.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        actor = user
+    }
+
+    if(!actor)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    const project = await Projects.findOne({ '_id': contribution.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
+    let valid = false;
+
+    if(project.host != req.body.id) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(req.body.id === admins[i]) {
+                valid = true;
+                break;
+            }
+        }
+    } else if (project.host === req.body.id) valid = true;
+
+    if(!valid)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to delete this contribution!',
+        data: {}
+    });
+
+    if(contribution.status === "closed")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You have deleted this contribution!',
+        data: {}
+    });
+
+    contribution.rating = req.body.theRating
+
+    contribution.save(contribution)
+    .then(data => {
+
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Contribution rating successfully updated!',
+            data: { contribution: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    updateContributionRatingEmail(contribution, project.code)
 
 }
 
@@ -2672,6 +2811,39 @@ async function removeContributionEmail(contribution, projectCode) {
     let subject = 'KoCoSD Contribution Deletion'
     let theMessage = `
         <h1>A project resource need/contribution of yours is deleted.</h1>
+        <p>The project code ${projectCode}<p>
+        <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+    `
+
+    Helper.sendEmail(target.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+}
+
+async function updateContributionRatingEmail(contribution, projectCode) {
+
+    var target;
+    if(contribution.contributorType === "user") {
+        target= await Users.findOne({ '_id': contribution.contributor, function (err) {
+            if (err) console.log("Error: "+err.message)
+        }});
+
+    } else if (contribution.contributorType === "institution") {
+        target= await Institutions.findOne({ '_id': contribution.contributor, function (err) {
+            if (err) console.log("Error: "+err.message)
+        }});
+    }
+
+    if(!target) {
+        console.log("target account not found")
+        return;
+    }
+
+    let subject = 'KoCoSD Contribution Rating Update'
+    let theMessage = `
+        <h1>A project resource contribution rating of yours is updated.</h1>
         <p>The project code ${projectCode}<p>
         <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
     `
@@ -3224,6 +3396,83 @@ async function getAccountInfo(theItem) {
     theItem.accountUsername = owner.username
     theItem.accountName = owner.name 
     theItem.isVerified = owner.isVerified
+}
+
+async function removeProjectIds(projectId, contribution) {
+    var owner;
+
+    if(contribution.contributorType === "user") {
+        owner = await Users.findOne({ '_id': contribution.contributor }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (contribution.contributorType === 'institution') {
+        owner = await Institutions.findOne({ '_id': contribution.contributor }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (addProjectIds) Such account not found!")
+        return
+    }
+
+    owner.projects.pull(projectId)
+    owner.save().catch(err => {
+        console.log("error: (addProjectIds) There is an error updating the projects! " + err.message)
+    });
+}
+
+// return false if there is still another contribution
+async function checkRemoveProjectIds(project, contribution) {
+    var owner;
+
+    if(contribution.contributorType === "user") {
+        owner = await Users.findOne({ '_id': contribution.contributor }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (contribution.contributorType === 'institution') {
+        owner = await Institutions.findOne({ '_id': contribution.contributor }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (addProjectIds) Such account not found!")
+        return
+    }
+
+    if(project.host != contribution.contributor) {
+        let admins = project.admins;
+        for(var i = 0; i < admins.length; i++) {
+            if(contribution.contributor === admins[i]) {
+                return false
+            }
+        }
+    } else if (project.host=== contribution.contributor) return false
+
+    const otherContribution =  await Contribution.findOne({ 'projectId':project.id, 'contributor':owner.id, 'contributorType':contribution.contributorType, 'status':'active' }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(otherContribution) return false
+
+    return true
+
 }
 
 handleError = (err) => {

@@ -15,7 +15,6 @@ module.exports = function (req, res, next) {
             req.role = decoded.role || ''
             req.body.type = decoded.type
             req.type = decoded.type
-            console.log(req.body)
             next();
         }
     } catch (err) {

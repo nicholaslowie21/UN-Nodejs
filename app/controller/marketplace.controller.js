@@ -3260,13 +3260,27 @@ exports.completeProjectReq = async function (req, res) {
         });
     });
 
+    var theRating = 1;
+    if(req.body.theRating) {
+        if(req.body.theRating >=1 && req.body.theRating <=5) {
+            theRating = req.body.theRating
+        } else {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'The rating is invalid!',
+                data: {}
+            });
+        }
+    }
+
+
     const contribution = new Contribution({
 		projectId: projectReq.projectId,
 		needId: projectReq.needId,
 		requestId: projectReq.id,
 		requestType: "project",
 		resType: projectReq.resType,
-        rating: 1,
+        rating: theRating,
         contributor: projectReq.ownerId,
         contributorType: projectReq.ownerType,
         status: 'active'
@@ -3296,6 +3310,8 @@ exports.completeProjectReq = async function (req, res) {
             data: {}
         });
     });
+
+    addProjectIds(project.id,projectReq.ownerId,projectReq.ownerType)
 }
 
 exports.acceptResourceReq = async function (req, res) {    
@@ -3653,6 +3669,19 @@ exports.completeResourceReq = async function (req, res) {
 
     theOwner = await getResourceOwner(resourceReq)
 
+    var theRating = 1;
+    if(req.body.theRating) {
+        if(req.body.theRating >=1 && req.body.theRating <=5) {
+            theRating = req.body.theRating
+        } else {
+            return res.status(500).json({
+                status: 'error',
+                msg: 'The rating is invalid!',
+                data: {}
+            });
+        }
+    }
+
     if(resourceReq.resType === 'knowledge') {
 
         for(var i = 0 ; i < theOwner.length; i++) {
@@ -3662,7 +3691,7 @@ exports.completeResourceReq = async function (req, res) {
                 requestId: resourceReq.id,
                 requestType: "resource",
                 resType: resourceReq.resType,
-                rating: 1,
+                rating: theRating,
                 contributor: theOwner[i].theId,
                 contributorType: theOwner[i].ownerType,
                 status: 'active'
@@ -3676,6 +3705,7 @@ exports.completeResourceReq = async function (req, res) {
                 });
             });
 
+            addProjectIds(resourceReq.projectId,theOwner[i].theId,theOwner[i].ownerType)
         }
     } else {
 
@@ -3685,7 +3715,7 @@ exports.completeResourceReq = async function (req, res) {
             requestId: resourceReq.id,
             requestType: "resource",
             resType: resourceReq.resType,
-            rating: 1,
+            rating: theRating,
             contributor: theOwner,
             contributorType: resourceReq.ownerType,
             status: 'active'
@@ -3698,7 +3728,7 @@ exports.completeResourceReq = async function (req, res) {
                 data: {}
             });
         });
-        
+        addProjectIds(resourceReq.projectId, theOwner, resourceReq.ownerType)
     }
 
     resourceReq.status = "completed"
@@ -3961,6 +3991,38 @@ async function getHostInfo(theItem) {
     theItem.hostName = owner.name
     theItem.hostUsername = owner.username
     
+}
+
+async function addProjectIds(projectId, ownerId, ownerType) {
+    var owner;
+
+    if(ownerType === "user") {
+        owner = await User.findOne({ '_id': ownerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (ownerType === 'institution') {
+        owner = await Institution.findOne({ '_id': ownerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (addProjectIds) Such account not found!")
+        return
+    }
+
+    if(!owner.projects.includes(projectId)) {
+        owner.projects.push(projectId)
+        owner.save().catch(err => {
+            console.log("error: (addProjectIds) There is an error updating the projects! " + err.message)
+        });
+    }
 }
 
 new CronJob('59 23 * * 0', async function () {
