@@ -255,6 +255,11 @@ exports.contactList = async function (req, res){
             accountUsername:"",
             accountEmail:"",
             accountImg:"",
+            accountOccupation:"",
+            accountEmail:"",
+            accountWebsite:"",
+            accountCountry:"",
+            accountSDGs:[],
             createdAt:""    
         }
 
@@ -309,6 +314,13 @@ async function getAccountInfo(theItem) {
     theItem.accountUsername = owner.username
     theItem.accountName = owner.name
     theItem.accountEmail = owner.email 
+    theItem.accountWebsite = owner.website 
+    theItem.accountSDGs = owner.SDGs 
+    theItem.accountCountry = owner.country
+
+    if(theItem.targetType === "user") {
+        theItem.accountOccupation = owner.occupation
+    }
 }
 
 async function getInstitutionInfo(theItem) {
