@@ -706,7 +706,7 @@ exports.useAutoKnowledgeResource = async function (req, res) {
         for(var i = 0; i < resource.owner.length; i++) {
             const contribution = new Contribution({
                 projectId: project.id,
-                needId: resourceneed.id,
+                needId: theResourceNeed.id,
                 requestId: data.id,
                 requestType: "resource",
                 resType: "knowledge",
