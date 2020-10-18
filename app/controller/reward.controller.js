@@ -188,7 +188,7 @@ exports.requestReward = async function (req, res){
         pathString = "/public/uploads/rewards/"+req.files.rewardImg[0].filename ;
     }
 
-    var theDate = moment(req.body.endDate).tz('Asia/Singapore')
+    var theDate = moment(req.body.endDate)
     
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
     return res.status(500).json({
@@ -208,7 +208,7 @@ exports.requestReward = async function (req, res){
 		sponsorType: req.type,
 		country: req.body.country,
         minTier: req.body.minTier,
-        endDate: theDate,
+        endDate: theDate.format("YYYY-MM-DD"),
         verifyFile: "/public/uploads/rewards/verification/"+ req.files.rewardFile[0].filename
     });
     
@@ -428,7 +428,6 @@ exports.createReward = async function (req, res){
     }
 
     var theDate = moment(req.body.endDate).tz('Asia/Singapore')
-    
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
     return res.status(500).json({
         status: 'error',
@@ -539,8 +538,7 @@ exports.updateReward = async function (req, res){
         pathString = "/public/uploads/rewards/"+req.thePath ;
     }
 
-    var theDate = moment(req.body.endDate).tz('Asia/Singapore')
-    
+    var theDate = moment(req.body.endDate) 
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
     return res.status(500).json({
         status: 'error',
@@ -562,7 +560,7 @@ exports.updateReward = async function (req, res){
         reward.quota = req.body.quota
 		reward.country = req.body.country
         reward.minTier = req.body.minTier
-        reward.endDate = theDate
+        reward.endDate = theDate.format("YYYY-MM-DD")
 
     
     reward.save(reward)
