@@ -642,7 +642,8 @@ exports.allReward = async function (req, res){
             verifyFile: "",
             accountName: "",
             accountUsername: "",
-            accountImgPath: ""
+            accountImgPath: "",
+            createdAt:""
         }
 
         reward.id = rewards[i].id
@@ -658,6 +659,7 @@ exports.allReward = async function (req, res){
         reward.minTier = rewards[i].minTier
         reward.endDate = rewards[i].endDate
         reward.verifyFile = rewards[i].verifyFile
+        reward.createdAt = rewards[i].createdAt
 
         await getRequesterInfo(reward)
         if(reward.accountName === "" && reward.sponsorType != "external") continue
@@ -736,7 +738,8 @@ exports.filteredReward = async function (req, res){
             verifyFile: "",
             accountName: "",
             accountUsername: "",
-            accountImgPath: ""
+            accountImgPath: "",
+            createdAt:""
         }
 
         reward.id = rewards[i].id
@@ -752,6 +755,7 @@ exports.filteredReward = async function (req, res){
         reward.minTier = rewards[i].minTier
         reward.endDate = rewards[i].endDate
         reward.verifyFile = rewards[i].verifyFile
+        reward.createdAt = rewards[i].createdAt
 
         await getRequesterInfo(reward)
         if(reward.accountName === "" && reward.sponsorType != "external") continue

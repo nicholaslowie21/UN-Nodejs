@@ -135,7 +135,7 @@ exports.addContact = async function (req, res){
     var institutionChosen = ""
     if(account.institutionChoice) institutionChosen = account.institutionChoice
 
-    const temp = await ContactCard.findOne({ 'targetId': accountId, 'targetType': accountType, 'institutionId': institutionChosen, 'status':'active' }, function (err) {
+    const temp = await ContactCard.findOne({ 'ownerId':req.id, 'ownerType':req.type, 'targetId': accountId, 'targetType': accountType, 'institutionId': institutionChosen, 'status':'active' }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
