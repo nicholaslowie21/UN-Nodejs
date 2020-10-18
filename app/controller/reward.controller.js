@@ -427,7 +427,7 @@ exports.createReward = async function (req, res){
         pathString = "/public/uploads/rewards/"+req.thePath ;
     }
 
-    var theDate = moment(req.body.endDate).tz('Asia/Singapore')
+    var theDate = moment().tz(req.body.endDate,'Asia/Singapore')
     
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
     return res.status(500).json({
