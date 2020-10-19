@@ -3227,7 +3227,7 @@ exports.completeProjectReq = async function (req, res) {
     if(projectReq.resType === "money") {
         resourceneed.pendingSum -= projectReq.moneySum
         resourceneed.receivedSum += projectReq.moneySum
-        var tempCompletion = resourceneed.receivedSum/resourceneed.total
+        var tempCompletion = resourceneed.receivedSum*100/resourceneed.total
         resourceneed.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
 
         // const money = new Money({
