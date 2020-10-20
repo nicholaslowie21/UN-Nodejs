@@ -2491,7 +2491,8 @@ exports.deleteResourceNeed = async function (req, res){
     
     for(var i = 0 ; i < contributions.length; i++) {
         removeContributionEmail(contributions[i],project.code)
-        if(checkRemoveProjectIds(project,contributions[i]) === true)
+        var theCondition = await checkRemoveProjectIds(project,contributions[i])
+        if(theCondition === true)
             removeProjectIds(project.id, contributions[i])
     }
 
@@ -2629,7 +2630,8 @@ exports.removeContribution = async function (req, res){
     });
 
     removeContributionEmail(contribution, project.code)
-    if(checkRemoveProjectIds(project,contribution) === true)
+    var theCondition = await checkRemoveProjectIds(project,contribution)
+    if(theCondition === true)
         removeProjectIds(project.id, contribution)
 
     if(contribution.resType === "money") {
@@ -2648,7 +2650,9 @@ exports.removeContribution = async function (req, res){
         });
 
         need.receivedSum = need.receivedSum - projectreq.moneySum;
-
+        need.completion = need.receivedSum/need.total
+        var tempCompletion = need.completion
+        need.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
         need.save()
     }
 
@@ -3458,7 +3462,6 @@ async function checkRemoveProjectIds(project, contribution) {
             return
         }
     });
-
     if(otherContribution) return false
 
     return true
