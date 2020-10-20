@@ -686,7 +686,12 @@ exports.getFeeds = async function (req, res) {
 
 exports.viewInstitutionById = async function (req, res) {
     const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err) {
-        if (err) return handleError(err);
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Institution not found!',
+            data: {}
+        });
     });
 
     if(!institution) 

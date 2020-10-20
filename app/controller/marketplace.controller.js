@@ -2818,7 +2818,12 @@ exports.getProjectPageResourceReq = async function (req, res) {
             needTitle: "",
             needDesc: "",
             resourceTitle: "",
-            updatedAt:""
+            updatedAt:"",
+            resourceOwnerId:"",
+            resourceOwnerName:"",
+            resourceOwnerUsername:"",
+            resourceOwnerType:"",
+            resourceOwnerImg:""
         }
 
         resourceReqItem.id = resourceReqs[i].id
@@ -2841,6 +2846,11 @@ exports.getProjectPageResourceReq = async function (req, res) {
         await getResourceInfo(resourceReqItem)
         if(resourceReqItem.resourceTitle === "") continue
         
+        await getResourceOwnerIdType(resourceReqItem)
+        if(resourceReqItem.resourceOwnerId === "") continue
+        
+        await getResourceReqResOwnerInfo(resourceReqItem)
+        if(resourceReqItem.resourceOwnerName === "") continue
         
         theList.push(resourceReqItem)
         
@@ -3217,7 +3227,7 @@ exports.completeProjectReq = async function (req, res) {
     if(projectReq.resType === "money") {
         resourceneed.pendingSum -= projectReq.moneySum
         resourceneed.receivedSum += projectReq.moneySum
-        var tempCompletion = resourceneed.receivedSum/resourceneed.total
+        var tempCompletion = resourceneed.receivedSum*100/resourceneed.total
         resourceneed.completion = Math.round((tempCompletion+Number.EPSILON)*100)/100
 
         // const money = new Money({
@@ -3906,6 +3916,58 @@ async function getResourceOwner(theItem) {
 
 }
 
+async function getResourceOwnerIdType(theItem) {
+
+    var resource;
+
+    if(theItem.resType === "item") {
+        resource = await Item.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "knowledge") {
+        resource = await Knowledge.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "venue") {
+        resource = await Venue.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "manpower") {
+        resource = await Manpower.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resType === "money") {
+        resource = await Money.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!resource) return
+    if(theItem.resType != "knowledge") {
+        theItem.resourceOwnerId = resource.owner
+        theItem.resourceOwnerType = resource.ownerType
+    }
+    else {
+        theItem.resourceOwnerId = resource.owner[0].theId
+        theItem.resourceOwnerType = resource.owner[0].ownerType
+    }
+}
+
 async function getAccountInfo(theItem) {
     var owner;
 
@@ -3933,6 +3995,36 @@ async function getAccountInfo(theItem) {
     theItem.requesterName = owner.name
     theItem.requesterUsername = owner.username
     theItem.requesterImg = owner.ionicImg
+    
+}
+
+async function getResourceReqResOwnerInfo(theItem) {
+    var owner;
+
+    if(theItem.resourceOwnerType === "user") {
+        owner = await User.findOne({ '_id': theItem.resourceOwnerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.resourceOwnerType === 'institution') {
+        owner = await Institution.findOne({ '_id': theItem.resourceOwnerId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getResReqResOwnerInfo) Such account not found!")
+        return
+    }
+
+    theItem.resourceOwnerName = owner.name
+    theItem.resourceOwnerUsername = owner.username
+    theItem.resourceOwnerImg = owner.ionicImg
     
 }
 
