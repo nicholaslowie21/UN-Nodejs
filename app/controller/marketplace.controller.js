@@ -442,7 +442,7 @@ exports.useKnowledgeResource = async function (req, res) {
     if(!resourceneed)
     return res.status(500).json({
         status: 'error',
-        msg: 'Such item resource need not found!',
+        msg: 'Such knowledge resource need not found!',
         data: {}
     });
 
@@ -500,21 +500,21 @@ exports.useKnowledgeResource = async function (req, res) {
         data: {}
     });
 
-    var temp = await ResourceReq.findOne({ 'needId': resourceneed.id, "resourceId": resource.id, "resType": "knowledge", "status":"completed" }, function (err) {
-        if (err)
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Something went wrong! '+err,
-            data: {}
-        });
-    });
+    // var temp = await ResourceReq.findOne({ 'needId': resourceneed.id, "resourceId": resource.id, "resType": "knowledge", "status":"completed" }, function (err) {
+    //     if (err)
+    //     return res.status(500).json({
+    //         status: 'error',
+    //         msg: 'Something went wrong! '+err,
+    //         data: {}
+    //     });
+    // });
 
-    if(temp)
-    return res.status(500).json({
-        status: 'error',
-        msg: 'Such knowledge resource use have been created! ',
-        data: {}
-    }); 
+    // if(temp)
+    // return res.status(500).json({
+    //     status: 'error',
+    //     msg: 'Such knowledge resource use have been created! ',
+    //     data: {}
+    // }); 
 
     const resourcereq = new ResourceReq({
         projectId: project.id,
@@ -564,6 +564,7 @@ exports.useKnowledgeResource = async function (req, res) {
 
     for(var j = 0; j < contributions.length; j++) {
         useKnowledgeEmail(contributions[j], project.code)
+        addProjectIds(contributions[j].projectId, contributions[j].contributor, contributions[j].contributorType)
     }
 
 }
@@ -737,6 +738,7 @@ exports.useAutoKnowledgeResource = async function (req, res) {
 
     for(var j = 0; j < contributions.length; j++) {
         useKnowledgeEmail(contributions[j], project.code)
+        addProjectIds(contributions[j].projectId, contributions[j].contributor, contributions[j].contributorType)
     }
 
 }
@@ -1033,7 +1035,7 @@ exports.getResourceSuggestion = async function (req, res) {
     });
 
     var needMap = new Map();
-    var titleElements = resourcneed.title.split(" ");
+    var titleElements = resourcneed.title.toLowerCase().split(" ");
 
     for(var i = 0; i < titleElements.length; i++) {
         needMap.set(titleElements[i],1)
@@ -1098,7 +1100,7 @@ exports.getResourceSuggestion = async function (req, res) {
             updatedAt:"",
             matchPoint: 0
         }
-        var resourceTitle = resources[i].title.split(" ")
+        var resourceTitle = resources[i].title.toLowerCase().split(" ")
 
         suggestedResource.id = resources[i].id
         suggestedResource.title = resources[i].title
@@ -1181,7 +1183,7 @@ exports.getResourceNeedSuggestion = async function (req, res){
     });
 
     var resourceMap = new Map();
-    var titleElements = resource.title.split(" ");
+    var titleElements = resource.title.toLowerCase().split(" ");
 
     for(var i = 0; i < titleElements.length; i++) {
         resourceMap.set(titleElements[i],1)
@@ -1238,7 +1240,7 @@ exports.getResourceNeedSuggestion = async function (req, res){
         await getProjectInfo(suggestedResourceNeed)
         if(suggestedResourceNeed.projectTitle === "") continue
 
-        var needTitle = suggestedResourceNeed.title.split(" ")
+        var needTitle = suggestedResourceNeed.title.toLowerCase().split(" ")
 
         for(var j = 0; j < needTitle.length; j++ ) {
             if(resourceMap.get(needTitle[j])) suggestedResourceNeed.matchPoint += 10;
@@ -1293,7 +1295,7 @@ async function suggestDiscoverWeekly(account, accountType) {
         await getProjectInfo(project);
         if(project.projectTitle === "") continue;
 
-        var titleSplit = project.projectTitle.split(" ")
+        var titleSplit = project.projectTitle.toLowerCase().split(" ")
         for(var j = 0; j < titleSplit.length; j++) {
             titleMap.set(titleSplit[j],1)
         }
@@ -1317,7 +1319,7 @@ async function suggestDiscoverWeekly(account, accountType) {
         }
 
         projectItem.projectId = projects[i].id
-        var theTitles = projects[i].title.split(" ")
+        var theTitles = projects[i].title.toLowerCase().split(" ")
         for(var j = 0; j < theTitles.length; j++) {
             if(titleMap.get(theTitles[j])) projectItem.matchPoint += 10
         }
@@ -1564,7 +1566,7 @@ exports.getProjectList = async function (req, res) {
 exports.getProjectListFiltered = async function (req, res) {    
     var theFilter = req.body.filterSDGs
 
-    if(!theFilter.length)
+    if(!theFilter || !theFilter.length)
     return res.status(500).json({
         status: 'error',
         msg: 'The list of SDGs filter is invalid!',
