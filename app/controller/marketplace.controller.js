@@ -1116,10 +1116,10 @@ exports.getResourceSuggestion = async function (req, res) {
             if(needMap.get(resourceTitle[j])) suggestedResource.matchPoint += 10;
         }
 
-        if(suggestedResource.matchPoint === 0) continue
+        if(suggestedResource.matchPoint < 1) continue
 
         await getOwnerInfo(suggestedResource)
-
+    
         theList.push(suggestedResource)
     }
 
@@ -1184,7 +1184,6 @@ exports.getResourceNeedSuggestion = async function (req, res){
 
     var resourceMap = new Map();
     var titleElements = resource.title.toLowerCase().split(" ");
-
     for(var i = 0; i < titleElements.length; i++) {
         resourceMap.set(titleElements[i],1)
     }
@@ -1241,15 +1240,17 @@ exports.getResourceNeedSuggestion = async function (req, res){
         if(suggestedResourceNeed.projectTitle === "") continue
 
         var needTitle = suggestedResourceNeed.title.toLowerCase().split(" ")
-
         for(var j = 0; j < needTitle.length; j++ ) {
-            if(resourceMap.get(needTitle[j])) suggestedResourceNeed.matchPoint += 10;
+            if(resourceMap.get(needTitle[j])){ 
+                suggestedResourceNeed.matchPoint += 10;
+            }
         }
 
+        if(suggestedResourceNeed.matchPoint < 1) continue
         if(resource.country === suggestedResourceNeed.country) suggestedResourceNeed.matchPoint += 5;
-        if(suggestedResourceNeed.matchPoint === 0) continue
-
-        theList.push(suggestedResourceNeed)
+        
+        theList.push(suggestedResourceNeed)     
+            
     }
 
     theList.reverse()
