@@ -913,30 +913,31 @@ exports.viewPrivateInstitutionVenue = async function (req, res) {
 }
 
 var createItemStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: (req, file, callback) => {
         let dir = 'public/uploads/resources/item'
         
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
-        cb(null, dir)
+        callback(null, dir)
     },
-    filename: async function (req, file, cb) {
-        let extentsion = file.originalname.split('.')
-        let thePath = "ItemPic-"+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
-        req.thePath = thePath;
-        cb(null, thePath)
+    filename: (req, file, callback) => {
+      const match = ["image/png", "image/jpeg"];
+  
+      if (match.indexOf(file.mimetype) === -1) {
+        var message = `${file.originalname} is invalid. Only accept png/jpeg.`;
+        return callback(message, null);
+      }
+
+      let extentsion = file.originalname.split('.')
+      let thePath = 'ItemPic-'+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+      req.thePath.push('/public/uploads/resources/item/'+thePath);
+      callback(null, thePath)
     },
     onError : function(err, next) {
         console.log('error', err);
         next(err);
     }
-})
-var uploadCreateItem = multer({ 
-    storage: createItemStorage,
-    fileFilter: function(_req, file, cb){
-            checkFileType(file, cb);
-    }   
 })
 
 function checkFileType(file, cb){
@@ -954,7 +955,9 @@ function checkFileType(file, cb){
     }
 }
 
-exports.multerCreateItem = uploadCreateItem.single('itemImg');
+var uploadCreateItem = multer({ storage: createItemStorage }).array("itemPics", 10);
+
+exports.multerCreateItem = uploadCreateItem;
 
 exports.createItem = async function (req, res) {
     var theOwner
@@ -989,12 +992,10 @@ exports.createItem = async function (req, res) {
         data: {}
     });
 
-    var pathString = ""
-    var thePaths = []
-    if(req.file) {
-        sharp('./'+req.file.path).toBuffer().then(
-            (data) => {
-                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+    for(var i = 0; i < req.files.length; i++) {
+        await sharp("./"+req.files[i].path).toBuffer().then(
+            async data => {
+                await sharp(data).resize(1000).toFile("./"+req.files[i].path, (err,info) => {
                     if(err)
                     return res.status(500).json({
                         status: 'error',
@@ -1013,9 +1014,6 @@ exports.createItem = async function (req, res) {
                 });
             }
         )
-
-        pathString = "/public/uploads/resources/item/"+req.thePath;
-        thePaths.push(pathString)
     }
     
     const item = new Item({
@@ -1025,7 +1023,7 @@ exports.createItem = async function (req, res) {
 		status: "active",
         country: req.body.country,
         ownerType: req.type,
-        imgPath: thePaths
+        imgPath: req.thePath
     });
 
     item.save(item)
@@ -1052,33 +1050,36 @@ exports.createItem = async function (req, res) {
 }
 
 var createVenueStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: (req, file, callback) => {
         let dir = 'public/uploads/resources/venue'
         
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
-        cb(null, dir)
+        callback(null, dir)
     },
-    filename: async function (req, file, cb) {
-        let extentsion = file.originalname.split('.')
-        let thePath = "VenuePic-"+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
-        req.thePath = thePath;
-        cb(null, thePath)
+    filename: (req, file, callback) => {
+      const match = ["image/png", "image/jpeg"];
+  
+      if (match.indexOf(file.mimetype) === -1) {
+        var message = `${file.originalname} is invalid. Only accept png/jpeg.`;
+        return callback(message, null);
+      }
+
+      let extentsion = file.originalname.split('.')
+      let thePath = 'VenuePic-'+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+      req.thePath.push('/public/uploads/resources/venue/'+thePath);
+      callback(null, thePath)
     },
     onError : function(err, next) {
         console.log('error', err);
         next(err);
     }
 })
-var uploadCreateVenue = multer({ 
-    storage: createVenueStorage,
-    fileFilter: function(_req, file, cb){
-            checkFileType(file, cb);
-    }   
-})
 
-exports.multerCreateVenue = uploadCreateVenue.single('venueImg');
+var uploadCreateVenue = multer({ storage: createVenueStorage }).array("venuePics", 10);
+
+exports.multerCreateVenue = uploadCreateVenue;
 
 exports.createVenue = async function (req, res) {
     var theOwner
@@ -1113,12 +1114,10 @@ exports.createVenue = async function (req, res) {
         data: {}
     });
 
-    var pathString = ""
-    var thePaths = []
-    if(req.file) {
-        sharp('./'+req.file.path).toBuffer().then(
-            (data) => {
-                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+    for(var i = 0; i < req.files.length; i++) {
+        await sharp("./"+req.files[i].path).toBuffer().then(
+            async data => {
+                await sharp(data).resize(1000).toFile("./"+req.files[i].path, (err,info) => {
                     if(err)
                     return res.status(500).json({
                         status: 'error',
@@ -1137,11 +1136,8 @@ exports.createVenue = async function (req, res) {
                 });
             }
         )
-
-        pathString = "/public/uploads/resources/venue/"+req.thePath;
-        thePaths.push(pathString)
     }
-    
+
     const venue = new Venue({
 		title: req.body.title,
 		desc: req.body.desc,
@@ -1150,7 +1146,7 @@ exports.createVenue = async function (req, res) {
         country: req.body.country,
         ownerType: req.type,
         address: req.body.address,
-        imgPath: thePaths
+        imgPath: req.thePath
     });
 
     venue.save(venue)
