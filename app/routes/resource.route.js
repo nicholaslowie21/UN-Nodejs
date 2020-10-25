@@ -28,7 +28,8 @@ router.get('/private/institution/venue', auth, resourceController.viewPrivateIns
 // router.post('/createItem', auth, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem )
 router.post('/createItem', auth, resourceController.multerCreateItem, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem)
 router.post('/updateItem', auth, ResourceValidator.updateItemResource, Helper.ifErrors, resourceController.updateItem )
-router.post('/uploadItemPicture', auth, resourceController.multerItemPicUpload, resourceController.itemPicture)
+router.post('/uploadItemPicture', auth, updloadMultipleFiles, resourceController.multerItemPicUpload, resourceController.itemPicture)
+router.post('/deleteItemPicture', auth, ResourceValidator.deleteItemPicture, resourceController.deleteItemPicture)
 
 router.post('/createVenue', auth, ResourceValidator.createVenueResource, Helper.ifErrors, resourceController.createVenue )
 router.post('/updateVenue', auth, ResourceValidator.updateVenueResource, Helper.ifErrors, resourceController.updateVenue )

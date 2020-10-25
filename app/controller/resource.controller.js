@@ -55,7 +55,37 @@ function checkFileType(file, cb){
     }
 }
 
-exports.multerItemPicUpload = upload.single('itemPic');
+var itemStorage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        let dir = 'public/uploads/resources/item'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        callback(null, dir)
+    },
+    filename: (req, file, callback) => {
+      const match = ["image/png", "image/jpeg"];
+  
+      if (match.indexOf(file.mimetype) === -1) {
+        var message = `${file.originalname} is invalid. Only accept png/jpeg.`;
+        return callback(message, null);
+      }
+
+      let extentsion = file.originalname.split('.')
+      let thePath = 'ItemPic-'+req.body.itemId+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+      req.thePath.push('/public/uploads/resources/item/'+thePath);
+      callback(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+  });
+
+var uploadItemPics = multer({ storage: itemStorage }).array("itemPics", 10);
+
+exports.multerItemPicUpload = uploadItemPics;
 
 var IPStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -91,35 +121,13 @@ exports.itemPicture = async function (req, res){
     }
 
     
-    if(!req.file) {
+    if(req.files.length === 0) {
         return res.status(500).json({
             status: 'error',
             msg: 'No picture uploaded! ',
             data: {}
         });
     }
-
-    sharp('./'+req.file.path).toBuffer().then(
-        (data) => {
-            sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
-                if(err)
-                return res.status(500).json({
-                    status: 'error',
-                    msg: 'Something went wrong during image upload! ',
-                    data: {}
-                });
-            });
-        }
-    ).catch(
-        (err) => {
-            console.log(err);
-            return res.status(500).json({
-                status: 'error',
-                msg: 'Something went wrong during upload! ',
-                data: {}
-            });
-        }
-    )
 
     const item = await Item.findOne({ '_id': req.body.itemId }, function (err) {
         if (err)
@@ -190,7 +198,31 @@ exports.itemPicture = async function (req, res){
         data: {}
     });
 
-    item.imgPath = "/public/uploads/resources/item/"+req.thePath;
+    for(var i = 0; i < req.files.length; i++) {
+        await sharp("./"+req.files[i].path).toBuffer().then(
+            async data => {
+                await sharp(data).resize(1000).toFile("./"+req.files[i].path, (err,info) => {
+                    if(err)
+                    return res.status(500).json({
+                        status: 'error',
+                        msg: 'Something went wrong during image upload! ',
+                        data: {}
+                    });
+                });
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during upload! ',
+                    data: {}
+                });
+            }
+        )
+    }
+
+    item.imgPath = item.imgPath.concat(req.thePath)
 
     item.save(item)
     .then(data => {
@@ -2036,6 +2068,111 @@ var venueStorage = multer.diskStorage({
             status: 'success',
             msg: 'Venue picture successfully updated',
             data: { venue: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteItemPicture = async function (req, res){
+    if(!req.body.itemId) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Item id is empty! ',
+            data: {}
+        });
+    }
+
+    const item = await Item.findOne({ '_id': req.body.itemId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such venue resource!',
+            data: {}
+        });
+    });
+
+    if(!item)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Item does not exists!',
+        data: {}
+    });
+
+    var theOwner;
+
+    if(req.type === "institution") {
+        const institution = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!institution)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+
+        if(institution.status != "active")
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Account is not authorized to perform this action right now!',
+            data: {}
+        });
+
+        theOwner = institution
+    } else if (req.type === "user") {
+        const user = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+
+        if(!user)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+        theOwner = user
+    }
+
+    if(theOwner.id!=item.owner)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to perform this action!',
+        data: {}
+    });
+
+    var oldList = item.imgPath
+    var toDelete = req.body.indexes
+    var newList = []
+
+    for(var i = 0; i < oldList.length; i++) {
+        if(!toDelete.includes(i))
+            newList.push(oldList[i])
+    }
+
+    item.imgPath = newList;
+
+    item.save(item)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Item picture successfully updated',
+            data: { item: data }
         });
     }).catch(err => {
         return res.status(500).json({
