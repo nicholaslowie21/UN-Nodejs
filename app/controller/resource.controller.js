@@ -1051,14 +1051,43 @@ exports.createItem = async function (req, res) {
     Helper.createProfileFeed(title,desc,accountId,accountType)
 }
 
+var createVenueStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/resources/venue'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = "VenuePic-"+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var uploadCreateVenue = multer({ 
+    storage: createVenueStorage,
+    fileFilter: function(_req, file, cb){
+            checkFileType(file, cb);
+    }   
+})
+
+exports.multerCreateVenue = uploadCreateVenue.single('venueImg');
+
 exports.createVenue = async function (req, res) {
     var theOwner
 
     let theCountry = nodeCountries.getCountryByName(req.body.country);
     req.body.country = theCountry.name;
 
-    if (req.body.type === "user") {
-        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+    if (req.type === "user") {
+        theOwner = await User.findOne({ '_id': req.id }, function (err) {
             if (err)
             return res.status(500).json({
                 status: 'error',
@@ -1066,8 +1095,8 @@ exports.createVenue = async function (req, res) {
                 data: {}
             });
         });
-    } else if (req.body.type === "institution") {
-        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+    } else if (req.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.id }, function (err) {
             if (err)
             return res.status(500).json({
                 status: 'error',
@@ -1083,6 +1112,35 @@ exports.createVenue = async function (req, res) {
         msg: 'Account not found!',
         data: {}
     });
+
+    var pathString = ""
+    var thePaths = []
+    if(req.file) {
+        sharp('./'+req.file.path).toBuffer().then(
+            (data) => {
+                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                    if(err)
+                    return res.status(500).json({
+                        status: 'error',
+                        msg: 'Something went wrong during image upload! ',
+                        data: {}
+                    });
+                });
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during upload! ',
+                    data: {}
+                });
+            }
+        )
+
+        pathString = "/public/uploads/resources/venue/"+req.thePath;
+        thePaths.push(pathString)
+    }
     
     const venue = new Venue({
 		title: req.body.title,
@@ -1090,8 +1148,9 @@ exports.createVenue = async function (req, res) {
 		owner: theOwner.id,
 		status: "active",
         country: req.body.country,
-        ownerType: req.body.type,
-        address: req.body.address
+        ownerType: req.type,
+        address: req.body.address,
+        imgPath: thePaths
     });
 
     venue.save(venue)
@@ -1112,7 +1171,7 @@ exports.createVenue = async function (req, res) {
     title = "Venue Resource"
     desc = "Offered an venue resource: " + venue.title
     accountId = theOwner.id
-    accountType = req.body.type
+    accountType = req.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
 }
