@@ -25,7 +25,8 @@ router.get('/private/institution/knowledge', auth, resourceController.viewPrivat
 router.get('/private/institution/item', auth, resourceController.viewPrivateInstitutionItem);
 router.get('/private/institution/venue', auth, resourceController.viewPrivateInstitutionVenue);
 
-router.post('/createItem', auth, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem )
+// router.post('/createItem', auth, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem )
+router.post('/createItem', auth, resourceController.multerCreateItem, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem)
 router.post('/updateItem', auth, ResourceValidator.updateItemResource, Helper.ifErrors, resourceController.updateItem )
 router.post('/uploadItemPicture', auth, resourceController.multerItemPicUpload, resourceController.itemPicture)
 

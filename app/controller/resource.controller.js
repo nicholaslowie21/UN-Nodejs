@@ -880,14 +880,58 @@ exports.viewPrivateInstitutionVenue = async function (req, res) {
     });
 }
 
+var createItemStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let dir = 'public/uploads/resources/item'
+        
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir)
+    },
+    filename: async function (req, file, cb) {
+        let extentsion = file.originalname.split('.')
+        let thePath = "ItemPic-"+req.id+"-"+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+        req.thePath = thePath;
+        cb(null, thePath)
+    },
+    onError : function(err, next) {
+        console.log('error', err);
+        next(err);
+    }
+})
+var uploadCreateItem = multer({ 
+    storage: createItemStorage,
+    fileFilter: function(_req, file, cb){
+            checkFileType(file, cb);
+    }   
+})
+
+function checkFileType(file, cb){
+    // Allowed ext
+    const filetypes = /jpeg|jpg|png/;
+    // Check ext
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    // Check mime
+    const mimetype = filetypes.test(file.mimetype);
+  
+    if(mimetype && extname){
+      return cb(null,true);
+    } else {
+      cb('Error: Images Only!');
+    }
+}
+
+exports.multerCreateItem = uploadCreateItem.single('itemImg');
+
 exports.createItem = async function (req, res) {
     var theOwner
 
     let theCountry = nodeCountries.getCountryByName(req.body.country);
     req.body.country = theCountry.name;
 
-    if (req.body.type === "user") {
-        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+    if (req.type === "user") {
+        theOwner = await User.findOne({ '_id': req.id }, function (err) {
             if (err)
             return res.status(500).json({
                 status: 'error',
@@ -895,8 +939,8 @@ exports.createItem = async function (req, res) {
                 data: {}
             });
         });
-    } else if (req.body.type === "institution") {
-        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+    } else if (req.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.id }, function (err) {
             if (err)
             return res.status(500).json({
                 status: 'error',
@@ -912,6 +956,35 @@ exports.createItem = async function (req, res) {
         msg: 'Account not found!',
         data: {}
     });
+
+    var pathString = ""
+    var thePaths = []
+    if(req.file) {
+        sharp('./'+req.file.path).toBuffer().then(
+            (data) => {
+                sharp(data).resize(800).toFile('./'+req.file.path, (err,info) => {
+                    if(err)
+                    return res.status(500).json({
+                        status: 'error',
+                        msg: 'Something went wrong during image upload! ',
+                        data: {}
+                    });
+                });
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong during upload! ',
+                    data: {}
+                });
+            }
+        )
+
+        pathString = "/public/uploads/resources/item/"+req.thePath;
+        thePaths.push(pathString)
+    }
     
     const item = new Item({
 		title: req.body.title,
@@ -919,7 +992,8 @@ exports.createItem = async function (req, res) {
 		owner: theOwner.id,
 		status: "active",
         country: req.body.country,
-		ownerType: req.body.type
+        ownerType: req.type,
+        imgPath: thePaths
     });
 
     item.save(item)
@@ -940,7 +1014,7 @@ exports.createItem = async function (req, res) {
     title = "Item Resource"
     desc = "Offered an item resource: " + item.title
     accountId = theOwner.id
-    accountType = req.body.type
+    accountType = req.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
 }
