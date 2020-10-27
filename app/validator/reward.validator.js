@@ -88,6 +88,13 @@ exports.filteredReward = [
     query('status').exists()
 ]
 
+exports.filteredMarketplaceReward = [
+    query('minTier').exists().custom(async value => {
+        if(value != "gold" && value != "silver" && value != "bronze")
+            return Promise.reject('the tier is invalid!')
+    })
+]
+
 exports.allReward = [
     query('status').exists()
 ]

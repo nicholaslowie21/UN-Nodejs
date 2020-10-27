@@ -347,6 +347,156 @@ exports.getRewardList = async function (req, res){
     });
 }
 
+exports.getMarketplace = async function (req, res){
+    const rewards = await Reward.find({ 'status':'open' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+    });
+
+    if(!rewards)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Rewards not found!',
+        data: {}
+    });
+
+    var theList = [];
+
+    for(var i = 0; i < rewards.length; i++) {
+        var reward = {
+            id:"",
+            title: "",
+            desc: "",
+            imgPath: "",
+            point: "",
+            quota: "",
+            status: "",
+            sponsorId: "",
+            sponsorType: "",
+            country: "",
+            minTier: "",
+            endDate: "",
+            verifyFile: "",
+            accountName: "",
+            accountUsername: "",
+            accountImgPath: "",
+            createdAt:""
+        }
+
+        reward.id = rewards[i].id
+        reward.title = rewards[i].title
+        reward.desc = rewards[i].desc
+        reward.imgPath = rewards[i].imgPath
+        reward.point = rewards[i].point
+        reward.quota = rewards[i].quota
+        reward.status = rewards[i].status
+        reward.sponsorId = rewards[i].sponsorId
+        reward.sponsorType = rewards[i].sponsorType
+        reward.country = rewards[i].country
+        reward.minTier = rewards[i].minTier
+        reward.endDate = rewards[i].endDate
+        reward.verifyFile = rewards[i].verifyFile
+        reward.createdAt = rewards[i].createdAt
+
+        await getRequesterInfo(reward)
+        if(reward.accountName === "" && reward.sponsorType != "external") continue
+
+        theList.push(reward)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Reward marketplace list successfully retrieved',
+        data: { rewards: theList }
+    });
+}
+
+exports.getFilteredMarketplace = async function (req, res){
+    const rewards = await Reward.find({ 'status':'open' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+    });
+
+    if(!rewards)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Rewards not found!',
+        data: {}
+    });
+
+    var theList = [];
+
+    var tierLevel = 0
+
+    if(req.query.minTier === 'bronze') tierLevel = 1
+    else if(req.query.minTier === 'silver') tierLevel = 2
+    else if(req.query.minTier === 'gold') tierLevel = 3
+    
+
+    for(var i = 0; i < rewards.length; i++) {
+        var reward = {
+            id:"",
+            title: "",
+            desc: "",
+            imgPath: "",
+            point: "",
+            quota: "",
+            status: "",
+            sponsorId: "",
+            sponsorType: "",
+            country: "",
+            minTier: "",
+            endDate: "",
+            verifyFile: "",
+            accountName: "",
+            accountUsername: "",
+            accountImgPath: "",
+            createdAt:""
+        }
+
+        reward.id = rewards[i].id
+        reward.title = rewards[i].title
+        reward.desc = rewards[i].desc
+        reward.imgPath = rewards[i].imgPath
+        reward.point = rewards[i].point
+        reward.quota = rewards[i].quota
+        reward.status = rewards[i].status
+        reward.sponsorId = rewards[i].sponsorId
+        reward.sponsorType = rewards[i].sponsorType
+        reward.country = rewards[i].country
+        reward.minTier = rewards[i].minTier
+        reward.endDate = rewards[i].endDate
+        reward.verifyFile = rewards[i].verifyFile
+        reward.createdAt = rewards[i].createdAt
+
+        var targetTierLevel = 0
+        if(reward.minTier === 'bronze') targetTierLevel = 1
+        else if(reward.minTier === 'silver') targetTierLevel = 2
+        else if(reward.minTier === 'gold') targetTierLevel = 3
+
+        if(targetTierLevel<tierLevel) continue
+
+        await getRequesterInfo(reward)
+        if(reward.accountName === "" && reward.sponsorType != "external") continue
+
+        theList.push(reward)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: ' Filterede reward marketplace list successfully retrieved',
+        data: { rewards: theList }
+    });
+}
+
 exports.getRewardDetail = async function (req, res){
     const reward = await Reward.findOne({ '_id':req.query.rewardId, 'sponsorId': req.id, 'sponsorType':req.type }, function (err) {
             if (err)
@@ -367,6 +517,73 @@ exports.getRewardDetail = async function (req, res){
     return res.status(200).json({
         status: 'success',
         msg: 'Reward Offer detail successfully retrieved',
+        data: { reward: reward }
+    });
+}
+
+exports.getMarketplaceRewardDetail = async function (req, res){
+    const theReward = await Reward.findOne({ '_id':req.query.rewardId }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+    });
+
+    if(!theReward)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Reward not found!',
+        data: {}
+    });
+
+    var reward = {
+        id:"",
+        title: "",
+        desc: "",
+        imgPath: "",
+        point: "",
+        quota: "",
+        status: "",
+        sponsorId: "",
+        sponsorType: "",
+        country: "",
+        minTier: "",
+        endDate: "",
+        verifyFile: "",
+        accountName: "",
+        accountUsername: "",
+        accountImgPath: "",
+        createdAt:""
+    }
+
+    reward.id = theReward.id
+    reward.title = theReward.title
+    reward.desc = theReward.desc
+    reward.imgPath = theReward.imgPath
+    reward.point = theReward.point
+    reward.quota = theReward.quota
+    reward.status = theReward.status
+    reward.sponsorId = theReward.sponsorId
+    reward.sponsorType = theReward.sponsorType
+    reward.country = theReward.country
+    reward.minTier = theReward.minTier
+    reward.endDate = theReward.endDate
+    reward.verifyFile = theReward.verifyFile
+    reward.createdAt = theReward.createdAt
+
+    await getRequesterInfo(reward)
+    if(reward.accountName === "" && reward.sponsorType != "external") 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving the sponsor info!',
+        data: { }
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Reward detail successfully retrieved',
         data: { reward: reward }
     });
 }
