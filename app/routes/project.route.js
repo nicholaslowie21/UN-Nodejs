@@ -56,4 +56,10 @@ router.post('/createPostComment', auth, ProjectValidator.createPostComment, Help
 router.post('/deletePostComment', auth, ProjectValidator.deletePostComment, Helper.ifErrors , projectController.deletePostComment)
 router.get('/comments', ProjectValidator.getComment, Helper.ifErrors , projectController.getComments)
 
+router.post('/projectEvent', auth, ProjectValidator.createProjectEvent, Helper.ifErrors , projectController.createProjectEvent)
+router.post('/updateProjectEvent', auth, ProjectValidator.updateProjectEvent, Helper.ifErrors , projectController.updateProjectEvent)
+router.delete('/projectEvent', auth, ProjectValidator.deleteProjectEvent, Helper.ifErrors , projectController.deleteProjectEvent)
+router.get('/public/events', ProjectValidator.getEvent, Helper.ifErrors , projectController.getPublicEvents)
+router.get('/all/events', ProjectValidator.getEvent, Helper.ifErrors , projectController.getAllEvents)
+
 module.exports = router;
