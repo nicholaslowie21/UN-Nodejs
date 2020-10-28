@@ -384,7 +384,8 @@ exports.getMarketplace = async function (req, res){
             accountName: "",
             accountUsername: "",
             accountImgPath: "",
-            createdAt:""
+            createdAt:"",
+            claimedNum: 0
         }
 
         reward.id = rewards[i].id
@@ -401,6 +402,7 @@ exports.getMarketplace = async function (req, res){
         reward.endDate = rewards[i].endDate
         reward.verifyFile = rewards[i].verifyFile
         reward.createdAt = rewards[i].createdAt
+        reward.claimedNum = rewards[i].claimedNum
 
         await getRequesterInfo(reward)
         if(reward.accountName === "" && reward.sponsorType != "external") continue
@@ -459,7 +461,8 @@ exports.getFilteredMarketplace = async function (req, res){
             accountName: "",
             accountUsername: "",
             accountImgPath: "",
-            createdAt:""
+            createdAt:"",
+            claimedNum: 0
         }
 
         reward.id = rewards[i].id
@@ -476,6 +479,7 @@ exports.getFilteredMarketplace = async function (req, res){
         reward.endDate = rewards[i].endDate
         reward.verifyFile = rewards[i].verifyFile
         reward.createdAt = rewards[i].createdAt
+        reward.claimedNum = rewards[i].claimedNum
 
         var targetTierLevel = 0
         if(reward.minTier === 'bronze') targetTierLevel = 1
