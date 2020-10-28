@@ -22,7 +22,8 @@ module.exports = mongoose => {
         projects: [String],
         wallet: { type: Number, default: 0 },
         SDGs: [Number],
-        institutionChoice:{ type: String, default: '' }
+        institutionChoice:{ type: String, default: '' },
+        tier: { type: String, default: 'bronze' }
       },
       { timestamps: true }
     );

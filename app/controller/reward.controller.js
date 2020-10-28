@@ -3,6 +3,7 @@ const db = require('../models')
 const Institution = db.institution
 const User = db.users
 const Reward = db.reward
+const Voucher = db.voucher
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
 const path = require('path')
@@ -498,6 +499,117 @@ exports.getFilteredMarketplace = async function (req, res){
         status: 'success',
         msg: ' Filterede reward marketplace list successfully retrieved',
         data: { rewards: theList }
+    });
+}
+
+exports.redeemReward = async function (req, res){
+    const reward = await Reward.findOne({ '_id':req.body.rewardId, 'status':'open' }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+    });
+
+    if(!reward)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such valid reward not found!',
+        data: {}
+    });
+
+    if(reward.claimedNum >= reward.quota) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Reward not found!',
+            data: {}
+        });
+
+    }
+
+    var theOwner = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+        
+    if(!theOwner) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    var tierLevel = 0
+
+    if(theOwner.tier === 'bronze') tierLevel = 1
+    else if(theOwner.tier === 'silver') tierLevel = 2
+    else if(theOwner.tier === 'gold') tierLevel = 3
+    
+    var targetTierLevel = 0
+    if(reward.minTier === 'bronze') targetTierLevel = 1
+    else if(reward.minTier === 'silver') targetTierLevel = 2
+    else if(reward.minTier === 'gold') targetTierLevel = 3
+
+    if(tierLevel<targetTierLevel)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Your account tier is not eligible!',
+        data: {}
+    });
+
+    if(reward.point > theOwner.wallet)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Your account waller point is not sufficient!',
+        data: {}
+    });
+
+    reward.claimedNum = reward.claimedNum + 1
+    if(reward.claimedNum >= reward.quota) reward.status = 'close'
+    reward.save().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    theOwner.wallet = theOwner.wallet - reward.point
+    theOwner.save().catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    const voucher = new Voucher({
+        rewardId: reward.id,
+        code: uid(),
+        status: 'active',
+        userId: theOwner.id,
+        claimedAt: moment.tz('Asia/Singapore').format("YYYY-MM-DD"),
+        endDate: reward.endDate
+    });
+
+    voucher.save(voucher)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Reward successfully redeemed!',
+            data: { voucher: data}
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
     });
 }
 
@@ -1157,18 +1269,35 @@ async function runRewardClearing() {
     }
 }
 
+async function runVoucherClearing() {
+    const vouchers = await Voucher.find({ 'status': {$ne: 'close'} }, function (err) {
+        if (err) console.log("error: "+err.message)
+    });
+
+    for(var i = 0; i < vouchers.length; i++){
+        var theDate = moment(vouchers[i].endDate).tz('Asia/Singapore')
+        if(theDate.isSameOrBefore(moment.tz('Asia/Singapore'))){
+            vouchers[i].status = 'close'
+            await vouchers[i].save()
+        }    
+
+    }
+}
+
 exports.manualRewardClearing = async function (req, res){
     runRewardClearing()
-    console.log("log: Manual reward clearing was triggered")
+    runVoucherClearing()
+    console.log("log: Manual reward and voucher clearing was triggered")
     
     return res.status(200).json({
         status: 'success',
-        msg: 'Manual reward clearing was triggered!',
+        msg: 'Manual reward and voucher clearing was triggered!',
         data: {}
     });
 }
 
 new CronJob('6 0 * * *', async function () {
     runRewardClearing()
-    console.log('log: Reward Clearing triggered')
+    runVoucherClearing()
+    console.log('log: Reward and Voucher Clearing triggered')
   }, null, true, 'Asia/Singapore');

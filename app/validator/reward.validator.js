@@ -75,6 +75,10 @@ exports.cancelReward = [
     body('rewardId').exists()
 ]
 
+exports.redeemReward = [
+    body('rewardId').exists()
+]
+
 exports.rewardDetail = [
     query('rewardId').exists()
 ]
