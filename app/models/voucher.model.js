@@ -1,10 +1,12 @@
 module.exports = mongoose => {
     var schema = mongoose.Schema(
       {
-        userId: { type: String, default: '' },
+        rewardId: { type: String, default: '' },
+        code: { type: String, default: '' },
         status: { type: String, default: '' },
-        imgPath: { type: String, default: '' },
-        country: { type: String, default: '' }
+        userId: { type: String, default: '' },
+        claimedAt: Date,
+        endDate: Date
       },
       { timestamps: true }
     );
@@ -15,7 +17,7 @@ module.exports = mongoose => {
       return object;
     });
   
-    const VerifyRequest = mongoose.model("VerifyRequest", schema);
+    const Voucher = mongoose.model("Voucher", schema);
 
-    return VerifyRequest;
+    return Voucher;
   };

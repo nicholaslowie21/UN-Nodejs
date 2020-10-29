@@ -32,6 +32,32 @@ exports.createPostComment = [
     body('comment').exists()
 ]
 
+exports.createProjectEvent = [
+    body('projectId').exists(),
+    body('title').exists(),
+    body('start').exists(),
+    body('end').exists(),
+    body('eventType').exists().custom(async value => {
+        if(value != 'public' && value != 'private')
+            return Promise.reject('Event type is not valid')
+    })
+]
+
+exports.updateProjectEvent = [
+    body('eventId').exists(),
+    body('title').exists(),
+    body('start').exists(),
+    body('end').exists(),
+    body('eventType').exists().custom(async value => {
+        if(value != 'public' && value != 'private')
+            return Promise.reject('Event type is not valid')
+    })
+]
+
+exports.deleteProjectEvent = [
+    query('eventId').exists()
+]
+
 exports.deletePostComment = [
     body('commentId').exists()
 ]
@@ -56,6 +82,10 @@ exports.getPostDetail = [
 
 exports.getComment = [
     query('postId').exists()
+]
+
+exports.getEvent = [
+    query('projectId').exists()
 ]
 
 exports.getContributions = [

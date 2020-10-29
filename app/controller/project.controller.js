@@ -15,6 +15,7 @@ const Venue = db.venue
 const Money = db.money
 const ProjectPost = db.projectpost
 const PostComment = db.postcomment
+const ProjectEvent = db.projectevent
 const { default: ShortUniqueId } = require('short-unique-id');
 const uid = new ShortUniqueId();
 const path = require('path')
@@ -591,6 +592,174 @@ exports.createPostComment = async function (req, res){
             msg: 'Something went wrong! Error: ' + err.message,
             data: {}
         });
+    });
+}
+
+exports.createProjectEvent = async function (req, res){
+
+    const project = await Projects.findOne({ '_id': req.body.projectId, 'status':'ongoing' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project event!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such ongoing project not found!',
+        data: {}
+    });
+    
+    const projectEvent = new ProjectEvent({
+		title: req.body.title,
+		start: req.body.start,
+		end: req.body.end,
+		projectId: req.body.projectId,
+        status: 'active',
+        eventType: req.body.eventType.toLowerCase()
+    });
+    
+    projectEvent.save(projectEvent)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Event successfully created',
+            data: { projectEvent: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.updateProjectEvent = async function (req, res){
+
+    const projectEvent = await ProjectEvent.findOne({ '_id': req.body.eventId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project event!',
+            data: {}
+        });
+    });
+
+    if(!projectEvent) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active project event not found!',
+        data: {}
+    });
+    
+    	projectEvent.title = req.body.title,
+		projectEvent.start= req.body.start,
+		projectEvent.end = req.body.end,
+		projectEvent.eventType = req.body.eventType.toLowerCase()
+    
+    projectEvent.save(projectEvent)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Event successfully updated!',
+            data: { projectEvent: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.deleteProjectEvent = async function (req, res){
+
+    const projectEvent = await ProjectEvent.findOne({ '_id': req.query.eventId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project event!',
+            data: {}
+        });
+    });
+
+    if(!projectEvent) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project event not found!',
+        data: {}
+    });
+    
+    projectEvent.status = "deleted"
+    
+    projectEvent.save(projectEvent)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Project Event successfully deleted!',
+            data: { projectEvent: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.getPublicEvents = async function (req, res){
+
+    const projectEvents = await ProjectEvent.find({ 'projectId': req.query.projectId, 'status':'active', 'eventType':'public' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project events!',
+            data: {}
+        });
+    });
+
+    if(!projectEvents) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project events not found!',
+        data: {}
+    });
+    
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project public events successfully retrieved!',
+        data: { projectEvents: projectEvents }
+    });
+}
+
+exports.getAllEvents = async function (req, res){
+
+    const projectEvents = await ProjectEvent.find({ 'projectId': req.query.projectId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project events!',
+            data: {}
+        });
+    });
+
+    if(!projectEvents) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such project events not found!',
+        data: {}
+    });
+    
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project events successfully retrieved!',
+        data: { projectEvents: projectEvents }
     });
 }
 

@@ -29,5 +29,7 @@ db.postcomment = require("./postcomment.model")(mongoose);
 db.discoverweekly = require("./discoverweekly.model")(mongoose);
 db.reward = require("./reward.model")(mongoose);
 db.contactcard = require("./contactcard.model")(mongoose);
+db.projectevent = require("./projectevent.model")(mongoose);
+db.voucher = require("./voucher.model")(mongoose);
 
 module.exports = db;

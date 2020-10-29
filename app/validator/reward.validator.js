@@ -75,6 +75,10 @@ exports.cancelReward = [
     body('rewardId').exists()
 ]
 
+exports.redeemReward = [
+    body('rewardId').exists()
+]
+
 exports.rewardDetail = [
     query('rewardId').exists()
 ]
@@ -86,6 +90,13 @@ exports.filteredReward = [
             return Promise.reject('Country is not valid');
     }),
     query('status').exists()
+]
+
+exports.filteredMarketplaceReward = [
+    query('minTier').exists().custom(async value => {
+        if(value != "gold" && value != "silver" && value != "bronze")
+            return Promise.reject('the tier is invalid!')
+    })
 ]
 
 exports.allReward = [

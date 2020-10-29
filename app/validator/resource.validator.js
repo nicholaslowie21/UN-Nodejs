@@ -140,3 +140,8 @@ exports.deleteVenuePicture = [
     body('venueId').exists(),
     body('indexes').exists()
 ]
+
+exports.deleteItemPicture = [
+    body('itemId').exists(),
+    body('indexes').exists()
+]
