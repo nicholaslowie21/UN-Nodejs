@@ -13,6 +13,7 @@ const Knowledge = db.knowledge
 const Item = db.item
 const Venue = db.venue
 const Money = db.money
+const Badge = db.badge
 const ProjectPost = db.projectpost
 const PostComment = db.postcomment
 const ProjectEvent = db.projectevent
@@ -1386,8 +1387,149 @@ exports.completeProject = async function (req, res) {
     
     var theAdmins = project.admins;
     for(var i = 0 ; i < theAdmins.length; i++) {
-        Helper.createProfileFeed(title,desc,theAdmins[i],"user")    
+        Helper.createProfileFeed(title,desc,theAdmins[i],"user")
+        
+        var adminContribution = {
+            contributor : theAdmins[i],
+            contributorType: "user"
+        }
+        var theAdminTotalPoint = (project.rating * 5) + 10;
+        awardContributionPoint(adminContribution, theAdminTotalPoint)
     }
+
+    var founderContribution = {
+        contributor : project.host,
+        contributorType: project.hostType
+    }
+    var theTotalPoint = (project.rating * 5) + 15;
+    awardContributionPoint(founderContribution, theTotalPoint)
+    
+    const contributions = await Contribution.find({ 'projectId': req.body.projectId, 'status': 'active' }, function (err) {
+        if (err) console.log('error: (completeProject) Something went wrong when retrieving contributions')
+    });
+
+    for(var x = 0; x < contributions.length; x++) {
+        var thePoint = contributions[i].rating * project.rating
+        console.log(contributions[i])
+        awardContributionPoint(contributions[i],thePoint)
+    }
+
+}
+
+async function awardContributionPoint(contribution, totalPoint) {
+    var owner;
+
+    if(contribution.contributorType === "user") {
+        owner = await Users.findOne({ '_id': contribution.contributor }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (contribution.contributorType === 'institution') {
+        owner = await Institutions.findOne({ '_id': contribution.contributor }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        return
+    }
+
+    if(contribution.contributorType === "user") owner.wallet = owner.wallet + totalPoint
+    owner.points = owner.points + totalPoint
+    owner.save().catch(err => {
+        console.log("Something went wrong when saving points!")
+        return
+    });
+
+    if(owner.points>=100) {
+        const badge = await Badge.findOne({ 'accountId': contribution.contributor, 'accountType': contribution.contributorType, 'tier':'bronze' }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        if(badge) return
+
+        const newBadge = new Badge({
+            title : 'Bronze',
+            description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
+            imgPath : "/public/badges/bronze.png",
+            accountId: contribution.contributor,
+            accountType: contribution.contributorType,
+            tier: 'bronze'
+        })
+
+        newBadge.save(newBadge).catch(err => {
+            console.log("Something went wrong when creating badge!")
+        });
+
+        owner.tier = 'bronze'
+    }
+
+    if(owner.points>=400) {
+        const badge = await Badge.findOne({ 'accountId': contribution.contributor, 'accountType': contribution.contributorType, 'tier':'silver' }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        if(badge) return
+
+        const newBadge = new Badge({
+            title : 'Silver',
+            description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
+            imgPath : "/public/badges/silver.png",
+            accountId: contribution.contributor,
+            accountType: contribution.contributorType,
+            tier: 'silver'
+        })
+
+        newBadge.save(newBadge).catch(err => {
+            console.log("Something went wrong when creating badge!")
+        });
+
+        owner.tier = 'bronze'
+    }
+
+    if(owner.points>=800) {
+        const badge = await Badge.findOne({ 'accountId': contribution.contributor, 'accountType': contribution.contributorType, 'tier':'gold' }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        if(badge) return
+
+        const newBadge = new Badge({
+            title : 'Gold',
+            description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
+            imgPath : "/public/badges/gold.png",
+            accountId: contribution.contributor,
+            accountType: contribution.contributorType,
+            tier: 'gold'
+        })
+
+        newBadge.save(newBadge).catch(err => {
+            console.log("Something went wrong when creating badge!")
+        });
+
+        owner.tier = 'bronze'
+    }
+
+    owner.save().catch(err => {
+        console.log("Something went wrong when saving account's tier!")
+        return
+    });
+
+
 }
 
 exports.deleteProject = async function (req, res) {

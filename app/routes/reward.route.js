@@ -26,4 +26,8 @@ router.get('/filter/tier/marketplace', auth, RewardValidator.filteredMarketplace
 
 router.post('/redeem', auth, RewardValidator.redeemReward, Helper.ifErrors, rewardController.redeemReward)
 
+router.get('/voucher', auth, RewardValidator.getVoucher, Helper.ifErrors, rewardController.getVoucher)
+router.post('/claim/voucher', auth, RewardValidator.claimVoucher, Helper.ifErrors, rewardController.claimVoucher)
+router.post('/transfer/voucher', auth, RewardValidator.transferVoucher, Helper.ifErrors, rewardController.transferVoucher)
+
 module.exports = router;

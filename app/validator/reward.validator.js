@@ -107,6 +107,19 @@ exports.allReward = [
     query('status').exists()
 ]
 
+exports.getVoucher = [
+    query('status').exists()
+]
+
+exports.claimVoucher = [
+    body('voucherId').exists()
+]
+
+exports.transferVoucher = [
+    body('voucherId').exists(),
+    body('targetId').exists()
+]
+
 exports.validateReward = [
     body('rewardId').exists(),
     body('action').exists().custom(async value => {

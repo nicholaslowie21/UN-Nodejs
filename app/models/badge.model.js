@@ -6,6 +6,7 @@ module.exports = mongoose => {
         imgPath: { type: String, default: '' },
         accountId: { type: String, default: '' },
         accountType: { type: String, default: '' },
+        tier: { type: String, default: '' }
       },
       { timestamps: true }
     );

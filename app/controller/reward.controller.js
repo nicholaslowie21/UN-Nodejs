@@ -1032,6 +1032,83 @@ exports.allReward = async function (req, res){
     });
 }
 
+exports.getVoucher = async function (req, res){
+    let account; 
+
+    account = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+    
+    const vouchers = await Voucher.find({ 'status': req.query.status }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving vouchers!',
+            data: {}
+        });
+    });
+
+    if(!vouchers) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such vouchers!',
+        data: {}
+    });
+
+    var theList = [];
+
+    for(var i = 0; i < vouchers.length; i++) {
+        var voucher = {
+            id:"",
+            rewardId: "",
+            code: "",
+            status: "",
+            userId: "",
+            claimedAt: "",
+            endDate: "",
+            createdAt: "",
+            rewardTitle: "",
+            rewardDesc:"",
+            rewardImgPath:"",
+            rewardCountry:""
+        }
+
+        voucher.id = vouchers[i].id
+        voucher.rewardId = vouchers[i].rewardId
+        voucher.code = vouchers[i].code
+        voucher.status = vouchers[i].status
+        voucher.userId = vouchers[i].userId
+        voucher.claimedAt = vouchers[i].claimedAt
+        voucher.endDate = vouchers[i].endDate
+        voucher.createdAt = vouchers[i].createdAt
+        
+        await getRewardInfo(voucher)
+        if(voucher.rewardTitle === "" ) continue
+
+        theList.push(voucher)
+    }
+    
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Voucher successfully retrieved',
+        data: { vouchers: theList }
+    });
+}
+
 exports.filteredReward = async function (req, res){
     let account; 
 
@@ -1251,6 +1328,142 @@ exports.deleteReward = async function (req, res){
     });
 }
 
+exports.claimVoucher = async function (req, res){
+    let account; 
+
+    account = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+    
+    const voucher = await Voucher.findOne({ '_id': req.body.voucherId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving voucher!',
+            data: {}
+        });
+    });
+
+    if(!voucher) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such voucher!',
+        data: {}
+    });
+
+    if(voucher.userId != req.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This voucher is not yours!',
+        data: {}
+    });
+
+    voucher.status = "claimed"
+
+    voucher.save(voucher)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Voucher successfully claimed',
+            data: { voucher: data }
+        });
+     }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.transferVoucher = async function (req, res){
+    let account; 
+
+    account = await User.findOne({ '_id': req.id }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!account)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+    
+    const voucher = await Voucher.findOne({ '_id': req.body.voucherId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving voucher!',
+            data: {}
+        });
+    });
+
+    if(!voucher) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such active voucher!',
+        data: {}
+    });
+
+    if(voucher.userId != req.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This voucher is not yours!',
+        data: {}
+    });
+
+    targetAccount = await User.findOne({ '_id': req.body.targetId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!targetAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The target account does not exists!',
+        data: {}
+    });
+
+    voucher.userId = req.body.targetId
+
+    voucher.save(voucher)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Voucher successfully transferred',
+            data: { voucher: data }
+        });
+     }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
 async function getRequesterInfo(theItem) {
     var owner;
 
@@ -1279,6 +1492,26 @@ async function getRequesterInfo(theItem) {
     theItem.accountImgPath = owner.ionicImg
     theItem.accountUsername = owner.username
     theItem.accountName = owner.name 
+}
+
+async function getRewardInfo(theItem) {
+    var reward = await Reward.findOne({ '_id': theItem.rewardId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    
+
+    if(!reward) {
+        console.log("error: (getRewardInfo) Such reward not found!")
+        return
+    }
+
+    theItem.rewardTitle = reward.title
+    theItem.rewardDesc = reward.desc
+    theItem.rewardImgPath = reward.imgPath
+    theItem.rewardCountry = reward.country
 }
 
 // to activate and deactivate reward based on the dates
