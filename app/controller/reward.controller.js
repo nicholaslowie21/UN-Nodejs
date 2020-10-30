@@ -197,6 +197,14 @@ exports.requestReward = async function (req, res){
         msg: 'The end date is invalid! ',
         data: {}
     });
+    
+    var startDate = moment(req.body.startDate).tz('Asia/Singapore')
+    if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The start date is invalid! ',
+        data: {}
+    });
 
     const reward = new Reward({
 		title: req.body.title,
@@ -210,6 +218,7 @@ exports.requestReward = async function (req, res){
 		country: req.body.country,
         minTier: req.body.minTier,
         endDate: theDate.format("YYYY-MM-DD"),
+        startDate: startDate.format("YYYY-MM-DD"),
         verifyFile: "/public/uploads/rewards/verification/"+ req.files.rewardFile[0].filename
     });
     
@@ -768,19 +777,29 @@ exports.createReward = async function (req, res){
         data: {}
     });
 
+    var startDate = moment(req.body.startDate).tz('Asia/Singapore')
+    if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The start date is invalid! ',
+        data: {}
+    });
+
     const reward = new Reward({
 		title: req.body.title,
         desc: req.body.desc,
         imgPath: pathString,
         point: req.body.point,
         quota: req.body.quota,
-        status: "open",
+        status: "accepted",
 		sponsorId: "",
 		sponsorType: "external",
 		country: req.body.country,
         minTier: req.body.minTier,
         endDate: theDate.format("YYYY-MM-DD"),
-        verifyFile: ""
+        verifyFile: "",
+        startDate: startDate.format("YYYY-MM-DD"),
+        externalName: req.body.externalName
     });
     
     reward.save(reward)
@@ -879,6 +898,14 @@ exports.updateReward = async function (req, res){
         data: {}
     });
 
+    var startDate = moment(req.body.startDate).tz('Asia/Singapore')
+    if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The start date is invalid! ',
+        data: {}
+    });
+
     if(req.body.quota < reward.claimedSum)
     return res.status(500).json({
         status: 'error',
@@ -894,7 +921,7 @@ exports.updateReward = async function (req, res){
 		reward.country = req.body.country
         reward.minTier = req.body.minTier
         reward.endDate = theDate.format("YYYY-MM-DD")
-
+        reward.startDate = startDate.format("YYYY-MM-DD")
     
     reward.save(reward)
     .then(data => {
@@ -1254,18 +1281,27 @@ async function getRequesterInfo(theItem) {
     theItem.accountName = owner.name 
 }
 
+// to activate and deactivate reward based on the dates
 async function runRewardClearing() {
     const rewards = await Reward.find({ 'status': {$ne: 'close'} }, function (err) {
         if (err) console.log("error: "+err.message)
     });
 
     for(var i = 0; i < rewards.length; i++){
+        if(rewards[i].status === 'accepted') {
+            var startDate = moment(rewards[i].startDate).tz('Asia/Singapore')
+            if(startDate.isSameOrBefore(moment.tz('Asia/Singapore'))) {
+                rewards[i].status = 'open'
+                await rewards[i].save()
+            }
+        
+        }
+        
         var theDate = moment(rewards[i].endDate).tz('Asia/Singapore')
-        if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')) || rewards[i].claimedSum === rewards[i].quota){
+        if(theDate.isBefore(moment.tz('Asia/Singapore')) || rewards[i].claimedSum === rewards[i].quota){
             rewards[i].status = 'close'
             await rewards[i].save()
-        }    
-
+        }
     }
 }
 
@@ -1276,7 +1312,7 @@ async function runVoucherClearing() {
 
     for(var i = 0; i < vouchers.length; i++){
         var theDate = moment(vouchers[i].endDate).tz('Asia/Singapore')
-        if(theDate.isSameOrBefore(moment.tz('Asia/Singapore'))){
+        if(theDate.isBefore(moment.tz('Asia/Singapore'))){
             vouchers[i].status = 'close'
             await vouchers[i].save()
         }    
