@@ -40,7 +40,8 @@ router.post('/deleteVenuePicture', auth, ResourceValidator.deleteVenuePicture, r
 router.post('/createManpower', auth, ResourceValidator.createManpowerResource, Helper.ifErrors, resourceController.createManpower )
 router.post('/updateManpower', auth, ResourceValidator.updateManpowerResource, Helper.ifErrors, resourceController.updateManpower )
 
-router.post('/createKnowledge', auth, ResourceValidator.createKnowledgeResource, Helper.ifErrors, resourceController.createKnowledge )
+// router.post('/createKnowledge', auth, ResourceValidator.createKnowledgeResource, Helper.ifErrors, resourceController.createKnowledge )
+router.post('/createKnowledge', auth, resourceController.multerIPUpload, ResourceValidator.createKnowledgeResource, Helper.ifErrors, resourceController.createKnowledge )
 router.post('/updateKnowledge', auth, ResourceValidator.updateKnowledgeResource, Helper.ifErrors, resourceController.updateKnowledge )
 router.post('/updateKnowledgeOwner', auth, ResourceValidator.updateKnowledgeResourceOwner, Helper.ifErrors, resourceController.updateKnowledgeOwner )
 router.post('/addKnowledgeOwner', auth, ResourceValidator.addKnowledgeResourceOwner, Helper.ifErrors, resourceController.addKnowledgeOwner )

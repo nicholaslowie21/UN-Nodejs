@@ -77,13 +77,34 @@ exports.createManpowerResource = [
 
 exports.createKnowledgeResource = [
     body('title').exists(),
-    body('desc').exists()
+    body('desc').exists(),
+    body('knowType').exists().custom(async value => {
+        if (value != 'patent' && value != 'publication' && value != 'other')
+            return Promise.reject('Patent is not valid');
+    }),
+    body('link').exists(),
+    body('patentNum').exists(),
+    body('expiry').exists(),
+    body('issn').exists(),
+    body('doi').exists(),
+    body('issueDate').exists()
 ]
 
 exports.updateKnowledgeResource = [
     body('knowledgeId').exists(),
     body('title').exists(),
-    body('desc').exists()
+    body('desc').exists(),
+    body('knowType').exists().custom(async value => {
+        console.log(value)
+        if (value != 'patent' && value != 'publication' && value != 'other')
+            return Promise.reject('Patent is not valid');
+    }),
+    body('link').exists(),
+    body('patentNum').exists(),
+    body('expiry').exists(),
+    body('issn').exists(),
+    body('doi').exists(),
+    body('issueDate').exists()
 ]
 
 exports.updateKnowledgeResourceOwner = [

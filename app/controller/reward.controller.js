@@ -779,7 +779,7 @@ exports.createReward = async function (req, res){
 		sponsorType: "external",
 		country: req.body.country,
         minTier: req.body.minTier,
-        endDate: theDate,
+        endDate: theDate.format("YYYY-MM-DD"),
         verifyFile: ""
     });
     
