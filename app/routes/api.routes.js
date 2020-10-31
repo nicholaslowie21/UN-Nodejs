@@ -11,6 +11,7 @@ const resourceRouter = require('./resource.route')
 const marketplaceRouter = require('./marketplace.route')
 const rewardRouter = require('./reward.route')
 const mobileRouter = require('./mobile.route')
+const communicationRouter = require('./communication.route')
 
 router.use('/authorization', authorizationRouter)
 router.use('/user', userRouter)
@@ -22,5 +23,6 @@ router.use('/resource', resourceRouter)
 router.use('/marketplace', marketplaceRouter)
 router.use('/reward', rewardRouter)
 router.use('/mobile', mobileRouter)
+router.use('/communication', communicationRouter)
 
 module.exports = router;
