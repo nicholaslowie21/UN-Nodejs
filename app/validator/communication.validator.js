@@ -7,11 +7,11 @@ exports.createAnnouncement = [
 ]
 
 exports.editAnnouncement = [
-    body('rewardId').exists(),
+    body('announcementId').exists(),
     body('title').exists(),
     body('desc').exists()
 ]
 
 exports.deleteAnnouncement = [
-    body('announcementId').exists()
+    query('announcementId').exists()
 ]
