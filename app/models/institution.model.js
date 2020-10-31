@@ -18,7 +18,9 @@ module.exports = mongoose => {
         verifyFilePath: { type: String, default: '' },
         members: [String],
         projects: [String],
-        SDGs: [Number]
+        SDGs: [Number],
+        points: { type: Number, default: 0 },
+        tier: { type: String, default: '' }
       },
       { timestamps: true }
     );

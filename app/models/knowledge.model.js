@@ -5,8 +5,14 @@ module.exports = mongoose => {
         desc: { type: String, default: '' },
         status: { type: String, default: '' },
         owner: [{ theId: String, ownerType: String}],
-        attachment: { type: String, default: '' }
-
+        attachment: { type: String, default: '' },
+        knowType: { type: String, default: 'other' },
+        link: { type: String, default: '' },
+        patentNum: { type: String, default: '' },
+        expiry: Date,
+        issn: { type: String, default: '' },
+        doi: { type: String, default: '' },
+        issueDate: Date
       },
       { timestamps: true }
     );

@@ -13,7 +13,9 @@ module.exports = mongoose => {
         sponsorId: { type: String, default: '' },
         sponsorType: { type: String, default: '' },
         claimedNum: { type: Number, default: 0 },
-        verifyFile: { type: String, default: '' }
+        verifyFile: { type: String, default: '' },
+        startDate: Date,
+        externalName: { type: String, default: '' }
       },
       { timestamps: true }
     );

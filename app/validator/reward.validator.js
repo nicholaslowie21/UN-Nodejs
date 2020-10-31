@@ -21,7 +21,8 @@ exports.requestReward = [
     body('minTier').exists().custom(async value => {
         if(value != "gold" && value != "silver" && value != "bronze")
             return Promise.reject('the tier is invalid!')
-    })
+    }),
+    body('startDate').exists()
 ]
 
 exports.createRequestReward = [
@@ -44,7 +45,9 @@ exports.createRequestReward = [
     body('minTier').exists().custom(async value => {
         if(value != "gold" && value != "silver" && value != "bronze")
             return Promise.reject('the tier is invalid!')
-    })
+    }),
+    body('startDate').exists(),
+    body('externalName').exists()
 ]
 
 exports.updateReward = [
@@ -68,7 +71,8 @@ exports.updateReward = [
     body('minTier').exists().custom(async value => {
         if(value != "gold" && value != "silver" && value != "bronze")
             return Promise.reject('the tier is invalid!')
-    })
+    }),
+    body('startDate').exists()
 ]
 
 exports.cancelReward = [
@@ -101,6 +105,19 @@ exports.filteredMarketplaceReward = [
 
 exports.allReward = [
     query('status').exists()
+]
+
+exports.getVoucher = [
+    query('status').exists()
+]
+
+exports.claimVoucher = [
+    body('voucherId').exists()
+]
+
+exports.transferVoucher = [
+    body('voucherId').exists(),
+    body('targetId').exists()
 ]
 
 exports.validateReward = [

@@ -98,7 +98,7 @@ var IPStorage = multer.diskStorage({
     },
     filename: async function (req, file, cb) {
         let extentsion = file.originalname.split('.')
-        let thePath = extentsion[0]+"-"+req.body.knowledgeId+Date.now()+'.'+extentsion[extentsion.length - 1]; 
+        let thePath = extentsion[0]+"-"+req.id+Date.now()+'.'+extentsion[extentsion.length - 1]; 
         req.thePath = thePath;
         cb(null, thePath)
     },
@@ -109,7 +109,7 @@ var IPStorage = multer.diskStorage({
 })
 var uploadIPAttachment = multer({ storage: IPStorage  })
 
-exports.multerIPUpload = uploadIPAttachment.single('IP');
+exports.multerIPUpload = uploadIPAttachment.single('attachment');
 
 exports.itemPicture = async function (req, res){
     if(!req.body.itemId) {
@@ -1237,8 +1237,8 @@ exports.createManpower = async function (req, res) {
 exports.createKnowledge = async function (req, res) {
     var theOwner
 
-    if (req.body.type === "user") {
-        theOwner = await User.findOne({ '_id': req.body.id }, function (err) {
+    if (req.type === "user") {
+        theOwner = await User.findOne({ '_id': req.id }, function (err) {
             if (err)
             return res.status(500).json({
                 status: 'error',
@@ -1246,8 +1246,8 @@ exports.createKnowledge = async function (req, res) {
                 data: {}
             });
         });
-    } else if (req.body.type === "institution") {
-        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
+    } else if (req.type === "institution") {
+        theOwner = await Institution.findOne({ '_id': req.id }, function (err) {
             if (err)
             return res.status(500).json({
                 status: 'error',
@@ -1264,11 +1264,32 @@ exports.createKnowledge = async function (req, res) {
         data: {}
     });
     
+    // var expiryDate = ""
+    // if(req.body.expire != "")
+    //     expiryDate = moment(req.body.endDate).tz('Asia/Singapore')
+    // if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+    // return res.status(500).json({
+    //     status: 'error',
+    //     msg: 'The end date is invalid! ',
+    //     data: {}
+    // });
+
+    var theFilePath = "";
+    if(req.file) theFilePath = "/public/uploads/resources/IP/"+req.thePath;
+
     const knowledge = new Knowledge({
 		title: req.body.title,
 		desc: req.body.desc,
 		owner: [{theId: theOwner.id, ownerType:req.body.type}],
-		status: "active"
+        status: "active",
+        attachment: theFilePath,
+        knowType: req.body.knowType,
+        link: req.body.link,
+        patentNum: req.body.patentNum,
+        expiry: req.body.expiry,
+        issn: req.body.issn,
+        doi: req.body.doi,
+        issueDate: req.body.issueDate
     });
 
     knowledge.save(knowledge)
@@ -1590,7 +1611,14 @@ exports.updateKnowledge = async function (req, res) {
 
     knowledge.title = req.body.title
     knowledge.desc = req.body.desc
-    
+    knowledge.knowType = req.body.knowType
+    knowledge.link = req.body.link
+    knowledge.patentNum = req.body.patentNum
+    knowledge.expiry = req.body.expiry
+    knowledge.issn = req.body.issn
+    knowledge.doi = req.body.doi
+    knowledge.issueDate = req.body.issueDate
+
     knowledge.save(knowledge)
     .then(data => {
         return res.status(200).json({
