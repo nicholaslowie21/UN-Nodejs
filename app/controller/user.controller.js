@@ -359,7 +359,8 @@ exports.viewUser = async function (req, res) {
         "badges": user.badges,
         "SDGs": user.SDGs,
         "wallet": user.wallet,
-        "ionicImg": user.ionicImg || ''
+        "ionicImg": user.ionicImg || '',
+        "tier": user.tier
     }
 
     return res.status(200).json({
