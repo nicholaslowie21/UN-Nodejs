@@ -395,7 +395,9 @@ exports.getMarketplace = async function (req, res){
             accountUsername: "",
             accountImgPath: "",
             createdAt:"",
-            claimedNum: 0
+            claimedNum: 0,
+            startDate:"",
+            externalName:""
         }
 
         reward.id = rewards[i].id
@@ -413,6 +415,8 @@ exports.getMarketplace = async function (req, res){
         reward.verifyFile = rewards[i].verifyFile
         reward.createdAt = rewards[i].createdAt
         reward.claimedNum = rewards[i].claimedNum
+        reward.startDate = rewards[i].startDate
+        reward.externalName = rewards[i].externalName
 
         await getRequesterInfo(reward)
         if(reward.accountName === "" && reward.sponsorType != "external") continue
@@ -472,7 +476,9 @@ exports.getFilteredMarketplace = async function (req, res){
             accountUsername: "",
             accountImgPath: "",
             createdAt:"",
-            claimedNum: 0
+            claimedNum: 0,
+            startDate:"",
+            externalName:""
         }
 
         reward.id = rewards[i].id
@@ -490,6 +496,8 @@ exports.getFilteredMarketplace = async function (req, res){
         reward.verifyFile = rewards[i].verifyFile
         reward.createdAt = rewards[i].createdAt
         reward.claimedNum = rewards[i].claimedNum
+        reward.startDate = rewards[i].startDate
+        reward.externalName = rewards[i].externalName
 
         var targetTierLevel = 0
         if(reward.minTier === 'bronze') targetTierLevel = 1
@@ -680,7 +688,9 @@ exports.getMarketplaceRewardDetail = async function (req, res){
         accountName: "",
         accountUsername: "",
         accountImgPath: "",
-        createdAt:""
+        createdAt:"",
+        startDate:"",
+        externalName:""
     }
 
     reward.id = theReward.id
@@ -697,6 +707,8 @@ exports.getMarketplaceRewardDetail = async function (req, res){
     reward.endDate = theReward.endDate
     reward.verifyFile = theReward.verifyFile
     reward.createdAt = theReward.createdAt
+    reward.startDate = theReward.startDate
+    reward.externalName = theReward.externalName
 
     await getRequesterInfo(reward)
     if(reward.accountName === "" && reward.sponsorType != "external") 
@@ -1001,7 +1013,9 @@ exports.allReward = async function (req, res){
             accountName: "",
             accountUsername: "",
             accountImgPath: "",
-            createdAt:""
+            createdAt:"",
+            startDate:"",
+            externalName:""
         }
 
         reward.id = rewards[i].id
@@ -1018,6 +1032,8 @@ exports.allReward = async function (req, res){
         reward.endDate = rewards[i].endDate
         reward.verifyFile = rewards[i].verifyFile
         reward.createdAt = rewards[i].createdAt
+        reward.startDate = rewards[i].startDate
+        reward.externalName = rewards[i].externalName
 
         await getRequesterInfo(reward)
         if(reward.accountName === "" && reward.sponsorType != "external") continue
@@ -1174,7 +1190,9 @@ exports.filteredReward = async function (req, res){
             accountName: "",
             accountUsername: "",
             accountImgPath: "",
-            createdAt:""
+            createdAt:"",
+            startDate:"",
+            externalName:""
         }
 
         reward.id = rewards[i].id
@@ -1191,6 +1209,8 @@ exports.filteredReward = async function (req, res){
         reward.endDate = rewards[i].endDate
         reward.verifyFile = rewards[i].verifyFile
         reward.createdAt = rewards[i].createdAt
+        reward.startDate = rewards[i].startDate
+        reward.externalName = rewards[i].externalName
 
         await getRequesterInfo(reward)
         if(reward.accountName === "" && reward.sponsorType != "external") continue
