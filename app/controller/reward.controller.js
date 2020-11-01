@@ -13,6 +13,7 @@ const nodeCountries =  require("node-countries");
 const Helper = require('../service/helper.service')
 const sharp = require('sharp')
 const CronJob = require('cron').CronJob;
+const randomstring = require("randomstring");
 
 var rewardStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -605,9 +606,11 @@ exports.redeemReward = async function (req, res){
         });
     });
 
+    let voucherCode = randomstring.generate({ length: 5, charset:'alphabetic', capitalization:'uppercase' })
+
     const voucher = new Voucher({
         rewardId: reward.id,
-        code: uid(),
+        code: voucherCode,
         status: 'active',
         userId: theOwner.id,
         claimedAt: moment.tz('Asia/Singapore').format("YYYY-MM-DD"),
