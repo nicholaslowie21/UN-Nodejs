@@ -1268,7 +1268,7 @@ exports.validateReward = async function (req, res){
     });
 
     if(req.body.action === "approve")
-        reward.status = "open"
+        reward.status = "accepted"
     else
         reward.status = "rejected"
 
