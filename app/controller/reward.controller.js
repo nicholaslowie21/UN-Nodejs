@@ -1069,7 +1069,7 @@ exports.getVoucher = async function (req, res){
         data: {}
     });
     
-    const vouchers = await Voucher.find({ 'status': req.query.status }, function (err) {
+    const vouchers = await Voucher.find({ 'status': req.query.status, 'userId':req.id }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',

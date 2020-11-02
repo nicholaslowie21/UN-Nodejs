@@ -613,11 +613,15 @@ exports.createProjectEvent = async function (req, res){
         msg: 'Such ongoing project not found!',
         data: {}
     });
+
+    var startDate = moment(req.body.start).tz('Asia/Singapore')
+    var endDate = moment(req.body.end).tz('Asia/Singapore')
+    
     
     const projectEvent = new ProjectEvent({
 		title: req.body.title,
-		start: req.body.start,
-		end: req.body.end,
+		start: startDate.format("YYYY-MM-DD"),
+		end: endDate.format("YYYY-MM-DD"),
 		projectId: req.body.projectId,
         status: 'active',
         eventType: req.body.eventType.toLowerCase()
@@ -657,9 +661,12 @@ exports.updateProjectEvent = async function (req, res){
         data: {}
     });
     
+    var startDate = moment(req.body.start).tz('Asia/Singapore')
+    var endDate = moment(req.body.end).tz('Asia/Singapore')
+
     	projectEvent.title = req.body.title,
-		projectEvent.start= req.body.start,
-		projectEvent.end = req.body.end,
+		projectEvent.start= startDate.format("YYYY-MM-DD"),
+		projectEvent.end = endDate.format("YYYY-MM-DD"),
 		projectEvent.eventType = req.body.eventType.toLowerCase()
     
     projectEvent.save(projectEvent)

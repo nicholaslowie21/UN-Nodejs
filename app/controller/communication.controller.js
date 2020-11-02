@@ -193,6 +193,8 @@ exports.getAnnouncement = async function (req, res) {
         data: {}
     });
 
+    announcements.reverse();
+
     return res.status(200).json({
         status: 'success',
         msg: 'Announcements successfully retrieved',
