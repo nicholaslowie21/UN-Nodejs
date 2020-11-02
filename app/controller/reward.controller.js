@@ -613,7 +613,6 @@ exports.redeemReward = async function (req, res){
         code: voucherCode,
         status: 'active',
         userId: theOwner.id,
-        claimedAt: moment.tz('Asia/Singapore').format("YYYY-MM-DD"),
         endDate: reward.endDate
     });
 
@@ -1394,6 +1393,8 @@ exports.claimVoucher = async function (req, res){
     });
 
     voucher.status = "claimed"
+    voucher.claimedAt = moment.tz('Asia/Singapore').format("YYYY-MM-DD "),
+        
 
     voucher.save(voucher)
     .then(data => {
