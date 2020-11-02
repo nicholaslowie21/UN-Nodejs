@@ -1393,9 +1393,8 @@ exports.claimVoucher = async function (req, res){
     });
 
     voucher.status = "claimed"
-    voucher.claimedAt = moment.tz('Asia/Singapore').format("YYYY-MM-DD "),
-        
-
+    voucher.claimedAt = moment().tz("Asia/Singapore")
+    
     voucher.save(voucher)
     .then(data => {
         return res.status(200).json({
