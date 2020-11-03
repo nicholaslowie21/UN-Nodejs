@@ -8,13 +8,8 @@ const Helper = require('../service/helper.service');
 
 router.post('/', auth, ReportValidator.createReport, Helper.ifErrors, reportController.createReport)
 router.get('/filtered/status', auth, ReportValidator.filteredStatus, reportController.filteredStatus)
-
-/*
-router.post('/institutionChoice', auth, MobileValidator.institutionChoice, Helper.ifErrors, mobileController.institutionChoice )
-router.delete('/institutionChoice', auth, mobileController.deleteInsitutionChoice )
-router.post('/addContact', auth, MobileValidator.addContact, Helper.ifErrors, mobileController.addContact )
-router.post('/deleteContact', auth, MobileValidator.deleteContact, Helper.ifErrors, mobileController.deleteContact )
-router.get('/contactList', auth, mobileController.contactList)
-*/
+router.get('/filtered/regional', auth, ReportValidator.filteredStatus, reportController.filteredRegional)
+router.get('/my/filtered', auth, ReportValidator.filteredStatus, reportController.myReport)
+router.post('/update/status', auth, ReportValidator.updateReport, Helper.ifErrors, reportController.updateReport)
 
 module.exports = router;

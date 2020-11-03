@@ -17,6 +17,7 @@ module.exports = function (req, res, next) {
             req.type = decoded.type
             next();
         }
+        
     } catch (err) {
         console.log(err.message);
         return res.status(504).json({ status: 'error', msg: 'Unauthorized access' });

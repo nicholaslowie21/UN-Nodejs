@@ -7,6 +7,8 @@ const Project = db.project
 const Reward = db.reward
 const Report = db.report
 const Helper = require('../service/helper.service')
+const nodeCountries = require('node-countries');
+
 
 exports.createReport = async function (req, res){
 
@@ -94,7 +96,7 @@ exports.filteredStatus = async function (req, res){
         if (err)
         return res.status(500).json({
             status: 'error',
-            msg: 'There was no such account!',
+            msg: 'There was no such reports!',
             data: {}
         });
     });
@@ -132,6 +134,148 @@ exports.filteredStatus = async function (req, res){
     return res.status(200).json({
         status: 'success',
         msg: 'Filtered reports successfully retrieved',
+        data: { reports: theList }
+    });
+}
+
+exports.updateReport = async function (req, res){
+    var report = await Report.findOne({ '_id': req.body.reportId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such report!',
+            data: {}
+        });
+    });
+
+    if(!report)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such report!',
+        data: {}
+    });
+
+    if(req.role === "user" || req.role === "institution")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized!',
+        data: {}
+    });
+
+    report.status = req.body.status
+
+    report.save(report)
+    .then(data => { 
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Report status successfully updated',
+            data: { report: data }
+        });
+    }).catch( err => {
+        return res.status(500).json({
+            status: 'success',
+            msg: 'Something went wrong! Error: '+err.message,
+            data: { }
+        });
+    })
+
+}
+
+exports.filteredRegional = async function (req, res){
+
+    let theCountry = nodeCountries.getCountryByName(req.query.country);
+    req.query.country = theCountry.name;
+    
+    reports = await Report.find({ 'status': req.query.status, 'country':req.query.country }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such report!',
+            data: {}
+        });
+    });
+
+    if(!reports)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such reports!',
+        data: {}
+    });
+
+    reports.reverse();
+
+    var theList = [];
+
+    for(var i = 0; i < reports.length; i++) {
+        var theReport = {
+            id: reports[i].id,
+            title: reports[i].title,
+            summary: reports[i].summary,
+            reportType: reports[i].reportType,
+            targetId: reports[i].targetId,
+            status: reports[i].status,
+            country: reports[i].country,
+            reporterId: reports[i].reporterId,
+            reporterType: reports[i].reporterType,
+            createdAt: reports[i].createdAt,
+            updatedAt: reports[i].updatedAt
+        }
+        await getReporterInfo(theReport)
+
+        if(theReport.reporterName != "") theList.push(theReport)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Filtered reports successfully retrieved',
+        data: { reports: theList }
+    });
+}
+
+exports.myReport = async function (req, res){
+
+    reports = await Report.find({ 'status': req.query.status, 'reporterId':req.id, 'reporterType':req.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!reports)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such reports!',
+        data: {}
+    });
+
+    reports.reverse();
+
+    var theList = [];
+
+    for(var i = 0; i < reports.length; i++) {
+        var theReport = {
+            id: reports[i].id,
+            title: reports[i].title,
+            summary: reports[i].summary,
+            reportType: reports[i].reportType,
+            targetId: reports[i].targetId,
+            status: reports[i].status,
+            country: reports[i].country,
+            reporterId: reports[i].reporterId,
+            reporterType: reports[i].reporterType,
+            createdAt: reports[i].createdAt,
+            updatedAt: reports[i].updatedAt
+        }
+        await getReporterInfo(theReport)
+
+        if(theReport.reporterName != "") theList.push(theReport)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My filtered reports successfully retrieved',
         data: { reports: theList }
     });
 }

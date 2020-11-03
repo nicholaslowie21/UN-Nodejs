@@ -8,6 +8,19 @@ exports.createReport = [
     body('reportType').exists()
 ]
 
+exports.updateReport = [
+    body('reportId').exists(),
+    body('status').exists().custom(async value => {
+        if(value != 'pending' && value != 'progress' && value != 'solved' && value != 'declined') 
+            return Promise.reject('status is invalid')
+    })
+]
+
 exports.filteredStatus = [
     query('status').exists()
+]
+
+exports.filteredStatus = [
+    query('status').exists(),
+    query('country').exists()
 ]
