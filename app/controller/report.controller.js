@@ -124,10 +124,21 @@ exports.filteredStatus = async function (req, res){
             reporterId: reports[i].reporterId,
             reporterType: reports[i].reporterType,
             createdAt: reports[i].createdAt,
-            updatedAt: reports[i].updatedAt
+            updatedAt: reports[i].updatedAt,
+            targetName:"",
+            targetUsername:"",
+            targetImg:"",
+            targetTitle:""
         }
         await getReporterInfo(theReport)
+        
+        if(theReport.reportType === "institution") await getInstitutionInfo(theReport)
+        else if(theReport.reportType === "user") await getUserInfo(theReport)
+        else if(theReport.reportType === "project") await getProjectInfo(theReport)
+        else if(theReport.reportType === "reward") await getRewardInfo(theReport)
 
+        if(theReport.targetUsername === "" && theReport.targetTitle === "") continue
+        
         if(theReport.reporterName != "") theList.push(theReport)
     }
 
@@ -218,9 +229,21 @@ exports.filteredRegional = async function (req, res){
             reporterId: reports[i].reporterId,
             reporterType: reports[i].reporterType,
             createdAt: reports[i].createdAt,
-            updatedAt: reports[i].updatedAt
+            updatedAt: reports[i].updatedAt,
+            targetName:"",
+            targetUsername:"",
+            targetImg:"",
+            targetTitle:""
         }
         await getReporterInfo(theReport)
+
+        if(theReport.reportType === "institution") await getInstitutionInfo(theReport)
+        else if(theReport.reportType === "user") await getUserInfo(theReport)
+        else if(theReport.reportType === "project") await getProjectInfo(theReport)
+        else if(theReport.reportType === "reward") await getRewardInfo(theReport)
+
+        if(theReport.targetUsername === "" && theReport.targetTitle === "") continue
+        
 
         if(theReport.reporterName != "") theList.push(theReport)
     }
@@ -266,10 +289,20 @@ exports.myReport = async function (req, res){
             reporterId: reports[i].reporterId,
             reporterType: reports[i].reporterType,
             createdAt: reports[i].createdAt,
-            updatedAt: reports[i].updatedAt
+            updatedAt: reports[i].updatedAt,
+            targetName:"",
+            targetUsername:"",
+            targetImg:"",
+            targetTitle:""
         }
         await getReporterInfo(theReport)
 
+        if(theReport.reportType === "institution") await getInstitutionInfo(theReport)
+        else if(theReport.reportType === "user") await getUserInfo(theReport)
+        else if(theReport.reportType === "project") await getProjectInfo(theReport)
+        else if(theReport.reportType === "reward") await getRewardInfo(theReport)
+
+        if(theReport.targetUsername === "" && theReport.targetTitle === "") continue
         if(theReport.reporterName != "") theList.push(theReport)
     }
 
@@ -295,6 +328,78 @@ async function checkInstitutionCountry(theId) {
     }
 
     return institution.country
+}
+
+async function getInstitutionInfo(theItem) {
+    var institution = await Institution.findOne({ '_id': theItem.targetId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    
+
+    if(!institution) {
+        console.log("error [reportController]: Such account not found!")
+        return
+    }
+
+    theItem.targetName = institution.name
+    theItem.targetUsername = institution.username
+    theItem.targetImg = institution.ionicImg
+}
+
+async function getUserInfo(theItem) {
+    var user = await User.findOne({ '_id': theItem.targetId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    
+
+    if(!user) {
+        console.log("error [reportController]: Such account not found!")
+        return
+    }
+
+    theItem.targetName = user.name
+    theItem.targetUsername = user.username
+    theItem.targetImg = user.ionicImg
+}
+
+async function getProjectInfo(theItem) {
+    var project = await Project.findOne({ '_id': theItem.targetId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    
+
+    if(!project) {
+        console.log("error [reportController]: Such account not found!")
+        return
+    }
+
+    theItem.targetTitle = project.title
+}
+
+async function getRewardInfo(theItem) {
+    var reward = await Reward.findOne({ '_id': theItem.targetId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    
+
+    if(!reward) {
+        console.log("error [reportController]: Such account not found!")
+        return
+    }
+
+    theItem.targetTitle = reward.title
 }
 
 async function checkUserCountry(theId) {
@@ -358,7 +463,7 @@ async function getReporterInfo(theItem) {
                 return
             }
         });
-    } else if (theItem.reportreType === 'institution') {
+    } else if (theItem.reporterType === 'institution') {
         owner = await Institution.findOne({ '_id': theItem.reporterId }, function (err) {
             if (err) {
                 console.log("error: "+err.message)
