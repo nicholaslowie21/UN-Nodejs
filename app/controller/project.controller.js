@@ -176,6 +176,10 @@ exports.createPost = async function (req, res){
     
     projectPost.save(projectPost)
     .then(data => {
+        var action = "Account created a Project Post: "+ data.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Post successfully created',
@@ -277,6 +281,10 @@ exports.updatePost = async function (req, res){
     
     projectPost.save(projectPost)
     .then(data => {
+        var action = "Account updated a Project Post: "+ data.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Post successfully updated',
@@ -347,6 +355,10 @@ exports.deletePost = async function (req, res){
 
     projectPost.save(projectPost)
     .then(data => {
+        var action = "Account deleted a Project Post: "+ data.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Post successfully deleted',
@@ -417,6 +429,10 @@ exports.deletePostPic = async function (req, res){
 
     projectPost.save(projectPost)
     .then(data => {
+        var action = "Account deleted a Project Post picture: "+ data.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Post Picture successfully deleted',
@@ -582,6 +598,10 @@ exports.createPostComment = async function (req, res){
     
     postComment.save(postComment)
     .then(data => {
+        var action = "Account commented "+ data.comment +" ("+data.id+")" +" on a Project Post: "+ projectPost.title +" ("+projectPost.id+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Post comment successfully created',
@@ -629,6 +649,10 @@ exports.createProjectEvent = async function (req, res){
     
     projectEvent.save(projectEvent)
     .then(data => {
+        var action = "Account created a milestone "+ data.title +" ("+data.id+")" +" for a project: "+ project.title +" ("+project.id+","+ project.code +")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Event successfully created',
@@ -671,6 +695,10 @@ exports.updateProjectEvent = async function (req, res){
     
     projectEvent.save(projectEvent)
     .then(data => {
+        var action = "Account updated a milestone "+ data.title +" ("+data.id+")" +" for a project: "+ " ("+data.projectId+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Event successfully updated!',
@@ -707,6 +735,10 @@ exports.deleteProjectEvent = async function (req, res){
     
     projectEvent.save(projectEvent)
     .then(data => {
+        var action = "Account deleted a milestone "+ data.title +" ("+data.id+")" +" for a project: "+ " ("+data.projectId+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Event successfully deleted!',
@@ -800,6 +832,10 @@ exports.deletePostComment = async function (req, res){
     
     postComment.save(postComment)
     .then(data => {
+        var action = "Account deleted a comment "+ data.comment +" ("+data.id+")" +" on a Project Post: "+" ("+data.postId+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Post comment successfully deleted',
@@ -1061,6 +1097,12 @@ exports.projectPicture = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account updated picture for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+    Helper.createAuditLog(action,req.type,req.id)
+
+
 }
 
 exports.viewProject = async function (req, res) {
@@ -1221,6 +1263,11 @@ exports.createProject = async function (req, res){
             });
         });
 
+        
+        var action = "Account created a project: "+project.title+" ("+data.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project successfully created!',
@@ -1301,6 +1348,10 @@ exports.postUpdateProject = async function (req, res) {
 
     project.save(project)
     .then(data => {
+        var action = "Account updated a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project successfully updated',
@@ -1403,6 +1454,10 @@ exports.completeProject = async function (req, res) {
         var theAdminTotalPoint = (project.rating * 5) + 10;
         awardContributionPoint(adminContribution, theAdminTotalPoint)
     }
+    
+    var action = "Account mark project as completed for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+    Helper.createAuditLog(action,req.type,req.id)
 
     var founderContribution = {
         contributor : project.host,
@@ -1666,6 +1721,10 @@ exports.deleteProject = async function (req, res) {
             });
         });
 
+        
+        var action = "Account deleted a project: "+project.title+" ("+data.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
         return res.status(200).json({
             status: 'success',
             msg: 'Project successfully deleted',
@@ -1923,6 +1982,7 @@ exports.addAdmin = async function (req, res) {
 
     project.save(project)
     .then(data => {
+        
         return res.status(200).json({
             status: 'success',
             msg: 'Project admin successfully added',
@@ -1955,6 +2015,11 @@ exports.addAdmin = async function (req, res) {
     accountType = "user"
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+
+    var action = "Account assigned user:"+ user.name +" ("+user.id+", "+ user.username +")" +" as admin for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+    Helper.createAuditLog(action,req.type,req.id)
+
 }
 
 exports.deleteAdmin = async function (req, res) {
@@ -2063,6 +2128,11 @@ exports.deleteAdmin = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Account removed user:"+ user.name +" ("+user.id+", "+ user.username +")" +" as admin for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+    Helper.createAuditLog(action,req.type,req.id)
+
 }
 
 exports.searchUsers = async function (req, res){
@@ -2210,6 +2280,10 @@ exports.createKPI = async function (req, res) {
 
     kpi.save(kpi)
     .then(data => {
+        var action = "Account created KPI:"+ kpi.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+        
         return res.status(200).json({
             status: 'success',
             msg: 'KPI successfully created',
@@ -2270,6 +2344,10 @@ exports.updateKPI = async function (req, res) {
 
     kpi.save(kpi)
     .then(data => {
+        var action = "Account updated KPI:"+ kpi.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'KPI successfully updated',
@@ -2333,6 +2411,9 @@ exports.deleteKPI = async function (req, res) {
         });
       });
 
+    var action = "Account deleted KPI:"+ kpi.title +" ("+req.body.kpiId+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    
+    Helper.createAuditLog(action,req.type,req.id)
 
     return res.status(200).json({
         status: 'success',

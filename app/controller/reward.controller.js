@@ -904,21 +904,24 @@ exports.updateReward = async function (req, res){
         pathString = "/public/uploads/rewards/"+req.thePath ;
     }
 
-    var theDate = moment(req.body.endDate) 
-    if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-    return res.status(500).json({
-        status: 'error',
-        msg: 'The end date is invalid! ',
-        data: {}
-    });
+    if(reward.status != 'active') {
 
-    var startDate = moment(req.body.startDate).tz('Asia/Singapore')
-    if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-    return res.status(500).json({
-        status: 'error',
-        msg: 'The start date is invalid! ',
-        data: {}
-    });
+        var theDate = moment(req.body.endDate) 
+        if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+        return res.status(500).json({
+            status: 'error',
+            msg: 'The end date is invalid! ',
+            data: {}
+        });
+
+        var startDate = moment(req.body.startDate).tz('Asia/Singapore')
+        if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+        return res.status(500).json({
+            status: 'error',
+            msg: 'The start date is invalid! ',
+            data: {}
+        });
+    }
 
     if(req.body.quota < reward.claimedSum)
     return res.status(500).json({
@@ -934,9 +937,11 @@ exports.updateReward = async function (req, res){
         reward.quota = req.body.quota
 		reward.country = req.body.country
         reward.minTier = req.body.minTier
-        reward.endDate = theDate.format("YYYY-MM-DD")
-        reward.startDate = startDate.format("YYYY-MM-DD")
     
+        if(reward.status != 'active') {
+            reward.endDate = theDate.format("YYYY-MM-DD")
+            reward.startDate = startDate.format("YYYY-MM-DD")
+        }
     reward.save(reward)
     .then(data => {
         return res.status(200).json({
