@@ -225,6 +225,10 @@ exports.requestReward = async function (req, res){
     
     reward.save(reward)
     .then(data => {
+        var action = "Account offered a reward request "+ data.title +" ("+data.id+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer request successfully created',
@@ -318,6 +322,10 @@ exports.cancelReward = async function (req, res){
 
     reward.save(reward)
     .then(data => {
+        var action = "Account cancelled a reward offer request"+ data.title +" ("+data.id+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer request successfully canceled',
@@ -618,6 +626,10 @@ exports.redeemReward = async function (req, res){
 
     voucher.save(voucher)
     .then(data => {
+        var action = "Account redeemed a reward "+ reward.title +" ("+reward.id+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward successfully redeemed!',
@@ -818,6 +830,10 @@ exports.createReward = async function (req, res){
     
     reward.save(reward)
     .then(data => {
+        var action = "Account created a reward "+ data.title +" ("+data.id+")"
+    
+        Helper.createAuditLog(action,"admin",req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer successfully created',
@@ -943,6 +959,10 @@ exports.updateReward = async function (req, res){
         }
     reward.save(reward)
     .then(data => {
+        var action = "Account updated a reward "+ data.title +" ("+data.id+")"
+    
+        Helper.createAuditLog(action,"admin",req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer successfully updated',
@@ -1280,6 +1300,10 @@ exports.validateReward = async function (req, res){
 
     reward.save(reward)
     .then(data => {
+        var action = "Account validated a reward request "+ data.title +" ("+data.id+") action: "+data.status
+    
+        Helper.createAuditLog(action,"admin",req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer successfully validated',
@@ -1340,6 +1364,10 @@ exports.deleteReward = async function (req, res){
 
     reward.save(reward)
     .then(data => {
+        var action = "Account deleted a reward "+ data.title +" ("+data.id+")"
+    
+        Helper.createAuditLog(action,"admin",req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer successfully deleted',
@@ -1401,6 +1429,10 @@ exports.claimVoucher = async function (req, res){
     
     voucher.save(voucher)
     .then(data => {
+        var action = "Account claimed a voucher "+ voucher.title +" ("+data.id+")"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Voucher successfully claimed',
@@ -1477,6 +1509,10 @@ exports.transferVoucher = async function (req, res){
 
     voucher.save(voucher)
     .then(data => {
+        var action = "Account transferred a voucher "+ voucher.title +" ("+voucher.id+") "
+        action +="to :"+ targetAccount.username + " ("+targetAccount.id+")"
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Voucher successfully transferred',

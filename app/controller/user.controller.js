@@ -115,6 +115,9 @@ exports.profilePicture = async function (req, res){
             data: {}
         });
     });
+    var action = "Account updated profile picture"
+    
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateUserProfile = async function (req, res, next) {
@@ -164,6 +167,9 @@ exports.updateUserProfile = async function (req, res, next) {
 
     user.save(user)
     .then(data => {
+        var action = "Account updated profile"
+    
+        Helper.createAuditLog(action,req.type,req.id)
         return res.status(200).json({
             status: 'success',
             msg: 'User profile successfully updated',
@@ -273,6 +279,10 @@ exports.currProjects = async function (req, res, next) {
             data: {}
         });
     });   
+
+    var action = "Account updated email"
+    
+    Helper.createAuditLog(action,req.type,req.id)
 
     return res.status(200).json({
         status: 'success',
