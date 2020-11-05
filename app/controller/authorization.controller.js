@@ -249,18 +249,26 @@ exports.postLogin = async function (req, res, next) {
 
    if(saltedHashPassword === user.password) {
     let token = TokenSign(user.id, user.role, type);
+    
+    Helper.createAuditLog("Account log in", type, user.id)
+
     return res.status(200).json({
         status: 'success',
         msg: 'You have successfully sign in!',
         data: { token: token, user: user, accountType: type }
     });
    } else {
+
+    Helper.createAuditLog("Account attempted login password mismatch", type, user.id)
+
     return res.status(500).json({
         status: 'error',
         msg: 'Password mismatch!',
         data: {}
     });
    }
+
+
 }
 
 exports.userChangePassword = async function (req, res, next) {
@@ -317,6 +325,8 @@ exports.userChangePassword = async function (req, res, next) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    Helper.createAuditLog("User change password", "user","user.id");
 }
 
 exports.institutionChangePassword = async function (req, res, next) {
@@ -443,6 +453,9 @@ exports.postChangePasswordRequest = async function (req, res) {
                     data: {}
                 });
             } else {
+
+                Helper.createAuditLog("Account requested for password reset", type, account.id)
+
                 return res.status(200).json({
                     status: 'success',
                     msg: 'Please check your email to reset the password.',
@@ -544,6 +557,7 @@ exports.postUpdatePassword = async function(req, res) {
 
             user.save(user)
             .then(data => {
+                Helper.createAuditLog("Account password succeffuly reset", "user", user.id)
                 res.render('success-reset', { title: "Reset password"});
                 return;
             }).catch(err => {
@@ -578,6 +592,7 @@ exports.postUpdatePassword = async function(req, res) {
 
             institution.save(institution)
             .then(data => {
+                Helper.createAuditLog("Account password succeffuly reset", "institution", institution.id)
                 res.render('success-reset', { title: "Reset password"});
                 return;
             }).catch(err => {
@@ -714,6 +729,7 @@ exports.verifyRequest = async function(req,res) {
     
     verifyrequest.save(verifyrequest)
     .then(data => {
+        Helper.createAuditLog("Account requested for verification", "user", user.id)
         return res.status(200).json({
             status: 'success',
             msg: 'Verification request successfully sent!',

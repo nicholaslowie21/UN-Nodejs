@@ -191,6 +191,11 @@ exports.reqResource = async function (req, res) {
 
     resourcereq.save(resourcereq)
     .then(data => {
+        var action = "Account requested a resource: "+resource.title+" ("+resource.id+", "+req.body.resType+")"
+        action += " for project: "+project.title+" ("+project.id+","+project.code+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource request successfully created',
@@ -339,7 +344,7 @@ exports.reqAutoResource = async function (req, res) {
 
     await resourceneed.save(resourceneed)
     .then(data => {
-        console.log(data)
+        // console.log(data)
         theResourceNeed = data;
     }).catch(err => {
         return res.status(500).json({
@@ -361,6 +366,10 @@ exports.reqAutoResource = async function (req, res) {
 
     resourcereq.save(resourcereq)
     .then(data => {
+        var action = "Account requested a resource (auto): "+resource.title+" ("+resource.id+", "+req.body.resType+")"
+        action += " for project: "+project.title+" ("+project.id+","+project.code+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
         return res.status(200).json({
             status: 'success',
             msg: 'Resource request successfully created',
@@ -549,6 +558,11 @@ exports.useKnowledgeResource = async function (req, res) {
             contributions.push(contribution)
         }
 
+        var action = "Account use a knowledge resource: "+resource.title+" ("+resource.id+", "+"knowledge"+")"
+        action += " for project: "+project.title+" ("+project.id+","+project.code+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Knowledge resource successfully used',
@@ -722,6 +736,11 @@ exports.useAutoKnowledgeResource = async function (req, res) {
             })
             contributions.push(contribution)
         }
+
+        var action = "Account use a knowledge resource (auto): "+resource.title+" ("+resource.id+", "+"knowledge"+")"
+        action += " for project: "+project.title+" ("+project.id+","+project.code+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
 
         return res.status(200).json({
             status: 'success',
@@ -2045,6 +2064,12 @@ exports.reqProject = async function (req, res) {
 
     projectreq.save(projectreq)
     .then(data => {
+        var action = "Account request to contribute to project: "+project.title+" ("+project.id+", "+project.code+")"
+        action += " for resourceneed: "+resourceneed.title+" ("+resourceneed.id+","+req.body.resType+") "
+        action += " using resource: "+resource.title+" ("+resource.id+","+req.body.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project request successfully created',
@@ -2101,7 +2126,7 @@ exports.contributeMoney = async function (req, res) {
     if(!resourceneed)
     return res.status(500).json({
         status: 'error',
-        msg: 'Such item resource need not found!',
+        msg: 'Such money resource need not found!',
         data: {}
     });
 
@@ -2209,6 +2234,12 @@ exports.contributeMoney = async function (req, res) {
 
     projectreq.save(projectreq)
     .then(data => {
+        var action = "Account request to contribute money to project: "+project.title+" ("+project.id+", "+project.code+")"
+        action += " for resourceneed: "+resourceneed.title+" ("+resourceneed.id+","+"money"+") "
+        action += " amount: $"+req.body.moneySum+" ("+moneyResId+","+"money"+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Money contribution request successfully created',
@@ -2954,6 +2985,12 @@ exports.acceptProjectReq = async function (req, res) {
 
     projectReq.save(projectReq)
     .then(data => {
+        var action = "Account accept contribution request to project: "+project.title+" ("+project.id+", "+project.code+")"
+        action += " for resourceneed: "+resourceneed.title+" ("+resourceneed.id+","+req.body.resType+") "
+        action += " for project request: ("+data.id+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully accepted',
@@ -3033,6 +3070,12 @@ exports.declineProjectReq = async function (req, res) {
 
     projectReq.save(projectReq)
     .then(data => {
+        var action = "Account decline contribution request to project: "+project.title+" ("+project.id+", "+project.code+")"
+        action += " for resourceneed: "+resourceneed.title+" ("+resourceneed.id+","+req.body.resType+") "
+        action += " for project request: ("+data.id+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully declined',
@@ -3131,6 +3174,12 @@ exports.cancelProjectReq = async function (req, res) {
 
     projectReq.save(projectReq)
     .then(data => {
+        var action = "Account cancel contribution request to project: "+project.title+" ("+project.id+", "+project.code+")"
+        action += " for resourceneed: "+resourceneed.title+" ("+resourceneed.id+","+req.body.resType+") "
+        action += " for project request: ("+data.id+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully cancelled',
@@ -3311,6 +3360,12 @@ exports.completeProjectReq = async function (req, res) {
 
     projectReq.save(projectReq)
     .then(data => {
+        var action = "Account mark contribution request as complete to project: "+project.title+" ("+project.id+", "+project.code+")"
+        action += " for resourceneed: "+resourceneed.title+" ("+resourceneed.id+","+req.body.resType+") "
+        action += " for project request: ("+data.id+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully completed',
@@ -3392,6 +3447,12 @@ exports.acceptResourceReq = async function (req, res) {
 
     resourceReq.save(resourceReq)
     .then(data => {
+        var action = "Account accepted resource request : ("+resourceReq.id+", "+"resource request id"+")"
+        action += " for resource: ("+resourceReq.resourceId+","+resourceReq.resType+") "
+        action += " for resource need: ("+resourceReq.needId+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource Request successfully accepted',
@@ -3471,6 +3532,12 @@ exports.declineResourceReq = async function (req, res) {
 
     resourceReq.save(resourceReq)
     .then(data => {
+        var action = "Account declined resource request : ("+resourceReq.id+", "+"resource request id"+")"
+        action += " for resource: ("+resourceReq.resourceId+","+resourceReq.resType+") "
+        action += " for resource need: ("+resourceReq.needId+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource Request successfully declined',
@@ -3585,6 +3652,12 @@ exports.cancelResourceReq = async function (req, res) {
 
     resourceReq.save(resourceReq)
     .then(data => {
+        var action = "Account cancelled resource request : ("+resourceReq.id+", "+"resource request id"+")"
+        action += " for resource: ("+resourceReq.resourceId+","+resourceReq.resType+") "
+        action += " for resource need: ("+resourceReq.needId+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource Request successfully cancelled',
@@ -3748,6 +3821,12 @@ exports.completeResourceReq = async function (req, res) {
 
     resourceReq.save(resourceReq)
     .then(data => {
+        var action = "Account mark complete resource request : ("+resourceReq.id+", "+"resource request id"+")"
+        action += " for resource: ("+resourceReq.resourceId+","+resourceReq.resType+") "
+        action += " for resource need: ("+resourceReq.needId+","+data.resType+")"
+
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource Request successfully completed',

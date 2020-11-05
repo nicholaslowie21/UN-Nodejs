@@ -3,8 +3,10 @@ const nodemailer = require('nodemailer');
 const { body, validationResult, oneOf, check } = require('express-validator');
 const db = require('../models')
 const ProfileFeed = db.profilefeed;
+const AuditLog = db.auditlog;
 
 const { networkInterfaces } = require('os');
+const contactcardModel = require('../models/contactcard.model');
 
 const nets = networkInterfaces();
 const results = {}; 
@@ -48,13 +50,24 @@ exports.createProfileFeed = function(title, desc, accountId, accountType) {
   });
 
   pf.save(pf).catch(err => {
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Profile feed creation error: ' + err.message,
-            data: {}
-        });
+      console.log('Error: (profileFeedHelper) '+err.message)
+      return
     });
 }
+
+exports.createAuditLog = function(action, targetType, targetId) {
+  const log = new AuditLog({
+		action: action,
+    targetType: targetType,
+    targetId: targetId
+  });
+
+  log.save(log).catch(err => {
+    console.log('Error: (auditLogHelper) '+err.message)
+    return
+  });
+}
+
 
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {

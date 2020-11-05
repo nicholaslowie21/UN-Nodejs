@@ -33,5 +33,6 @@ db.projectevent = require("./projectevent.model")(mongoose);
 db.voucher = require("./voucher.model")(mongoose);
 db.announcement = require("./announcement.model")(mongoose);
 db.report = require("./report.model")(mongoose);
+db.auditlog = require("./auditlog.model")(mongoose);
 
 module.exports = db;
