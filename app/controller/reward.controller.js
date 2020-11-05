@@ -583,7 +583,7 @@ exports.redeemReward = async function (req, res){
     if(reward.point > theOwner.wallet)
     return res.status(500).json({
         status: 'error',
-        msg: 'Your account waller point is not sufficient!',
+        msg: 'Your account wallet point is not sufficient!',
         data: {}
     });
 
