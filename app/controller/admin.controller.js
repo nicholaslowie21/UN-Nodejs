@@ -3,6 +3,8 @@ const db = require('../models')
 const Users = db.users
 const Projects = db.project
 const Institutions = db.institution
+const Reward = db.reward
+const AuditLog = db.auditlog
 const Helper = require('../service/helper.service')
 
 exports.searchUsers = async function (req, res){
@@ -20,6 +22,10 @@ exports.searchUsers = async function (req, res){
             data: {}
         });
     }
+    
+    var action = "Account search for users, keywords (username): "+req.query.username
+    
+    Helper.createAuditLog(action,"admin",req.id)
 
     return res.status(200).json({
         status: 'success',
@@ -43,6 +49,10 @@ exports.searchInstitutions = async function (req, res){
             data: {}
         });
     }
+
+    var action = "Account search for institutions, keywords (username): "+req.query.username
+    
+    Helper.createAuditLog(action,"admin",req.id)
 
     return res.status(200).json({
         status: 'success',
@@ -153,6 +163,10 @@ exports.assignRegionalAdmin = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Account assigned "+target.username+" as regional admin"
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.assignAdmin = async function (req, res) {
@@ -197,6 +211,10 @@ exports.assignAdmin = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Account assigned "+target.username+" as admin"
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.assignAdminLead = async function (req, res) {
@@ -242,6 +260,10 @@ exports.assignAdminLead = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Account assigned "+target.username+" as admin lead"
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 // demotion of any type of admin uses this function since any demotion is back to user
@@ -287,6 +309,10 @@ exports.assignUser = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Account demoted "+target.username+" back as user"
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.suspendUser = async function (req, res) {
@@ -331,6 +357,10 @@ exports.suspendUser = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Suspended an account: "+target.username
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.suspendInstitution = async function (req, res) {
@@ -380,6 +410,10 @@ exports.suspendInstitution = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Suspended an institution account: "+target.username
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.activateUser = async function (req, res) {
@@ -424,6 +458,10 @@ exports.activateUser = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Re-activate an account: "+target.username
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.activateInstitution = async function (req, res) {
@@ -473,6 +511,10 @@ exports.activateInstitution = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Re-activate an institution account: "+target.username
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.suspendProject = async function (req, res) {
@@ -528,6 +570,10 @@ exports.suspendProject = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Suspended a project: "+target.title
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.activateProject = async function (req, res) {
@@ -585,6 +631,154 @@ exports.activateProject = async function (req, res) {
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    var action = "Re-activate a project "+target.title
+    
+    Helper.createAuditLog(action,"admin",req.id)
+}
+
+exports.getAuditLogs = async function (req, res) {
+    const logs = await AuditLog.find({ 'targetId': req.query.targetId, 'targetType': req.query.targetType }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!logs) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Logs not found!',
+        data: {}
+    });
+
+    logs.reverse();
+
+    var action = "Retrieved logs for "+req.query.targetId+", "+req.query.targetType
+    
+    Helper.createAuditLog(action,"admin",req.id)
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Log successfully retrieved!',
+        data: { logs: logs }
+    });
+}
+
+exports.exportAuditLog = async function (req, res) {
+    const logs = await AuditLog.find({ 'targetId': req.query.targetId, 'targetType': req.query.targetType }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!logs) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Logs not found!',
+        data: {}
+    });
+
+    logs.reverse();
+
+    var title = ""
+    var target;
+    if(req.query.targetType === 'admin' || req.query.targetType === 'user') {
+        target = await Users.findOne({ '_id': req.query.targetId }, function (err) {
+            if (err) return handleError(err);
+        }); 
+        title = target.username
+    } else if(req.query.targetType === 'institution') {
+        target = await Institutions.findOne({ '_id': req.query.targetId }, function (err) {
+            if (err) return handleError(err);
+        }); 
+        title = target.username
+    } else if(req.query.targetType === 'reward') {
+        target = await Reward.findOne({ '_id': req.query.targetId }, function (err) {
+            if (err) return handleError(err);
+        }); 
+        title = target.title
+    } else if(req.query.targetType === 'project') {
+        target = await Projects.findOne({ '_id': req.query.targetId }, function (err) {
+            if (err) return handleError(err);
+        }); 
+        title = target.title
+    }
+
+    if(!target)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong! Target not found.',
+        data: {}
+    });
+
+    var pdf = require("pdf-creator-node");
+    var fs = require('fs');
+
+    let report = `
+    <html>
+    <body style="font-size: 20px">
+        <h1> Subject: ${title}</h1>
+        <ul>
+            {{#each logs}}
+            <li>Action: {{this.action}}</li>
+            <li>Created At: {{this.createdAt}}</li>
+            <br>
+        {{/each}}
+        </ul>
+    </body>
+    </html>
+    `
+    var options = {
+        format: "A4",
+        orientation: "portrait",
+        border: "10mm",
+        header: {
+            height: "45mm",
+            contents: '<div style="text-align: center;"><h1>KoCoSD Audit Logs</h1></div>'
+        }
+    };
+
+    var theData = []
+
+    for(var i = 0; i < logs.length; i++) {
+        var theItem = {
+            action: logs[i].action,
+            createdAt: moment.tz(logs[i].createdAt, 'Asia/Singapore').format('LLLL')
+        }
+        theData.push(theItem)
+    }
+
+    let dir = 'public/auditLogs'
+        
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+
+    var thePath = `/public/auditLogs/${req.query.targetId}-auditLogs-${Date.now()}.pdf` 
+    var document = {
+        html: report,
+        data: {
+            logs: theData
+        },
+        path: "."+thePath
+    };
+
+    pdf.create(document, options)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Audit log export link successfully generated!',
+            data: { thePath: thePath }
+        });
+    })
+    .catch(error => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong!'+error.message,
+            data: { }
+        });
+    });
+
+    var action = "Generated export logs for "+req.query.targetId+", "+req.query.targetType
+    action += " file path: "+thePath
+    
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 handleError = (err) => {

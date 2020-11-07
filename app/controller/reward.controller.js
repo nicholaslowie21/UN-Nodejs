@@ -228,6 +228,9 @@ exports.requestReward = async function (req, res){
         var action = "Account offered a reward request "+ data.title +" ("+data.id+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+            
+        action = "Reward request is offered"
+        Helper.createAuditLog(action,"reward",data.id)
 
         return res.status(200).json({
             status: 'success',
@@ -325,6 +328,9 @@ exports.cancelReward = async function (req, res){
         var action = "Account cancelled a reward offer request"+ data.title +" ("+data.id+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+
+        action = "Reward request is canceled"
+        Helper.createAuditLog(action,"reward",data.id)
 
         return res.status(200).json({
             status: 'success',
@@ -630,6 +636,10 @@ exports.redeemReward = async function (req, res){
     
         Helper.createAuditLog(action,req.type,req.id)
 
+        action = "Reward is redeemed by " + theOwner.username +" (username) "
+        action =+ "voucher: "+voucher.code+" ("+data.id+")"
+        Helper.createAuditLog(action,"reward",data.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward successfully redeemed!',
@@ -834,6 +844,9 @@ exports.createReward = async function (req, res){
     
         Helper.createAuditLog(action,"admin",req.id)
 
+        action = "Reward is created"
+        Helper.createAuditLog(action,"reward",data.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer successfully created',
@@ -962,6 +975,9 @@ exports.updateReward = async function (req, res){
         var action = "Account updated a reward "+ data.title +" ("+data.id+")"
     
         Helper.createAuditLog(action,"admin",req.id)
+
+        action = "Reward detail is updated"
+        Helper.createAuditLog(action,"reward",data.id)
 
         return res.status(200).json({
             status: 'success',
@@ -1303,6 +1319,9 @@ exports.validateReward = async function (req, res){
         var action = "Account validated a reward request "+ data.title +" ("+data.id+") action: "+data.status
     
         Helper.createAuditLog(action,"admin",req.id)
+        
+        action = "Reward request is validated, action: "+data.status
+        Helper.createAuditLog(action,"reward",data.id)
 
         return res.status(200).json({
             status: 'success',
@@ -1367,6 +1386,9 @@ exports.deleteReward = async function (req, res){
         var action = "Account deleted a reward "+ data.title +" ("+data.id+")"
     
         Helper.createAuditLog(action,"admin",req.id)
+
+        action = "Reward is deleted"
+        Helper.createAuditLog(action,"reward",data.id)
 
         return res.status(200).json({
             status: 'success',

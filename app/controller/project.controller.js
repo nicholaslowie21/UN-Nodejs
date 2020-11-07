@@ -180,6 +180,10 @@ exports.createPost = async function (req, res){
     
         Helper.createAuditLog(action,req.type,req.id)
 
+        var action = "Project added a post: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Post successfully created',
@@ -285,6 +289,10 @@ exports.updatePost = async function (req, res){
     
         Helper.createAuditLog(action,req.type,req.id)
 
+        var action = "Project updated a post: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Post successfully updated',
@@ -359,6 +367,10 @@ exports.deletePost = async function (req, res){
     
         Helper.createAuditLog(action,req.type,req.id)
 
+        var action = "Project deleted a post: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Post successfully deleted',
@@ -432,6 +444,10 @@ exports.deletePostPic = async function (req, res){
         var action = "Account deleted a Project Post picture: "+ data.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project deleted a post picture: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',
@@ -617,7 +633,6 @@ exports.createPostComment = async function (req, res){
 }
 
 exports.createProjectEvent = async function (req, res){
-
     const project = await Projects.findOne({ '_id': req.body.projectId, 'status':'ongoing' }, function (err) {
         if (err)
         return res.status(500).json({
@@ -653,6 +668,10 @@ exports.createProjectEvent = async function (req, res){
     
         Helper.createAuditLog(action,req.type,req.id)
 
+        var action = "Project added a milestone: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Event successfully created',
@@ -668,7 +687,6 @@ exports.createProjectEvent = async function (req, res){
 }
 
 exports.updateProjectEvent = async function (req, res){
-
     const projectEvent = await ProjectEvent.findOne({ '_id': req.body.eventId, 'status':'active' }, function (err) {
         if (err)
         return res.status(500).json({
@@ -699,6 +717,10 @@ exports.updateProjectEvent = async function (req, res){
     
         Helper.createAuditLog(action,req.type,req.id)
 
+        var action = "Project updated a milestone: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Event successfully updated!',
@@ -714,7 +736,6 @@ exports.updateProjectEvent = async function (req, res){
 }
 
 exports.deleteProjectEvent = async function (req, res){
-
     const projectEvent = await ProjectEvent.findOne({ '_id': req.query.eventId }, function (err) {
         if (err)
         return res.status(500).json({
@@ -738,6 +759,10 @@ exports.deleteProjectEvent = async function (req, res){
         var action = "Account deleted a milestone "+ data.title +" ("+data.id+")" +" for a project: "+ " ("+data.projectId+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project deleted a milestone: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',
@@ -1102,7 +1127,9 @@ exports.projectPicture = async function (req, res){
     
     Helper.createAuditLog(action,req.type,req.id)
 
-
+    var action = "Project updated its picture: "+ req.file.path 
+    
+    Helper.createAuditLog(action,"project",project.id)
 }
 
 exports.viewProject = async function (req, res) {
@@ -1268,6 +1295,10 @@ exports.createProject = async function (req, res){
     
         Helper.createAuditLog(action,req.type,req.id)
 
+        action = "Project created"
+    
+        Helper.createAuditLog(action,"project",data.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project successfully created!',
@@ -1351,6 +1382,10 @@ exports.postUpdateProject = async function (req, res) {
         var action = "Account updated a project: "+project.title+" ("+project.id+", "+project.code+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+
+        action = "Project details updated"
+    
+        Helper.createAuditLog(action,"project",data.id)
 
         return res.status(200).json({
             status: 'success',
@@ -1458,6 +1493,10 @@ exports.completeProject = async function (req, res) {
     var action = "Account mark project as completed for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
     Helper.createAuditLog(action,req.type,req.id)
+
+    var action = "Project marked as completed" 
+    
+    Helper.createAuditLog(action,"project",project.id)
 
     var founderContribution = {
         contributor : project.host,
@@ -1721,10 +1760,14 @@ exports.deleteProject = async function (req, res) {
             });
         });
 
-        
         var action = "Account deleted a project: "+project.title+" ("+data.id+", "+project.code+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+
+        action = "Project deleted"
+    
+        Helper.createAuditLog(action,"project",data.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project successfully deleted',
@@ -2016,10 +2059,13 @@ exports.addAdmin = async function (req, res) {
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
 
-    var action = "Account assigned user:"+ user.name +" ("+user.id+", "+ user.username +")" +" as admin for a project: "+project.title+" ("+project.id+", "+project.code+")"
+    var action = "Account assigned user: "+ user.name +" ("+user.id+", "+ user.username +")" +" as admin for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
     Helper.createAuditLog(action,req.type,req.id)
 
+    var action = "Project added an admin: "+ user.name +" ("+user.id+", "+ user.username +")" 
+    
+    Helper.createAuditLog(action,"project",project.id)
 }
 
 exports.deleteAdmin = async function (req, res) {
@@ -2133,6 +2179,9 @@ exports.deleteAdmin = async function (req, res) {
     
     Helper.createAuditLog(action,req.type,req.id)
 
+    var action = "Project removed an admin: "+ user.name +" ("+user.id+", "+ user.username +")" 
+    
+    Helper.createAuditLog(action,"project",project.id)
 }
 
 exports.searchUsers = async function (req, res){
@@ -2283,6 +2332,10 @@ exports.createKPI = async function (req, res) {
         var action = "Account created KPI:"+ kpi.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project added a KPI: "+ kpi.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
         
         return res.status(200).json({
             status: 'success',
@@ -2347,6 +2400,10 @@ exports.updateKPI = async function (req, res) {
         var action = "Account updated KPI:"+ kpi.title +" ("+data.id+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
         Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project updated a KPI: "+ kpi.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',
@@ -2414,6 +2471,10 @@ exports.deleteKPI = async function (req, res) {
     var action = "Account deleted KPI:"+ kpi.title +" ("+req.body.kpiId+")" +" for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
     Helper.createAuditLog(action,req.type,req.id)
+
+    var action = "Project deleted a KPI: "+ kpi.title +" ("+data.id+")" 
+    
+    Helper.createAuditLog(action,"project",project.id)
 
     return res.status(200).json({
         status: 'success',
@@ -2568,6 +2629,15 @@ exports.createResourceNeed = async function (req, res){
 
     resourceneed.save(resourceneed)
     .then(data => {
+
+        var action = "Account added a resource need: "+ data.title +" ("+data.id+")"
+        action += " for a project: "+project.title+" ("+project.id+")" 
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project added a resource need: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',
@@ -2731,6 +2801,15 @@ exports.editResourceNeed = async function (req, res){
     resourceneed.save(resourceneed)
     .then(data => {
 
+        var action = "Account edited a resource need: "+ data.title +" ("+data.id+")"
+        action += " for a project: "+project.title+" ("+project.id+")" 
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project edited a resource need: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource need successfully updated!',
@@ -2865,6 +2944,15 @@ exports.deleteResourceNeed = async function (req, res){
     resourceneed.save(resourceneed)
     .then(data => {
 
+        var action = "Account removed a resource need: "+ data.title +" ("+data.id+")"
+        action += " for a project: "+project.title+" ("+project.id+")" 
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project deleted a resource need: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource need successfully deleted!',
@@ -2886,7 +2974,6 @@ exports.deleteResourceNeed = async function (req, res){
         contributions[i].status = "closed"
         contributions[i].save()
     }
-
     
     for(var i = 0 ; i < contributions.length; i++) {
         removeContributionEmail(contributions[i],project.code)
@@ -3014,6 +3101,15 @@ exports.removeContribution = async function (req, res){
 
     contribution.save(contribution)
     .then(data => {
+
+        var action = "Account removed a contribution: ("+data.id+")"
+        action += " for a project: "+project.title+" ("+project.id+")" 
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project's contribution removed: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',
@@ -3174,6 +3270,15 @@ exports.updateContributionRating = async function (req, res){
 
     contribution.save(contribution)
     .then(data => {
+
+        var action = "Account updated a contribution rating: ("+data.id+")"
+        action += " for a project: "+project.title+" ("+project.id+")" 
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
+        var action = "Project's contribution rating updated for contributionss: "+ data.title +" ("+data.id+")" 
+    
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',

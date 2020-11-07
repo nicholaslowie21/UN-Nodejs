@@ -196,6 +196,10 @@ exports.reqResource = async function (req, res) {
 
         Helper.createAuditLog(action,req.type,req.id)
 
+        action = "Project requested a resource: "+ resource.title +" ("+resource.id+", "+req.body.resType+")"
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource request successfully created',
@@ -370,6 +374,10 @@ exports.reqAutoResource = async function (req, res) {
         action += " for project: "+project.title+" ("+project.id+","+project.code+")"
 
         Helper.createAuditLog(action,req.type,req.id)
+
+        action = "Project requested a resource (auto): "+ resource.title +" ("+resource.id+", "+req.body.resType+")"
+    
+        Helper.createAuditLog(action,"project",project.id)
         return res.status(200).json({
             status: 'success',
             msg: 'Resource request successfully created',
@@ -563,6 +571,10 @@ exports.useKnowledgeResource = async function (req, res) {
 
         Helper.createAuditLog(action,req.type,req.id)
 
+        action = "Project use a knowledge resource: "+ resource.title +" ("+resource.id+", "+"knowledge"+")"
+    
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Knowledge resource successfully used',
@@ -741,6 +753,10 @@ exports.useAutoKnowledgeResource = async function (req, res) {
         action += " for project: "+project.title+" ("+project.id+","+project.code+")"
 
         Helper.createAuditLog(action,req.type,req.id)
+
+        action = "Project use a knowledge resource(auto): "+ resource.title +" ("+resource.id+", "+"knowledge"+")"
+    
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',
@@ -2900,7 +2916,6 @@ exports.getProjectPageResourceReq = async function (req, res) {
 }
 
 exports.acceptProjectReq = async function (req, res) {    
-    
     const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId, 'status': 'pending' }, function (err) {
         if (err)
         return res.status(500).json({
@@ -2991,6 +3006,10 @@ exports.acceptProjectReq = async function (req, res) {
 
         Helper.createAuditLog(action,req.type,req.id)
 
+        action = "Project accepted a contribution request for resourceneed: "+ resourceneed.title +" ("+resourceneed.id+", "+req.body.resType+")"
+        action += " for project request: ("+data.id+","+data.resType+")"
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully accepted',
@@ -3006,7 +3025,6 @@ exports.acceptProjectReq = async function (req, res) {
 }
 
 exports.declineProjectReq = async function (req, res) {    
-    
     const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId, 'status': 'pending' }, function (err) {
         if (err)
         return res.status(500).json({
@@ -3076,6 +3094,10 @@ exports.declineProjectReq = async function (req, res) {
 
         Helper.createAuditLog(action,req.type,req.id)
 
+        action = "Project declined a contribution request for resourceneed: "+ resourceneed.title +" ("+resourceneed.id+", "+req.body.resType+")"
+        action += " for project request: ("+data.id+","+data.resType+")"
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully declined',
@@ -3091,7 +3113,6 @@ exports.declineProjectReq = async function (req, res) {
 }
 
 exports.cancelProjectReq = async function (req, res) {    
-    
     const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId }, function (err) {
         if (err)
         return res.status(500).json({
@@ -3180,6 +3201,11 @@ exports.cancelProjectReq = async function (req, res) {
 
         Helper.createAuditLog(action,req.type,req.id)
 
+        action = "Project declined a contribution request for resourceneed: "+ resourceneed.title +" ("+resourceneed.id+", "+req.body.resType+")"
+        action += " for project request: ("+data.id+","+data.resType+")"
+
+        Helper.createAuditLog(action,"project",project.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully cancelled',
@@ -3195,7 +3221,6 @@ exports.cancelProjectReq = async function (req, res) {
 }
 
 exports.completeProjectReq = async function (req, res) {    
-    
     const projectReq = await ProjectReq.findOne({ '_id': req.body.projectReqId, 'status': 'accepted' }, function (err) {
         if (err)
         return res.status(500).json({
@@ -3365,6 +3390,11 @@ exports.completeProjectReq = async function (req, res) {
         action += " for project request: ("+data.id+","+data.resType+")"
 
         Helper.createAuditLog(action,req.type,req.id)
+
+        action = "Project marked a contribution request as completed for resourceneed: "+ resourceneed.title +" ("+resourceneed.id+", "+req.body.resType+")"
+        action += " for project request: ("+data.id+","+data.resType+")"
+
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',
@@ -3658,6 +3688,14 @@ exports.cancelResourceReq = async function (req, res) {
 
         Helper.createAuditLog(action,req.type,req.id)
 
+        if(data.cancelType === 'project') {
+            action = "Project cancelled a resource request : ("+resourceReq.id+", "+"resource request id"+")"
+            action += " for resource: ("+resourceReq.resourceId+","+resourceReq.resType+") "
+            action += " for resource need: ("+resourceReq.needId+","+data.resType+")" 
+            
+            Helper.createAuditLog(action,"project",project.id)
+        }
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource Request successfully cancelled',
@@ -3821,11 +3859,17 @@ exports.completeResourceReq = async function (req, res) {
 
     resourceReq.save(resourceReq)
     .then(data => {
-        var action = "Account mark complete resource request : ("+resourceReq.id+", "+"resource request id"+")"
+        var action = "Account marked complete resource request : ("+resourceReq.id+", "+"resource request id"+")"
         action += " for resource: ("+resourceReq.resourceId+","+resourceReq.resType+") "
         action += " for resource need: ("+resourceReq.needId+","+data.resType+")"
 
         Helper.createAuditLog(action,req.type,req.id)
+
+        action = "Project marked complete a resource request : ("+resourceReq.id+", "+"resource request id"+")"
+        action += " for resource: ("+resourceReq.resourceId+","+resourceReq.resType+") "
+        action += " for resource need: ("+resourceReq.needId+","+data.resType+")" 
+            
+        Helper.createAuditLog(action,"project",project.id)
 
         return res.status(200).json({
             status: 'success',

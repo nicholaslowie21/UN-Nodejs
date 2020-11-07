@@ -149,6 +149,11 @@ exports.profilePicture = async function (req, res){
 
     institution.save(institution)
     .then(data => {
+        
+        var action = "Account updated profile picture"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Account profile picture successfully updated',
@@ -199,6 +204,11 @@ exports.updateProfile = async function (req, res, next) {
 
     institution.save(institution)
     .then(data => {
+        
+        var action = "Account updated profile"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Account profile successfully updated',
@@ -259,6 +269,11 @@ exports.updateEmail = async function (req, res, next) {
 
     institution.save(institution)
     .then(data => {
+
+        var action = "Account updated email"
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Account email successfully updated',
@@ -362,6 +377,11 @@ exports.addMembers = async function(req,res) {
 
     institution.save(institution)
     .then(data => {
+        
+        var action = "Account added affiliated members: "+member.username
+    
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Institution members successfully updated',
@@ -422,6 +442,11 @@ exports.delMembers = async function(req,res) {
 
         await institution.save(institution)
         .then(data => {
+            
+            var action = "Account removed an affiliated member: "+member.username
+    
+            Helper.createAuditLog(action,req.type,req.id)
+
             return res.status(200).json({
                 status: 'success',
                 msg: 'Institution members successfully updated',
@@ -536,7 +561,6 @@ exports.pastProjects = async function (req, res, next) {
 exports.membersCSVProcessing = async function (req, res, next) {
     const csvFilePath = req.file.path;
 
-    console.log("here "+req.id)
     const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
         if (err) return handleError(err);
     });
@@ -600,6 +624,12 @@ exports.membersCSVProcessing = async function (req, res, next) {
             });  
             
             fs.unlinkSync(csvFilePath)
+
+            
+            var action = "Account added member csv file: "+req.file.path
+    
+            Helper.createAuditLog(action,req.type,req.id)
+
 
             return res.status(200).json({
                 status: 'success',

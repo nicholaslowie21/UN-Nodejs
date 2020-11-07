@@ -326,6 +326,11 @@ exports.chatAccount = async function (req, res) {
         });
     });
     
+    
+    var action = "Account opened a chat room with "+targetAccount.username
+    
+    Helper.createAuditLog(action,req.type,req.id)
+
     return res.status(200).json({
         status: 'success',
         msg: 'Chat room successfully entered',
@@ -416,16 +421,24 @@ exports.sendChat = async function (req, res) {
 
     
     chatRoom.lastMessage = req.body.message
+    var targetUsername = ''
     if(req.id === chatRoom.user1id) {
         chatRoom.user1read = true
         chatRoom.user2read = false
+        targetUsername = chatRoom.user2username
     } else if(req.id === chatRoom.user2id) {
         chatRoom.user1read = false
         chatRoom.user2read = true
+        targetUsername = chatRoom.user1username
     }
 
     await chatRoom.save(chatRoom)
     .then(data => {
+
+        
+        var action = "Account send a chat to "+targetUsername
+        
+        Helper.createAuditLog(action,req.type,req.id)
         
         return res.status(200).json({
             status: 'success',

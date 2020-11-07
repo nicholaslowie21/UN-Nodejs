@@ -20,6 +20,18 @@ exports.suspendUser = [
     body('targetId').exists()
 ]
 
+exports.getAuditLogs = [
+    body('role').exists().custom(async value => {
+        if (value == 'user') 
+            return Promise.reject('You are not authorised to retrieve this list!')
+    }),
+    query('targetId').exists(),
+    query('targetType').exists().custom(async value => {
+        if (value != 'project' && value != 'institution' && value != 'user' && value !='reward' && value !='admin') 
+            return Promise.reject('targetType is invalid!')
+    })
+]
+
 exports.suspendProject = [
     body('role').exists().custom(async value => {
         if (value == 'user') 
