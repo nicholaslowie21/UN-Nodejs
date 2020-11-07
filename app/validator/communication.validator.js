@@ -29,3 +29,18 @@ exports.sendChat = [
     body('roomId').exists(),
     body('message').exists()
 ]
+
+exports.markRead = [
+    body('roomId').exists()
+]
+
+exports.getRoomLists = [
+    query('chatType').exists().custom(async value => {
+        if (value != 'admin' && value != 'normal') 
+            return Promise.reject('The chat type is invalid!')
+    })
+]
+
+exports.getChats= [
+    query('roomId').exists()
+]

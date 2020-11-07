@@ -441,3 +441,207 @@ exports.sendChat = async function (req, res) {
     });
     
 }
+
+exports.markRead = async function (req, res) {
+    var chatRoom = await ChatRoom.findOne({ '_id': req.body.roomId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!chatRoom)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such chat room!',
+        data: {}
+    });
+
+    var myAccount 
+    
+    if(req.type === 'user') {
+        myAccount = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    } else if(req.type === 'institution') {
+        myAccount = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    }  
+
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+    
+    if(req.id === chatRoom.user1id) {
+        chatRoom.user1read = true
+    } else if(req.id === chatRoom.user2id) {
+        chatRoom.user2read = true
+    }
+
+    await chatRoom.save(chatRoom)
+    .then(data => {
+        
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Chats successfully mark as read',
+            data: { chatRoom: chatRoom }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+    
+}
+
+exports.getRoomList = async function (req, res) {
+    var chatRooms = await ChatRoom.find({ 'status':'open','chatType':req.query.chatType, $or: [{user1id: req.id}, {user2id: req.id}]  }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!chatRooms)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such chat room!',
+        data: {}
+    });
+
+    var myAccount 
+    
+    if(req.type === 'user') {
+        myAccount = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    } else if(req.type === 'institution') {
+        myAccount = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    }  
+
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    chatRooms.reverse();
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Chat rooms successfully retrieved',
+        data: { chatRooms: chatRooms }
+    });
+}
+
+exports.getChats = async function (req, res) {
+    var chatRoom = await ChatRoom.findOne({ '_id': req.query.roomId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!chatRoom)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such chat room!',
+        data: {}
+    });
+
+    var myAccount 
+    
+    if(req.type === 'user') {
+        myAccount = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    } else if(req.type === 'institution') {
+        myAccount = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    }  
+
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+    
+    if(req.id === chatRoom.user1id) {
+        chatRoom.user1read = true
+    } else if(req.id === chatRoom.user2id) {
+        chatRoom.user2read = true
+    }
+
+    var chats = await Chat.find({ 'roomId': req.query.roomId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    await chatRoom.save(chatRoom)
+    .then(data => {
+        
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Chats successfully retrieved',
+            data: { chatRoom: chatRoom, chats: chats }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+    
+}

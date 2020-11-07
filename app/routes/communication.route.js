@@ -13,6 +13,8 @@ router.get('/announcement', auth, communicationController.getAnnouncement)
 
 router.post('/chat/chatAccount', auth, CommunicationValidator.chatAccount, Helper.ifErrors, communicationController.chatAccount)
 router.post('/chat/send', auth, CommunicationValidator.sendChat, Helper.ifErrors, communicationController.sendChat)
-
+router.post('/chat/read', auth, CommunicationValidator.markRead, Helper.ifErrors, communicationController.markRead)
+router.get('/chat/rooms', auth, CommunicationValidator.getRoomLists, Helper.ifErrors, communicationController.getRoomList)
+router.get('/chat/chats', auth, CommunicationValidator.getChats, Helper.ifErrors, communicationController.getChats)
 
 module.exports = router;
