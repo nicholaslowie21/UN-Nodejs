@@ -11,4 +11,8 @@ router.post('/editAnnouncement', auth, CommunicationValidator.editAnnouncement, 
 router.delete('/deleteAnnouncement', auth, CommunicationValidator.deleteAnnouncement, Helper.ifErrors, communicationController.deleteAnnouncement)
 router.get('/announcement', auth, communicationController.getAnnouncement)
 
+router.post('/chat/chatAccount', auth, CommunicationValidator.chatAccount, Helper.ifErrors, communicationController.chatAccount)
+router.post('/chat/send', auth, CommunicationValidator.sendChat, Helper.ifErrors, communicationController.sendChat)
+
+
 module.exports = router;

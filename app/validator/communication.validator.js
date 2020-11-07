@@ -15,3 +15,17 @@ exports.editAnnouncement = [
 exports.deleteAnnouncement = [
     query('announcementId').exists()
 ]
+
+exports.chatAccount = [
+    body('chatType').exists().custom(async value => {
+        if (value != 'admin' && value != 'normal') 
+            return Promise.reject('The chat type is invalid!')
+    }),
+    body('targetId').exists(),
+    body('targetType').exists()
+]
+
+exports.sendChat = [
+    body('roomId').exists(),
+    body('message').exists()
+]
