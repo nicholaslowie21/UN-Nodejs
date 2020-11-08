@@ -317,6 +317,37 @@ exports.chatAccount = async function (req, res) {
         });
     } 
 
+    var theTargetAcc = {
+        accountId: "",
+        accountType:""
+    }
+    if(chatRoom.user1id === req.id) {
+        theTargetAcc.accountId = chatRoom.user2id
+        theTargetAcc.accountType = chatRoom.user2type
+    } else if(chatRoom.user2id === req.id) {
+        theTargetAcc.accountId = chatRoom.user1id
+        theTargetAcc.accountType = chatRoom.user1type
+    } 
+
+    const theChatRoom = {
+        chatType: chatRoom.chatType,
+        status: chatRoom.status,
+        user1username: chatRoom.user1username,
+        user2username: chatRoom.user2username,
+        user1type: chatRoom.user1type,
+        user2type: chatRoom.user2type,
+        user1id: chatRoom.user1id,
+        user2id: chatRoom.user2id,
+        user1read: chatRoom.user1read,
+        user2read: chatRoom.user2read,
+        lastMessage: chatRoom.lastMessage,
+        createdAt: chatRoom.createdAt,
+        updatedAt: chatRoom.updatedAt,
+        targetImg: ""
+    };
+
+    theChatRoom.targetImg = await getTargetImg(theTargetAcc)
+
     var chats = await Chat.find({ 'roomId': chatRoom.id }, function (err) {
         if (err)
         return res.status(500).json({
@@ -334,7 +365,7 @@ exports.chatAccount = async function (req, res) {
     return res.status(200).json({
         status: 'success',
         msg: 'Chat room successfully entered',
-        data: { chatRoom: chatRoom, chats: chats }
+        data: { chatRoom: theChatRoom, chats: chats }
     });
 }
 
@@ -573,10 +604,48 @@ exports.getRoomList = async function (req, res) {
 
     chatRooms.reverse();
 
+    var theList = [];
+
+    for(var i = 0 ; i < chatRooms.length; i ++) {
+        const theChatRoom = {
+            chatType: chatRooms[i].chatType,
+            status: chatRooms[i].status,
+            user1username: chatRooms[i].user1username,
+            user2username: chatRooms[i].user2username,
+            user1type: chatRooms[i].user1type,
+            user2type: chatRooms[i].user2type,
+            user1id: chatRooms[i].user1id,
+            user2id: chatRooms[i].user2id,
+            user1read: chatRooms[i].user1read,
+            user2read: chatRooms[i].user2read,
+            lastMessage: chatRooms[i].lastMessage,
+            createdAt: chatRooms[i].createdAt,
+            updatedAt: chatRooms[i].updatedAt,
+            targetImg: ""
+        };
+
+        var theTargetAcc = {
+            accountId: "",
+            accountType:""
+        }
+        if(theChatRoom.user1id === req.id) {
+            theTargetAcc.accountId = theChatRoom.user2id
+            theTargetAcc.accountType = theChatRoom.user2type
+        } else if(theChatRoom.user2id === req.id) {
+            theTargetAcc.accountId = theChatRoom.user1id
+            theTargetAcc.accountType = theChatRoom.user1type
+        } 
+
+        theChatRoom.targetImg = await getTargetImg(theTargetAcc)
+
+        theList.push(theChatRoom)
+
+    }
+
     return res.status(200).json({
         status: 'success',
         msg: 'Chat rooms successfully retrieved',
-        data: { chatRooms: chatRooms }
+        data: { chatRooms: theList }
     });
 }
 
@@ -657,4 +726,31 @@ exports.getChats = async function (req, res) {
         });
     });
     
+}
+
+async function getTargetImg(theItem) {
+    var owner;
+
+    if(theItem.accountType === "user") {
+        owner = await User.findOne({ '_id': theItem.accountId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theItem.accountType === 'institution') {
+        owner = await Institution.findOne({ '_id': theItem.accountId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getTargetImg) Such account not found!")
+        return
+    }
+
+    return owner.ionicImg 
 }
