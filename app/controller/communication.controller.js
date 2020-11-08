@@ -281,7 +281,7 @@ exports.chatAccount = async function (req, res) {
         user2type = req.type
     }
 
-    var chatRoom = await ChatRoom.findOne({ 'status': 'open', 'user1id': user1.id, 'user2id': user2.id }, function (err) {
+    var chatRoom = await ChatRoom.findOne({ 'status': 'open', 'user1id': user1.id, 'user2id': user2.id, 'chatType':req.body.chatType }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
