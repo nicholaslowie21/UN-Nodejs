@@ -703,6 +703,21 @@ exports.getChats = async function (req, res) {
         chatRoom.user2read = true
     }
 
+    var theTargetAcc = {
+        accountId: "",
+        accountType:""
+    }
+    if(chatRoom.user1id === req.id) {
+        theTargetAcc.accountId = chatRoom.user2id
+        theTargetAcc.accountType = chatRoom.user2type
+    } else if(chatRoom.user2id === req.id) {
+        theTargetAcc.accountId = chatRoom.user1id
+        theTargetAcc.accountType = chatRoom.user1type
+    } 
+
+    var targetImg = ""
+    targetImg = await getTargetImg(theTargetAcc)
+
     var chats = await Chat.find({ 'roomId': req.query.roomId }, function (err) {
         if (err)
         return res.status(500).json({
@@ -718,7 +733,7 @@ exports.getChats = async function (req, res) {
         return res.status(200).json({
             status: 'success',
             msg: 'Chats successfully retrieved',
-            data: { chatRoom: chatRoom, chats: chats }
+            data: { targetImg: targetImg, chatRoom: chatRoom, chats: chats }
         });
     }).catch(err => {
         return res.status(500).json({
