@@ -330,6 +330,7 @@ exports.chatAccount = async function (req, res) {
     } 
 
     const theChatRoom = {
+        id: chatRoom.id,
         chatType: chatRoom.chatType,
         status: chatRoom.status,
         user1username: chatRoom.user1username,
@@ -608,6 +609,7 @@ exports.getRoomList = async function (req, res) {
 
     for(var i = 0 ; i < chatRooms.length; i ++) {
         const theChatRoom = {
+            id: chatRooms[i].id,
             chatType: chatRooms[i].chatType,
             status: chatRooms[i].status,
             user1username: chatRooms[i].user1username,
