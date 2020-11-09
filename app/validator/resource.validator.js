@@ -95,7 +95,6 @@ exports.updateKnowledgeResource = [
     body('title').exists(),
     body('desc').exists(),
     body('knowType').exists().custom(async value => {
-        console.log(value)
         if (value != 'patent' && value != 'publication' && value != 'other')
             return Promise.reject('Patent is not valid');
     }),
