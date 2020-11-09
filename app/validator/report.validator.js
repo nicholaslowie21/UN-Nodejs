@@ -24,7 +24,7 @@ exports.reportDetail = [
     query('reportId').exists()
 ]
 
-exports.filteredStatus = [
+exports.filteredRegional = [
     query('status').exists(),
     query('country').exists()
 ]
