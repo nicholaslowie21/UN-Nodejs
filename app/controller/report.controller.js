@@ -255,6 +255,45 @@ exports.filteredRegional = async function (req, res){
     });
 }
 
+exports.reportDetail = async function (req, res){
+    var report = await Report.findOne({ '_id': req.query.reportId}, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such report!',
+            data: {}
+        });
+    });
+
+    if(!report)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such report!',
+        data: {}
+    });
+
+    var theReport = JSON.parse(JSON.stringify(report))
+
+    await getReporterInfo(theReport)
+    if(theReport.reportType === "institution") await getInstitutionInfo(theReport)
+    else if(theReport.reportType === "user") await getUserInfo(theReport)
+    else if(theReport.reportType === "project") await getProjectInfo(theReport)
+    else if(theReport.reportType === "reward") await getRewardInfo(theReport)
+
+    if(theReport.targetUsername === "" && theReport.targetTitle === "")
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong when retrieving target!',
+        data: {}
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Report detail successfully retrieved',
+        data: { report: theReport }
+    });
+}
+
 exports.myReport = async function (req, res){
 
     reports = await Report.find({ 'status': req.query.status, 'reporterId':req.id, 'reporterType':req.type }, function (err) {

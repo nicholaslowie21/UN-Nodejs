@@ -20,6 +20,10 @@ exports.filteredStatus = [
     query('status').exists()
 ]
 
+exports.reportDetail = [
+    query('reportId').exists()
+]
+
 exports.filteredStatus = [
     query('status').exists(),
     query('country').exists()
