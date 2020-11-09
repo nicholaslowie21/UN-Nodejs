@@ -1025,7 +1025,14 @@ exports.getKnowledgeList = async function (req, res) {
             ownerName: "",
             ownerUsername: "",
             createdAt:"",
-            updatedAt:""
+            updatedAt:"",
+            knowType:"",
+            link:"",
+            patentNum:"",
+            expiry:"",
+            issn:"",
+            doi:"",
+            issueDate:""
         }
 
         resourceItem.id = knowledges[i].id
@@ -1038,7 +1045,14 @@ exports.getKnowledgeList = async function (req, res) {
         resourceItem.imgPath = knowledges[i].imgPath
         resourceItem.createdAt = knowledges[i].createdAt
         resourceItem.updatedAt = knowledges[i].updatedAt
-
+        resourceItem.knowType = knowledges[i].knowType
+        resourceItem.link = knowledges[i].link
+        resourceItem.patentNum = knowledges[i].patentNum
+        resourceItem.expiry = knowledges[i].expiry
+        resourceItem.issn = knowledges[i].issn
+        resourceItem.doi = knowledges[i].doi
+        resourceItem.issueDate = knowledges[i].issueDate
+        
         await getOwnerInfo(resourceItem)
 
         theList.push(resourceItem)
@@ -2291,6 +2305,7 @@ async function getOwnerInfo(resourceItem) {
     }
 
     if(!owner) {
+        console.log("a "+resourceItem.owner+" "+resourceItem.ownerType)
         console.log("error: (getHostInfo) Such account not found!")
         return
     }

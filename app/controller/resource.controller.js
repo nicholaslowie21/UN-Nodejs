@@ -1280,7 +1280,7 @@ exports.createKnowledge = async function (req, res) {
     const knowledge = new Knowledge({
 		title: req.body.title,
 		desc: req.body.desc,
-		owner: [{theId: theOwner.id, ownerType:req.body.type}],
+		owner: [{theId: theOwner.id, ownerType:req.type}],
         status: "active",
         attachment: theFilePath,
         knowType: req.body.knowType,
