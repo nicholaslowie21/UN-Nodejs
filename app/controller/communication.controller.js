@@ -557,8 +557,102 @@ exports.markRead = async function (req, res) {
     
 }
 
-exports.getRoomList = async function (req, res) {
+exports.getRoomListFiltered = async function (req, res) {
     var chatRooms = await ChatRoom.find({ 'status':'open','chatType':req.query.chatType, $or: [{user1id: req.id}, {user2id: req.id}]  }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was no such account!',
+            data: {}
+        });
+    });
+
+    if(!chatRooms)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such chat room!',
+        data: {}
+    });
+
+    var myAccount 
+    
+    if(req.type === 'user') {
+        myAccount = await User.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    } else if(req.type === 'institution') {
+        myAccount = await Institution.findOne({ '_id': req.id }, function (err) {
+            if (err)
+            return res.status(500).json({
+                status: 'error',
+                msg: 'There was no such account!',
+                data: {}
+            });
+        });
+    }  
+
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such account!',
+        data: {}
+    });
+
+    chatRooms.reverse();
+
+    var theList = [];
+
+    for(var i = 0 ; i < chatRooms.length; i ++) {
+        const theChatRoom = {
+            id: chatRooms[i].id,
+            chatType: chatRooms[i].chatType,
+            status: chatRooms[i].status,
+            user1username: chatRooms[i].user1username,
+            user2username: chatRooms[i].user2username,
+            user1type: chatRooms[i].user1type,
+            user2type: chatRooms[i].user2type,
+            user1id: chatRooms[i].user1id,
+            user2id: chatRooms[i].user2id,
+            user1read: chatRooms[i].user1read,
+            user2read: chatRooms[i].user2read,
+            lastMessage: chatRooms[i].lastMessage,
+            createdAt: chatRooms[i].createdAt,
+            updatedAt: chatRooms[i].updatedAt,
+            targetImg: ""
+        };
+
+        var theTargetAcc = {
+            accountId: "",
+            accountType:""
+        }
+        if(theChatRoom.user1id === req.id) {
+            theTargetAcc.accountId = theChatRoom.user2id
+            theTargetAcc.accountType = theChatRoom.user2type
+        } else if(theChatRoom.user2id === req.id) {
+            theTargetAcc.accountId = theChatRoom.user1id
+            theTargetAcc.accountType = theChatRoom.user1type
+        } 
+
+        theChatRoom.targetImg = await getTargetImg(theTargetAcc)
+
+        theList.push(theChatRoom)
+
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Filtered chat rooms successfully retrieved',
+        data: { chatRooms: theList }
+    });
+}
+
+exports.getRoomList = async function (req, res) {
+    var chatRooms = await ChatRoom.find({ 'status':'open', $or: [{user1id: req.id}, {user2id: req.id}]  }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
