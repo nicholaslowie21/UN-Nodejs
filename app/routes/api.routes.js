@@ -13,6 +13,7 @@ const rewardRouter = require('./reward.route')
 const mobileRouter = require('./mobile.route')
 const communicationRouter = require('./communication.route')
 const reportRouter = require('./report.route')
+const devRouter = require('./dev.route')
 
 router.use('/authorization', authorizationRouter)
 router.use('/user', userRouter)
@@ -26,5 +27,6 @@ router.use('/reward', rewardRouter)
 router.use('/mobile', mobileRouter)
 router.use('/communication', communicationRouter)
 router.use('/report', reportRouter)
+router.use('/dev', devRouter)
 
 module.exports = router;

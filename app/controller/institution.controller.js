@@ -640,7 +640,7 @@ exports.membersCSVProcessing = async function (req, res, next) {
         else {
             res.json({
                 status: 'error',
-                masg: 'There was an issue in the upload please try again'
+                msg: 'There was an issue in the upload please try again'
             });
         }
     }).catch(error => res.status(400).json({

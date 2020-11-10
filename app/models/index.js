@@ -36,5 +36,6 @@ db.report = require("./report.model")(mongoose);
 db.auditlog = require("./auditlog.model")(mongoose);
 db.chatroom = require("./chatroom.model")(mongoose);
 db.chat = require("./chat.model")(mongoose);
+db.target = require("./target.model")(mongoose);
 
 module.exports = db;
