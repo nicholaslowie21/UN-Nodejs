@@ -5,6 +5,7 @@ const Projects = db.project;
 const Badges = db.badge;
 const Institutions = db.institution;
 const Feed = db.profilefeed
+const Target = db.target
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
@@ -165,6 +166,24 @@ exports.updateUserProfile = async function (req, res, next) {
     user.SDGs = theSDGs;
     user.skills = theSkills;
 
+    var targetIds = user.targets
+    var theList = [];
+    if(targetIds){
+        for(var i = 0; i < targetIds.length; i++){
+            var target = await Target.findOne({ '_id': targetIds[i] }, function (err) {
+                if (err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'There was an issue retrieving the target!',
+                    data: {}
+                });
+            }); 
+
+            if(theSDGs.includes(target.SDG)) theList.push(target.id)
+        }
+    }
+    user.targets = theList
+    
     user.save(user)
     .then(data => {
         var action = "Account updated profile"

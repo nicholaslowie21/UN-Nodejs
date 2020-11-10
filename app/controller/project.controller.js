@@ -1377,6 +1377,25 @@ exports.postUpdateProject = async function (req, res) {
     project.rating = req.body.rating;
     project.SDGs = theSDGs;
 
+    var targetIds = project.targets
+    var theList = [];
+    if(targetIds){
+        for(var i = 0; i < targetIds.length; i++){
+            var target = await Target.findOne({ '_id': targetIds[i] }, function (err) {
+                if (err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'There was an issue retrieving the target!',
+                    data: {}
+                });
+            }); 
+
+            if(theSDGs.includes(target.SDG)) theList.push(target.id)
+        }
+    }
+
+    project.targets = theList
+
     project.save(project)
     .then(data => {
         var action = "Account updated a project: "+project.title+" ("+project.id+", "+project.code+")"

@@ -20,7 +20,8 @@ module.exports = mongoose => {
         projects: [String],
         SDGs: [Number],
         points: { type: Number, default: 0 },
-        tier: { type: String, default: '' }
+        tier: { type: String, default: '' },
+        targets: [String]
       },
       { timestamps: true }
     );

@@ -11,7 +11,8 @@ module.exports = mongoose => {
         code: { type: String, default: '' },
         imgPath: { type: String, default: '' },
         admins: [String],
-        SDGs: [Number]
+        SDGs: [Number],
+        targets: [String]
       },
       { timestamps: true }
     );

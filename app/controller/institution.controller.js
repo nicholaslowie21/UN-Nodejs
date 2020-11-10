@@ -202,6 +202,25 @@ exports.updateProfile = async function (req, res, next) {
     institution.website = req.body.website;
     institution.SDGs = theSDGs;
 
+    var targetIds = institution.targets
+    var theList = [];
+    if(targetIds){
+        for(var i = 0; i < targetIds.length; i++){
+            var target = await Target.findOne({ '_id': targetIds[i] }, function (err) {
+                if (err)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'There was an issue retrieving the target!',
+                    data: {}
+                });
+            }); 
+
+            if(theSDGs.includes(target.SDG)) theList.push(target.id)
+        }
+    }
+
+    institution.targets = theList
+
     institution.save(institution)
     .then(data => {
         
