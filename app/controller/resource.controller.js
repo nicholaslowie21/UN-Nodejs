@@ -1309,8 +1309,8 @@ exports.createKnowledge = async function (req, res) {
 
     title = "Knowledge Resource"
     desc = "Offered a knowledge resource: " + knowledge.title
-    accountId = theOwner.id
-    accountType = req.body.type
+    accountId = req.id
+    accountType = req.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
 }
