@@ -603,8 +603,6 @@ exports.getRoomListFiltered = async function (req, res) {
         data: {}
     });
 
-    chatRooms.reverse();
-
     var theList = [];
 
     for(var i = 0 ; i < chatRooms.length; i ++) {
@@ -644,6 +642,7 @@ exports.getRoomListFiltered = async function (req, res) {
 
     }
 
+    theList.reverse()
     return res.status(200).json({
         status: 'success',
         msg: 'Filtered chat rooms successfully retrieved',
@@ -697,8 +696,6 @@ exports.getRoomList = async function (req, res) {
         data: {}
     });
 
-    chatRooms.reverse();
-
     var theList = [];
 
     for(var i = 0 ; i < chatRooms.length; i ++) {
@@ -737,6 +734,8 @@ exports.getRoomList = async function (req, res) {
         theList.push(theChatRoom)
 
     }
+
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',
