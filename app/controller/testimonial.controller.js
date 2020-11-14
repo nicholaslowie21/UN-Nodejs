@@ -55,6 +55,106 @@ exports.getCommonProject = async function (req, res){
     });
 }
 
+exports.getOutgoingTestimonial = async function (req, res){
+    
+    var myAccount = await getAccount(req.id, req.type)
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving your account',
+        data: { }
+    });
+
+    const testimonials = await Testimonial.find({ 'status': req.query.status, 'creatorId': req.query.accountId, 'creatorType': req.query.accountType}, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong while retrieving testimonials',
+            data: { }
+        });
+    });
+
+    if (!testimonials)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving testimonials',
+        data: { }
+    });
+
+    var theList = []
+
+    for(var i = 0; i < testimonials.length; i++) {
+        var temp = JSON.parse(JSON.stringify(testimonials[i]))
+        var targetAccount = await getAccount(testimonials[i].targetId, testimonials[i].targetType)
+
+        if(!targetAccount) continue
+
+        temp.targetName = targetAccount.name
+        temp.targetUsername = targetAccount.username
+        temp.targetImg = targetAccount.ionicImg
+
+        theList.push(temp)
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My outgoing testimonials retrieved',
+        data: { testimonials: theList }
+    });
+}
+
+exports.getMyTestimonial = async function (req, res){
+    
+    var myAccount = await getAccount(req.id, req.type)
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving your account',
+        data: { }
+    });
+
+    const testimonials = await Testimonial.find({ 'status': req.query.status, 'targetId': req.query.accountId, 'targetType': req.query.accountType}, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong while retrieving testimonials',
+            data: { }
+        });
+    });
+
+    if (!testimonials)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving testimonials',
+        data: { }
+    });
+
+    var theList = []
+
+    for(var i = 0; i < testimonials.length; i++) {
+        var temp = JSON.parse(JSON.stringify(testimonials[i]))
+        var targetAccount = await getAccount(testimonials[i].creatorId, testimonials[i].creatorType)
+
+        if(!targetAccount) continue
+
+        temp.creatorName = targetAccount.name
+        temp.creatorUsername = targetAccount.username
+        temp.creatorImg = targetAccount.ionicImg
+
+        theList.push(temp)
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My testimonials retrieved',
+        data: { testimonials: theList }
+    });
+}
+
 exports.requestTestimonial = async function (req, res){
     
     var targetAccount = await getAccount(req.id, req.type)
@@ -92,10 +192,12 @@ exports.requestTestimonial = async function (req, res){
     var theRequest = await Testimonial.findOne({ 'targetId': req.id, 'targetType':req.type, 
         'creatorId':creatorAccount.id, 'creatorType': req.body.accountType, 'projectId': req.body.projectId,
         'status': { $in: ['open','requested','pending'] }}, function (err) {
-        if (err) {
-            console.log("The projectId in your contribution is invalid! error: "+err.message)
-            return
-        }
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: { }
+        });
     });
 
     if(theRequest)
@@ -119,6 +221,154 @@ exports.requestTestimonial = async function (req, res){
         return res.status(200).json({
             status: 'success',
             msg: 'Testimonial request created!',
+            data: { testimonial: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+    
+}
+
+exports.updateTestimonialStatus = async function (req, res){
+    
+    var myAccount = await getAccount(req.id, req.type)
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving your account',
+        data: { }
+    });
+
+    var testimonial = await Testimonial.findOne({ '_id': req.body.testimonialId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: { }
+        });
+    });
+
+    if(!testimonial)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such testimonial',
+        data: { }
+    });
+
+    if(testimonial.targetId != req.id)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to perform this action',
+        data: { }
+    });
+
+    if( req.body.status === 'open' && testimonial.status != 'pending')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This update is invalid',
+        data: { }
+    });
+
+    if( req.body.status === 'dismissed' && testimonial.status != 'pending')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This update is invalid',
+        data: { }
+    });
+
+    if( req.body.status === 'canceled' && testimonial.status != 'requested')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This update is invalid',
+        data: { }
+    });
+    
+
+    testimonial.status = req.body.status
+
+    testimonial.save(testimonial)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Testimonial updated successfully!',
+            data: { testimonial: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+    
+}
+
+exports.updateOutgoingTestimonialStatus = async function (req, res){
+    
+    var myAccount = await getAccount(req.id, req.type)
+    if(!myAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving your account',
+        data: { }
+    });
+
+    var testimonial = await Testimonial.findOne({ '_id': req.body.testimonialId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: { }
+        });
+    });
+
+    if(!testimonial)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no such testimonial',
+        data: { }
+    });
+
+    if(req.id != testimonial.creatorId)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'You are not authorized to perform this action!',
+        data: { }
+    });
+
+    if( req.body.status === 'pending' && testimonial.status != 'requested')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This update is invalid',
+        data: { }
+    });
+
+    if( req.body.status === 'dismissed' && testimonial.status != 'requested')
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This update is invalid',
+        data: { }
+    });
+
+    if(req.body.status === 'pending' && req.body.desc.length === 0)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This desc field is invalid',
+        data: { }
+    });
+
+    if(req.body.status === 'pending') testimonial.desc = req.body.desc
+    testimonial.status = req.body.status
+
+    testimonial.save(testimonial)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Testimonial updated successfully!',
             data: { testimonial: data }
         });
     }).catch(err => {

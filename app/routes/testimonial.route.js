@@ -8,12 +8,11 @@ const Helper = require('../service/helper.service');
 
 router.get('/common/projects', auth, TestimonialValidator.getCommonProject, Helper.ifErrors, testimonialController.getCommonProject)
 router.post('/request', auth, TestimonialValidator.requestTestimonial, Helper.ifErrors, testimonialController.requestTestimonial)
-// router.post('/request', auth, TestimonialValidator, Helper.ifErrors, targetController.possibleTarget)
 
-// router.post('/account/targets', auth, TargetValidator.updateAccountTarget, Helper.ifErrors, targetController.updateAccountTarget)
-// router.get('/account/targets', auth, TargetValidator.getAccountTarget, Helper.ifErrors, targetController.accountTargetLists)
+router.get('/outgoing', auth, TestimonialValidator.getTestimonial, Helper.ifErrors, testimonialController.getOutgoingTestimonial)
+router.get('/', auth, TestimonialValidator.getTestimonial, Helper.ifErrors, testimonialController.getMyTestimonial)
 
-// router.post('/project/targets', auth, TargetValidator.updateProjectTarget, Helper.ifErrors, targetController.updateProjectTarget)
-// router.get('/project/targets', TargetValidator.getProjectTarget, Helper.ifErrors, targetController.getProjectTarget)
+router.post('/update/status', auth, TestimonialValidator.updateMyTestimonial, Helper.ifErrors, testimonialController.updateTestimonialStatus)
+router.post('/outgoing/update/status', auth, TestimonialValidator.updateOutgoingTestimonial, Helper.ifErrors, testimonialController.updateOutgoingTestimonialStatus)
 
 module.exports = router;
