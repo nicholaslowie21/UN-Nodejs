@@ -3467,6 +3467,83 @@ exports.getContributions = async function (req, res){
         msg: 'Contributions successfully retrieved!',
         data: { contributions: theList }
     });
+}
+
+exports.getAccountContributions = async function (req, res){
+    const contributions = await Contribution.find({ 'contributor': req.query.accountId, 'contributorType': req.query.accountType ,'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an error retrieving contributions!' + err.message,
+            data: {}
+        });
+    });
+
+    if(!contributions)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was no contributions or something went wrong!',
+        data: {}
+    });
+
+    var theList = []
+    var sum = 0;
+
+    for(var i = 0; i < contributions.length; i++) {
+        var contributionItem = {
+            "contributionId":"",
+            "projectId": "",
+            "needId": "",
+            "requestId": "",
+            "requestType": "",
+            "resType": "",
+            "rating": "",
+            "contributor": "",
+            "contributorType": "",
+            "needTitle":"",
+            "resourceTitle":"",
+            "resourceId":"",
+            "desc":"",
+            "contributorUsername":"",
+            "contributorName":"",
+            "projectTitle":""
+        }
+
+        contributionItem.contributionId = contributions[i].id
+        contributionItem.projectId = contributions[i].projectId
+        contributionItem.needId = contributions[i].needId
+        contributionItem.requestId = contributions[i].requestId
+        contributionItem.requestType = contributions[i].requestType
+        contributionItem.resType = contributions[i].resType
+        contributionItem.rating = contributions[i].rating
+        contributionItem.contributor = contributions[i].contributor
+        contributionItem.contributorType = contributions[i].contributorType
+
+        await getNeedInfo(contributionItem)
+        await getRequestInfo(contributionItem)
+        await getResourceInfo(contributionItem)
+
+        await getContributorInfo(contributionItem)
+        if(contributionItem.contributorName === "") continue
+
+        await getProjectInfo(contributionItem)
+        if(contributionItem.contributorName === "") continue
+
+        sum += contributionItem.rating
+        theList.push(contributionItem)
+    }
+
+    var avgRating = 0;
+    if(theList.length > 0) {
+        avgRating = sum/theList.length
+        avgRating = Math.round((avgRating+Number.EPSILON)*100)/100
+    } 
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Account\'s contributions successfully retrieved!',
+        data: { avgRating: avgRating, contributions: theList }
+    });
 
 }
 
@@ -3627,6 +3704,7 @@ async function getNeedInfo(contributionItem) {
     const need = await ResourceNeed.findOne({ '_id': contributionItem.needId }, function (err) {
         if (err) {
             console.log("The needId in your contribution is invalid! error: "+err.message)
+            return
         }
     });
 
@@ -3636,6 +3714,22 @@ async function getNeedInfo(contributionItem) {
     }
 
     contributionItem.needTitle = need.title;
+}
+
+async function getProjectInfo(contributionItem) {
+    const project = await Projects.findOne({ '_id': contributionItem.projectId }, function (err) {
+        if (err) {
+            console.log("The projectId in your contribution is invalid! error: "+err.message)
+            return
+        }
+    });
+
+    if(!project) {
+        console.log("Error: Something went wrong when retrieving needs")
+        return
+    }
+
+    contributionItem.projectTitle = project.title;
 }
 
 async function getRequestInfo(contributionItem) {

@@ -92,6 +92,11 @@ exports.getContributions = [
     query('projectId').exists()
 ]
 
+exports.getAccountContributions = [
+    query('accountId').exists(),
+    query('accountType').exists()
+]
+
 exports.createProject = [
     body('title').exists(),
     body('desc').exists(),

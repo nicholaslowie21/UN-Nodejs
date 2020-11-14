@@ -15,6 +15,7 @@ const communicationRouter = require('./communication.route')
 const reportRouter = require('./report.route')
 const devRouter = require('./dev.route')
 const targetRouter = require('./target.route')
+const testimonialRouter = require('./testimonial.route')
 
 router.use('/authorization', authorizationRouter)
 router.use('/user', userRouter)
@@ -30,5 +31,6 @@ router.use('/communication', communicationRouter)
 router.use('/report', reportRouter)
 router.use('/dev', devRouter)
 router.use('/target', targetRouter)
+router.use('/testimonial', testimonialRouter)
 
 module.exports = router;

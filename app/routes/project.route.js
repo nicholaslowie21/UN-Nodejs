@@ -44,6 +44,7 @@ router.get('/contributors', ProjectValidator.getContributions, Helper.ifErrors, 
 router.post('/updateContributionRating', auth, ProjectValidator.updateContributionRating, Helper.ifErrors, projectController.updateContributionRating)
 
 router.get('/accountNewsFeed', auth, projectController.getAccNewsFeed )
+router.get('/account/contributions', ProjectValidator.getAccountContributions, Helper.ifErrors, projectController.getAccountContributions )
 
 router.post('/createPost', auth, projectController.multerCreatePost , ProjectValidator.createPost, Helper.ifErrors , projectController.createPost)
 router.post('/updatePost', auth, projectController.multerUpdatePost , ProjectValidator.updatePost, Helper.ifErrors , projectController.updatePost)
