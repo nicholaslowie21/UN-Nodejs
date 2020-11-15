@@ -86,13 +86,13 @@ exports.getOutgoingTestimonial = async function (req, res){
     for(var i = 0; i < testimonials.length; i++) {
         var temp = JSON.parse(JSON.stringify(testimonials[i]))
         var targetAccount = await getAccount(testimonials[i].targetId, testimonials[i].targetType)
-
+        var theProject = await getProject(testimonials[i].projectId)
         if(!targetAccount) continue
-
+        if(!theProject) continue
         temp.targetName = targetAccount.name
         temp.targetUsername = targetAccount.username
         temp.targetImg = targetAccount.ionicImg
-
+        temp.projectTitle = theProject.title
         theList.push(temp)
     }
 
@@ -136,13 +136,16 @@ exports.getMyTestimonial = async function (req, res){
     for(var i = 0; i < testimonials.length; i++) {
         var temp = JSON.parse(JSON.stringify(testimonials[i]))
         var targetAccount = await getAccount(testimonials[i].creatorId, testimonials[i].creatorType)
-
+        var theProject = await getProject(testimonials[i].projectId)
+        
         if(!targetAccount) continue
-
+        if(!theProject) continue
+        
         temp.creatorName = targetAccount.name
         temp.creatorUsername = targetAccount.username
         temp.creatorImg = targetAccount.ionicImg
-
+        temp.projectTitle = theProject.title
+        
         theList.push(temp)
     }
 
