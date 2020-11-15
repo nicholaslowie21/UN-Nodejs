@@ -8,6 +8,7 @@ const Helper = require('../service/helper.service');
 
 router.get('/common/projects', auth, TestimonialValidator.getCommonProject, Helper.ifErrors, testimonialController.getCommonProject)
 router.post('/request', auth, TestimonialValidator.requestTestimonial, Helper.ifErrors, testimonialController.requestTestimonial)
+router.post('/write', auth, TestimonialValidator.writeTestimonial, Helper.ifErrors, testimonialController.writeTestimonial)
 
 router.get('/outgoing', auth, TestimonialValidator.getTestimonial, Helper.ifErrors, testimonialController.getOutgoingTestimonial)
 router.get('/', auth, TestimonialValidator.getTestimonial, Helper.ifErrors, testimonialController.getMyTestimonial)

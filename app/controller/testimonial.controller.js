@@ -229,6 +229,84 @@ exports.requestTestimonial = async function (req, res){
             msg: 'Something went wrong! Error: ' + err.message,
             data: {}
         });
+    });   
+}
+
+exports.writeTestimonial = async function (req, res){
+    
+    var targetAccount = await getAccount(req.body.accountId, req.body.accountType)
+    if(!targetAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving account',
+        data: { }
+    });
+
+    var creatorAccount = await getAccount(req.id, req.type)
+    if(!creatorAccount)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while retrieving account',
+        data: { }
+    });
+
+    var theProject = await getProject(req.body.projectId)
+
+    if(!theProject)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Something went wrong while verifying project',
+        data: { }
+    });
+    
+    if(!targetAccount.projects.includes(theProject.id) || !creatorAccount.projects.includes(theProject.id))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'This project is not mutual',
+        data: { }
+    });
+
+    var theRequest = await Testimonial.findOne({ 'targetId': req.id, 'targetType':req.type, 
+        'creatorId':creatorAccount.id, 'creatorType': req.body.accountType, 'projectId': req.body.projectId,
+        'status': { $in: ['open','requested','pending'] }}, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: { }
+        });
+    });
+
+    if(theRequest)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'There was already such testimonial query',
+        data: { }
+    });
+
+    const newRequest = new Testimonial({
+        targetId: targetAccount.id,
+        targetType: req.type,
+        creatorId: creatorAccount.id,
+        creatorType: req.body.accountType,
+        status:'pending',
+        projectId: req.body.projectId,
+        desc: req.body.desc
+    })
+
+    newRequest.save(newRequest)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Testimonial created!',
+            data: { testimonial: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
     });
     
 }

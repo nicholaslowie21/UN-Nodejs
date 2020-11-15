@@ -12,6 +12,13 @@ exports.requestTestimonial = [
     body('projectId').exists()
 ]
 
+exports.writeTestimonial = [
+    body('accountId').exists(),
+    body('accountType').exists(),
+    body('projectId').exists(),
+    body('desc').exists()
+]
+
 exports.updateMyTestimonial = [
     body('testimonialId').exists(),
     body('status').exists().custom(async value => {
