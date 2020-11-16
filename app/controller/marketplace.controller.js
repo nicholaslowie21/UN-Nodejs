@@ -200,6 +200,8 @@ exports.reqResource = async function (req, res) {
     
         Helper.createAuditLog(action,"project",project.id)
 
+        Helper.createNotification("Resource Request", "Resource: "+resource.title+" has been requested.", resource.owner, resource.ownerType)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource request successfully created',
@@ -378,6 +380,9 @@ exports.reqAutoResource = async function (req, res) {
         action = "Project requested a resource (auto): "+ resource.title +" ("+resource.id+", "+req.body.resType+")"
     
         Helper.createAuditLog(action,"project",project.id)
+
+        Helper.createNotification("Resource Request", "Resource: "+resource.title+" has been requested.", resource.owner, resource.ownerType)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Resource request successfully created',
@@ -564,6 +569,8 @@ exports.useKnowledgeResource = async function (req, res) {
                 console.log("error: "+err.message)
             })
             contributions.push(contribution)
+
+            Helper.createNotification("Knowledge Used", "Resource: "+resource.title+" has been used.", resource.owner[i].theId, resource.owner[i].ownerType)
         }
 
         var action = "Account use a knowledge resource: "+resource.title+" ("+resource.id+", "+"knowledge"+")"
@@ -747,6 +754,9 @@ exports.useAutoKnowledgeResource = async function (req, res) {
                 console.log("error: "+err.message)
             })
             contributions.push(contribution)
+            
+            Helper.createNotification("Knowledge Used", "Resource: "+resource.title+" has been used.", resource.owner[i].theId, resource.owner[i].ownerType)
+
         }
 
         var action = "Account use a knowledge resource (auto): "+resource.title+" ("+resource.id+", "+"knowledge"+")"
@@ -3025,6 +3035,8 @@ exports.acceptProjectReq = async function (req, res) {
         action += " for project request: ("+data.id+","+data.resType+")"
         Helper.createAuditLog(action,"project",project.id)
 
+        Helper.createNotification("Project Request", "Your request to contribute "+resourceneed.title+" to "+ project.title+" has been accepted.", data.ownerId, data.ownerType)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully accepted',
@@ -3112,6 +3124,8 @@ exports.declineProjectReq = async function (req, res) {
         action = "Project declined a contribution request for resourceneed: "+ resourceneed.title +" ("+resourceneed.id+", "+req.body.resType+")"
         action += " for project request: ("+data.id+","+data.resType+")"
         Helper.createAuditLog(action,"project",project.id)
+
+        Helper.createNotification("Project Request", "Your request to contribute "+resourceneed.title+" to "+ project.title+" has been declined.", data.ownerId, data.ownerType)
 
         return res.status(200).json({
             status: 'success',
@@ -3221,6 +3235,7 @@ exports.cancelProjectReq = async function (req, res) {
 
         Helper.createAuditLog(action,"project",project.id)
 
+        Helper.createNotification("Project Request", "Your request to contribute "+resourceneed.title+" to "+ project.title+" has been canceled.", data.ownerId, data.ownerType)
         return res.status(200).json({
             status: 'success',
             msg: 'Project Request successfully cancelled',
@@ -3410,6 +3425,8 @@ exports.completeProjectReq = async function (req, res) {
         action += " for project request: ("+data.id+","+data.resType+")"
 
         Helper.createAuditLog(action,"project",project.id)
+
+        Helper.createNotification("Project Request", "Your request to contribute "+resourceneed.title+" to "+ project.title+" has been completed.", data.ownerId, data.ownerType)
 
         return res.status(200).json({
             status: 'success',

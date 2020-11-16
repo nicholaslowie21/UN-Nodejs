@@ -167,6 +167,8 @@ exports.assignRegionalAdmin = async function (req, res) {
     var action = "Account assigned "+target.username+" as regional admin"
     
     Helper.createAuditLog(action,"admin",req.id)
+
+    Helper.createNotification("KoCoSD Admin", "You have been assigned as regional admin!", target.id, "user")
 }
 
 exports.assignAdmin = async function (req, res) {
@@ -215,6 +217,8 @@ exports.assignAdmin = async function (req, res) {
     var action = "Account assigned "+target.username+" as admin"
     
     Helper.createAuditLog(action,"admin",req.id)
+
+    Helper.createNotification("KoCoSD Admin", "You have been assigned as admin!", target.id, "user")
 }
 
 exports.assignAdminLead = async function (req, res) {
@@ -264,6 +268,8 @@ exports.assignAdminLead = async function (req, res) {
     var action = "Account assigned "+target.username+" as admin lead"
     
     Helper.createAuditLog(action,"admin",req.id)
+
+    Helper.createNotification("KoCoSD Admin", "You have been assigned as admin lead!", target.id, "user")
 }
 
 // demotion of any type of admin uses this function since any demotion is back to user
@@ -313,6 +319,8 @@ exports.assignUser = async function (req, res) {
     var action = "Account demoted "+target.username+" back as user"
     
     Helper.createAuditLog(action,"admin",req.id)
+
+    Helper.createNotification("KoCoSD Admin", "Your account has been demoted back to user!", target.id, "user")
 }
 
 exports.suspendUser = async function (req, res) {
@@ -574,6 +582,8 @@ exports.suspendProject = async function (req, res) {
     var action = "Suspended a project: "+target.title
     
     Helper.createAuditLog(action,"admin",req.id)
+
+    Helper.createNotification("KoCoSD Admin", "Project: "+target.title+" has been suspended.", target.host, target.hostType)
 }
 
 exports.activateProject = async function (req, res) {
@@ -635,6 +645,8 @@ exports.activateProject = async function (req, res) {
     var action = "Re-activate a project "+target.title
     
     Helper.createAuditLog(action,"admin",req.id)
+
+    Helper.createNotification("KoCoSD Admin", "Project: "+target.title+" has been re-activated.", target.host, target.hostType)
 }
 
 exports.getAuditLogs = async function (req, res) {

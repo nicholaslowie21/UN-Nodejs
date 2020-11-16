@@ -1494,13 +1494,14 @@ exports.completeProject = async function (req, res) {
     accountType = project.hostType
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
-
+    
     desc = "Completed a project :" + project.title + " as an admin."
     
     var theAdmins = project.admins;
     for(var i = 0 ; i < theAdmins.length; i++) {
         Helper.createProfileFeed(title,desc,theAdmins[i],"user")
-        
+        Helper.createNotification("Project", "Congratzz! Project: "+ project.title+" has been completed.", theAdmins[i], "user")
+
         var adminContribution = {
             contributor : theAdmins[i],
             contributorType: "user"
@@ -1532,6 +1533,9 @@ exports.completeProject = async function (req, res) {
         var thePoint = contributions[i].rating * project.rating
         console.log(contributions[i])
         awardContributionPoint(contributions[i],thePoint)
+        
+        Helper.createNotification("Project", "Congratzz! Project: "+ project.title+" has been completed.", contributions[i].contributor, contributions[i].contributorType )
+
     }
 
 }
@@ -1818,7 +1822,9 @@ exports.deleteProject = async function (req, res) {
             if (!info) {
                 console.log('Something went wrong while trying to send email!')
             } 
-        })    
+        })
+        
+        Helper.createNotification("Project", "Project: "+ project.title+" has been deleted.", adminsArr[i].id, "user")
     }
 
     const contributions = await Contribution.find({ 'projectId': project.id, 'status':'active' }, function (err) {
@@ -1830,6 +1836,7 @@ exports.deleteProject = async function (req, res) {
     
     for(var i = 0 ; i < contributions.length; i++) {
         removeContributionEmail(contributions[i],project.code)
+        Helper.createNotification("Project", "Project: "+ project.title+" has been deleted.", contributions[i].contributor, contributions[i].contributorType)
     }
 }
 
@@ -2077,6 +2084,7 @@ exports.addAdmin = async function (req, res) {
     accountType = "user"
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+    Helper.createNotification("Project", "You have been assigned as admin for project: "+ project.title+".", accountId, accountType)
 
     var action = "Account assigned user: "+ user.name +" ("+user.id+", "+ user.username +")" +" as admin for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
@@ -2197,6 +2205,7 @@ exports.deleteAdmin = async function (req, res) {
     var action = "Account removed user:"+ user.name +" ("+user.id+", "+ user.username +")" +" as admin for a project: "+project.title+" ("+project.id+", "+project.code+")"
     
     Helper.createAuditLog(action,req.type,req.id)
+    Helper.createNotification("Project", "You have been removed from admin for project: "+ project.title+".", user.id, "user")
 
     var action = "Project removed an admin: "+ user.name +" ("+user.id+", "+ user.username +")" 
     

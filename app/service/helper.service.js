@@ -4,6 +4,7 @@ const { body, validationResult, oneOf, check } = require('express-validator');
 const db = require('../models')
 const ProfileFeed = db.profilefeed;
 const AuditLog = db.auditlog;
+const Notification = db.notification
 
 const { networkInterfaces } = require('os');
 const contactcardModel = require('../models/contactcard.model');
@@ -68,6 +69,20 @@ exports.createAuditLog = function(action, targetType, targetId) {
   });
 }
 
+exports.createNotification = function(title, desc, accountId, accountType) {
+  const notif = new Notification({
+    title: title,
+    desc: desc,
+    accountType: accountType,
+    accountId: accountId,
+    isRead: false
+  });
+
+  notif.save(notif).catch(err => {
+    console.log('Error: (notifCreationHelper) '+err.message)
+    return
+  });
+}
 
 // to process error from built-in express check
 exports.ifErrors = (req, res, next) => {
