@@ -289,9 +289,9 @@ exports.writeTestimonial = async function (req, res){
 
     const newRequest = new Testimonial({
         targetId: targetAccount.id,
-        targetType: req.type,
+        targetType: req.body.accountType,
         creatorId: creatorAccount.id,
-        creatorType: req.body.accountType,
+        creatorType: req.type,
         status:'pending',
         projectId: req.body.projectId,
         desc: req.body.desc
