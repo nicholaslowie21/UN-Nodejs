@@ -3,7 +3,7 @@ module.exports = mongoose => {
       {
         title: { type: String, default: '' },
         desc: { type: String, default: '' },
-        completion: Number,
+        completion: { type: Number, default: 0 },
         projectId: { type: String, default: '' }
       },
       { timestamps: true }

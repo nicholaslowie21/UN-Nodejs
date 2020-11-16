@@ -1,11 +1,11 @@
 module.exports = mongoose => {
     var schema = mongoose.Schema(
       {
-        token: String,
-        type: String,
-        accountId: String,
+        token: { type: String, default: '' },
+        type: { type: String, default: '' },
+        accountId: { type: String, default: '' },
         expiredAt: Date,
-        status: String
+        status: { type: String, default: '' }
       },
       { timestamps: true }
     );

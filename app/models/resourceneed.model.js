@@ -6,11 +6,11 @@ module.exports = mongoose => {
         status: { type: String, default: 'progress' },
         type: { type: String, default: '' },
         code: { type: String, default: '' },
-        total: Number,
-        pendingSum: Number,
-        receivedSum: Number,
-        completion: Number,
-        projectId: String
+        total: { type: Number, default: 0 },
+        pendingSum: { type: Number, default: 0 },
+        receivedSum: { type: Number, default: 0 },
+        completion: { type: Number, default: 0 },
+        projectId: { type: String, default: '' }
       },
       { timestamps: true }
     );
