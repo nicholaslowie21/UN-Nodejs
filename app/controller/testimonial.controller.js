@@ -361,14 +361,6 @@ exports.updateTestimonialStatus = async function (req, res){
         data: { }
     });
 
-    if( req.body.status === 'canceled' && testimonial.status != 'requested')
-    return res.status(500).json({
-        status: 'error',
-        msg: 'This update is invalid',
-        data: { }
-    });
-    
-
     testimonial.status = req.body.status
 
     testimonial.save(testimonial)
@@ -422,13 +414,6 @@ exports.updateOutgoingTestimonialStatus = async function (req, res){
     });
 
     if( req.body.status === 'pending' && testimonial.status != 'requested')
-    return res.status(500).json({
-        status: 'error',
-        msg: 'This update is invalid',
-        data: { }
-    });
-
-    if( req.body.status === 'dismissed' && testimonial.status != 'requested')
     return res.status(500).json({
         status: 'error',
         msg: 'This update is invalid',

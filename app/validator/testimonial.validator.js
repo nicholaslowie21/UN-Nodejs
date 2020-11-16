@@ -22,7 +22,7 @@ exports.writeTestimonial = [
 exports.updateMyTestimonial = [
     body('testimonialId').exists(),
     body('status').exists().custom(async value => {
-        if(value != "open" && value != "close" && value != "dismissed" && value != "canceled")
+        if(value != "open" && value != "close" && value != "dismissed")
             return Promise.reject('status is invalid!')
     })
 ]
