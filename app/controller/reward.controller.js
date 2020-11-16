@@ -1323,6 +1323,8 @@ exports.validateReward = async function (req, res){
         action = "Reward request is validated, action: "+data.status
         Helper.createAuditLog(action,"reward",data.id)
 
+        Helper.createNotification("Reward", "Your request: "+ data.title + " status has been updated to "+reward.status, reward.sponsorId, reward.sponsorType)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Reward offer successfully validated',
@@ -1389,6 +1391,8 @@ exports.deleteReward = async function (req, res){
 
         action = "Reward is deleted"
         Helper.createAuditLog(action,"reward",data.id)
+
+        Helper.createNotification("Reward", "Your reward: "+ data.title + " has been deleted ", data.sponsorId, data.sponsorType)
 
         return res.status(200).json({
             status: 'success',

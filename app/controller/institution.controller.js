@@ -383,6 +383,8 @@ exports.addMembers = async function(req,res) {
     member.institutionIds.push(institution.id);
     member.isVerified = "true";
 
+    Helper.createNotification("Affiliation", "Your account is now added as member to "+institution.name, member.id, "user")
+
     member.save(member)
     .then(data => {
         console.log("User is updated!")
@@ -451,6 +453,7 @@ exports.delMembers = async function(req,res) {
         await member.save(member)
         .then(data => {
             console.log("User is updated!")
+            Helper.createNotification("Affiliation", "Your account is removed as member from "+institution.name, member.id, "user")
         }).catch(err => {
             return res.status(500).json({
                 status: 'error',
@@ -624,7 +627,7 @@ exports.membersCSVProcessing = async function (req, res, next) {
                     member.institutionIds.push(institution.id);
                     member.isVerified = "true";
                     institution.members.push(member.id);
-    
+                    Helper.createNotification("Affiliation", "Your account is now added as member to "+institution.name, member.id, "user")
                     member.save(member)
                     .then().catch(err => {
                         failedMember.push(obj.username);

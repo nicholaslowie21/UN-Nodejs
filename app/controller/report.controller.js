@@ -175,7 +175,7 @@ exports.updateReport = async function (req, res){
 
     report.status = req.body.status
 
-    report.save(report)
+    await report.save(report)
     .then(data => { 
         return res.status(200).json({
             status: 'success',
@@ -189,6 +189,9 @@ exports.updateReport = async function (req, res){
             data: { }
         });
     })
+    var theTime = moment(report.updatedAt).tz('Asia/Singapore').format("LLL").toString()
+    
+    Helper.createNotification("Report", "Your report: "+ report.title + " status has been updated to "+req.body.status+" on "+theTime, report.reporterId, report.reporterType )
 
 }
 

@@ -3005,6 +3005,9 @@ exports.deleteResourceNeed = async function (req, res){
     
     for(var i = 0 ; i < contributions.length; i++) {
         removeContributionEmail(contributions[i],project.code)
+        
+        Helper.createNotification("Project", "Your contribution for "+ resourceneed.title + " of project "+project.title+" has been removed.", contributions[i].contributor, contributions[i].contributorType )
+        
         var theCondition = await checkRemoveProjectIds(project,contributions[i])
         if(theCondition === true)
             removeProjectIds(project.id, contributions[i])
@@ -3153,6 +3156,9 @@ exports.removeContribution = async function (req, res){
     });
 
     removeContributionEmail(contribution, project.code)
+    
+    Helper.createNotification("Project", "Your contribution for project "+project.title+"("+project.code+")"+" has been removed.", contribution.contributor, contribution.contributorType )
+    
     var theCondition = await checkRemoveProjectIds(project,contribution)
     if(theCondition === true)
         removeProjectIds(project.id, contribution)

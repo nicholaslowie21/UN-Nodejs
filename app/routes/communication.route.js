@@ -18,4 +18,6 @@ router.get('/chat/rooms', auth, communicationController.getRoomList)
 router.get('/chat/chats', auth, CommunicationValidator.getChats, Helper.ifErrors, communicationController.getChats)
 router.get('/chat/filtered/rooms', auth, CommunicationValidator.getRoomLists, Helper.ifErrors, communicationController.getRoomListFiltered)
 
+router.get('/notifications', auth, communicationController.getNotifications)
+
 module.exports = router;

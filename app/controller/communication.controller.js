@@ -5,6 +5,7 @@ const User = db.users
 const Institution = db.institution
 const Chat = db.chat
 const ChatRoom = db.chatroom
+const Notification = db.notification
 const Helper = require('../service/helper.service')
 
 exports.createAnnouncement = async function (req, res){
@@ -648,6 +649,39 @@ exports.getRoomListFiltered = async function (req, res) {
         msg: 'Filtered chat rooms successfully retrieved',
         data: { chatRooms: theList }
     });
+}
+
+exports.getNotifications = async function (req, res) {
+    var notifications = await Notification.find({ 'accountId':req.id,'accountType':req.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err.message,
+            data: {}
+        });
+    });
+
+    if(!notifications) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue while retrieving notifications!',
+            data: {}
+        });
+    } else {
+        notifications.reverse()
+
+        
+        
+        res.status(200).json({
+            status: 'success',
+            msg: 'Notifications successfully retrieved',
+            data: { notifications: notifications }
+        });
+
+        await Notification.updateMany({ 'accountId':req.id,'accountType':req.type } , { isRead: true } );
+        return
+    }
+    
 }
 
 exports.getRoomList = async function (req, res) {

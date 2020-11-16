@@ -5,6 +5,7 @@ const User = db.users
 const Institution = db.institution
 const Project = db.project
 const Testimonial = db.testimonial
+const Helper = require('../service/helper.service')
 
 exports.getCommonProject = async function (req, res){
     
@@ -233,6 +234,8 @@ exports.requestTestimonial = async function (req, res){
             data: {}
         });
     });   
+
+    Helper.createNotification("Testimonial", targetAccount.name + " requested for your testimonial. Check them out!", creatorAccount.id, req.body.accountType)
 }
 
 exports.writeTestimonial = async function (req, res){
@@ -311,6 +314,8 @@ exports.writeTestimonial = async function (req, res){
             data: {}
         });
     });
+
+    Helper.createNotification("Testimonial", creatorAccount.name + " write a testimonial for you. Check them out!", targetAccount.id, req.body.accountType)
     
 }
 
@@ -378,6 +383,7 @@ exports.updateTestimonialStatus = async function (req, res){
         });
     });
     
+    Helper.createNotification("Testimonial", myAccount.name + " updated the status of the testimonial you wrote about them to "+req.body.status, testimonial.creatorId, testimonial.creatorType)
 }
 
 exports.updateOutgoingTestimonialStatus = async function (req, res){
@@ -445,6 +451,7 @@ exports.updateOutgoingTestimonialStatus = async function (req, res){
         });
     });
     
+    Helper.createNotification("Testimonial", myAccount.name + " updated the status of the testimonial they wrote about you to "+req.body.status, testimonial.targetId, testimonial.targetType)
 }
 
 async function getProject(theId) {

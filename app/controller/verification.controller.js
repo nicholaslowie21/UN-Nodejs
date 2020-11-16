@@ -351,6 +351,8 @@ exports.acceptUserRequest = async function (req, res){
             console.log('Something went wrong while trying to send email!')
         } 
     })
+    
+    Helper.createNotification("KoCoSD Admin", "Congratz! Your account is now verified", user.id, "user")
 
     title = "Account Verified"
     desc = "This account has been verified by our admins"
@@ -433,6 +435,8 @@ exports.declineUserRequest = async function (req, res){
             console.log('Something went wrong while trying to send email!')
         } 
     })
+
+    Helper.createNotification("KoCoSD Admin", "Your verification request is rejected.", user.id, "user")
 
     return res.status(200).json({
         status: 'success',
