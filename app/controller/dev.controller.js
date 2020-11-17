@@ -76,7 +76,7 @@ exports.addTarget = async function (req, res){
 
 exports.addTargetCSV = async function (req, res, next) {
     const csvFilePath = req.file.path;
-    console.log(csvFilePath)
+    
     await csvtojson().fromFile(csvFilePath).then( async function (csvData) {
         if (fs.existsSync(csvFilePath)) {
             for (const obj of csvData) {
