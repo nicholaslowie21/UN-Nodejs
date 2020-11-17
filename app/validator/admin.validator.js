@@ -32,6 +32,26 @@ exports.getAuditLogs = [
     })
 ]
 
+exports.getAccountClaims = [
+    body('role').exists().custom(async value => {
+        if (value == 'user') 
+            return Promise.reject('You are not authorised to retrieve this list!')
+    }),
+    query('status').exists()
+]
+
+exports.validateAccountClaim = [
+    body('role').exists().custom(async value => {
+        if (value == 'user') 
+            return Promise.reject('You are not authorised to retrieve this list!')
+    }),
+    body('action').exists().custom(async value => {
+        if (value != 'accepted' && value != 'declined' ) 
+            return Promise.reject('Action invalid!')
+    }),
+    body('claimId').exists()
+]
+
 exports.suspendProject = [
     body('role').exists().custom(async value => {
         if (value == 'user') 

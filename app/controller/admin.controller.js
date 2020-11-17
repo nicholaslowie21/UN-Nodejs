@@ -1,3 +1,4 @@
+const { get } = require('http')
 const moment = require('moment-timezone')
 const db = require('../models')
 const Users = db.users
@@ -5,6 +6,7 @@ const Projects = db.project
 const Institutions = db.institution
 const Reward = db.reward
 const AuditLog = db.auditlog
+const AccountClaim = db.accountclaim
 const Helper = require('../service/helper.service')
 
 exports.searchUsers = async function (req, res){
@@ -672,6 +674,133 @@ exports.getAuditLogs = async function (req, res) {
         msg: 'Log successfully retrieved!',
         data: { logs: logs }
     });
+}
+
+exports.getAccountClaims = async function (req, res) {
+    const claims = await AccountClaim.find({ 'status': req.query.status}, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!claims) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Claims not found!',
+        data: {}
+    });
+
+    var theList = []
+    for(var i = 0; i < claims.length; i++) {
+        var temp = JSON.parse(JSON.stringify(claims[i]))
+        var tempAcc = await getAccount(temp.accountId, temp.accountType)
+
+        if(!tempAcc) continue
+
+        temp.account = tempAcc
+        theList.push(temp)
+
+    }
+    
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Claims successfully retrieved!',
+        data: { claims: theList }
+    });
+}
+
+exports.validateAccountClaim = async function (req, res) {
+    const claim = await AccountClaim.findOne({ '_id': req.body.claimId}, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!claim) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Claim not found!',
+        data: {}
+    });
+
+    var account = await getAccount(claim.accountId, claim.accountType)
+    if(!account) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    var gotError = false
+
+    if(req.body.action === "accepted") {
+        account.status = 'active'
+        account.save().catch(err => {
+            gotError = true
+            return res.status(500).json({
+                status: 'error',
+                msg: 'Something went wrong! Error: '+err,
+                data: {}
+            });     
+        })
+    }
+
+    if(gotError === true) return
+
+    claim.status = req.body.action
+
+    claim.save(claim)
+    .then( data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Claim successfully validated!',
+            data: { claim: data, account: account }
+        });
+    }).catch(err => {
+        gotError = true
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: {}
+        });     
+    })
+
+    let subject = 'KoCoSD Account Claim'
+    let theMessage = `
+        <h1>Your account claim has been reviewed!</h1>
+        <p>The status: ${req.body.action}.</p>
+        <p>You may directly log in to our system if it is accepted by the admin</p>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+    
+    Helper.sendEmail(account.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+}
+
+async function getAccount(theId, theType) {
+    var account;
+
+    if(theType === "user") {
+        account = await Users.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [mapping]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    } else if (theType === 'institution') {
+        account = await Institutions.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [mapping]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    }
+
+    if(!account) {
+        console.log("Error: Something went wrong when retrieving account")
+        return
+    }
+
+    return account
 }
 
 exports.exportAuditLog = async function (req, res) {
