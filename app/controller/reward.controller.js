@@ -207,6 +207,13 @@ exports.requestReward = async function (req, res){
         data: {}
     });
 
+    if(theDate.isBefore(startDate))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The start date is invalid! ',
+        data: {}
+    });
+
     const reward = new Reward({
 		title: req.body.title,
         desc: req.body.desc,
@@ -815,6 +822,13 @@ exports.createReward = async function (req, res){
 
     var startDate = moment(req.body.startDate).tz('Asia/Singapore')
     if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
+    return res.status(500).json({
+        status: 'error',
+        msg: 'The start date is invalid! ',
+        data: {}
+    });
+
+    if(theDate.isBefore(startDate))
     return res.status(500).json({
         status: 'error',
         msg: 'The start date is invalid! ',
