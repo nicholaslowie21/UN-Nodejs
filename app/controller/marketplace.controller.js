@@ -1,3 +1,4 @@
+const moment = require('moment-timezone')
 const db = require('../models')
 const Manpower = db.manpower
 const User = db.users
@@ -4278,4 +4279,188 @@ async function addProjectIds(projectId, ownerId, ownerType) {
 new CronJob('59 23 * * 0', async function () {
     runDiscoverWeekly()
     console.log('Discover Weekly triggered')
-  }, null, true, 'Asia/Singapore');
+}, null, true, 'Asia/Singapore');
+
+async function runPendingProjectReqReminder () {
+    const projectreqs = await ProjectReq.find({ 'status': 'pending' }, function (err) {
+        if (err) console.log(err)
+    });
+
+    var projectHashMap = new Map()
+    for(var i = 0; i < projectreqs.length; i++) {
+        var createdDate = moment(projectreqs[i].createdAt).tz('Asia/Singapore')
+        var dateNow = moment.tz('Asia/Singapore')
+
+        if(dateNow.diff(createdDate, 'days') >= 7) 
+            projectHashMap.set(projectreqs[i].projectId,1)
+    }
+
+    var projectIds = Array.from(projectHashMap.keys())
+   
+    for(var i = 0; i < projectIds.length; i++) {
+        var project = await getProject(projectIds[i])
+ 
+        if(!project) continue
+        var projectHost = await getAccount(project.host, project.hostType)
+
+        if(!projectHost) continue
+
+        let subject = 'KoCoSD Pending Project Request'
+        let theMessage = `
+            <h1>There is a pending project request!</h1>
+            <p>Somebody wanted to contribute to your project: ${project.title}. It has been pending for a while now :(.</p>
+            <p>Check them out now in the platform :)</p>
+            <br>
+        `
+        Helper.sendEmail(projectHost.email, subject, theMessage, function (info) {
+            if (!info) {
+                console.log('Something went wrong while trying to send email!')
+            } 
+        })
+    }
+}  
+
+async function getProject(theId) {
+    const project = await Project.findOne({ '_id': theId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!project) return
+    if(project.status != 'ongoing') return
+
+    return project
+}
+
+async function getAccount(theId, theType) {
+    var account;
+
+    if(theType === "user") {
+        account = await User.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [testimonial]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    } else if (theType === 'institution') {
+        account = await Institution.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [testimonial]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    }
+
+    if(!account) {
+        console.log("Error: Something went wrong when retrieving account")
+        return
+    }
+
+    return account
+}
+
+async function runPendingResourceReqReminder () {
+    const resourcereqs = await ResourceReq.find({ 'status': 'pending' }, function (err) {
+        if (err) console.log(err)
+    });
+
+    var resourceHashMap = new Map()
+    for(var i = 0; i < resourcereqs.length; i++) {
+        var createdDate = moment(resourcereqs[i].createdAt).tz('Asia/Singapore')
+        var dateNow = moment.tz('Asia/Singapore')
+
+        var resource = {
+            resourceId:"",
+            resourceType:""
+        }
+        
+        resource.resourceId = resourcereqs[i].resourceId
+        resource.resourceType = resourcereqs[i].resType
+
+        if(dateNow.diff(createdDate, 'days') >= 7) 
+            resourceHashMap.set(resource,1)
+    }
+
+    var resources = Array.from(resourceHashMap.keys())
+   
+    for(var i = 0; i < resources.length; i++) {
+        var resource = await getResourceEntity(resources[i])
+ 
+        if(!resource) continue
+        var resourceOwner = await getAccount(resource.owner, resource.ownerType)
+
+        if(!resourceOwner) continue
+        if(resource.status != "active") continue
+
+        let subject = 'KoCoSD Pending Pesource Request'
+        let theMessage = `
+            <h1>There is a pending request to your resource!</h1>
+            <p>Somebody wanted to request for your resource: ${resource.title}. It has been pending for a while now :(</p>
+            <p>Check them out now in the platform :)</p>
+            <br>
+        `
+        Helper.sendEmail(resourceOwner.email, subject, theMessage, function (info) {
+            if (!info) {
+                console.log('Something went wrong while trying to send email!')
+            } 
+        })
+    }
+}
+
+async function getResourceEntity(theItem) {
+
+    var resource;
+
+    if(theItem.resourceType === "item") {
+        resource = await Item.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resourceType === "venue") {
+        resource = await Venue.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if(theItem.resourceType === "manpower") {
+        resource = await Manpower.findOne({ '_id': theItem.resourceId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } 
+
+    if(!resource) return
+    return resource
+}
+
+new CronJob('59 23 * * 6', async function () {
+    runPendingProjectReqReminder()
+    console.log('Email reminder to pending project request triggered')
+}, null, true, 'Asia/Singapore');
+
+exports.triggerProjectReqsReminder = async function (req, res) {    
+    runPendingProjectReqReminder()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Pending Project Requests reminder successfully manually triggered',
+        data: { }
+    });
+}
+
+exports.triggerResourceReqsReminder = async function (req, res) {    
+    runPendingResourceReqReminder()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Pending Resource Requests reminder successfully manually triggered',
+        data: { }
+    });
+}

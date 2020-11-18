@@ -1010,4 +1010,4 @@ exports.triggerInactiveEmail = async function (req, res) {
 new CronJob('59 23 * * 0', async function () {
     runInactiveEmailReminder()
     console.log('Email reminder to inactive user triggered')
-  }, null, true, 'Asia/Singapore');
+}, null, true, 'Asia/Singapore');

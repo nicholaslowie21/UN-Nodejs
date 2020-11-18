@@ -52,6 +52,9 @@ router.get('/suggestion/resourceneed', auth, MarketValidator.suggestResourceNeed
 router.get('/discoverWeekly', auth, marketController.getDiscoverWeekly)
 router.post('/triggerDiscoverWeekly', marketController.triggerDiscoverWeekly)
 
+router.post('/pendingProjReqsReminder', marketController.triggerProjectReqsReminder)
+router.post('/pendingResReqsReminder', marketController.triggerResourceReqsReminder)
+
 router.get('/test', auth, marketController.testEndpoint)
 
 module.exports = router;
