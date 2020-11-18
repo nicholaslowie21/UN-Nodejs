@@ -4455,6 +4455,11 @@ exports.triggerProjectReqsReminder = async function (req, res) {
     });
 }
 
+new CronJob('59 23 * * 6', async function () {
+    runPendingResourceReqReminder()
+    console.log('Email reminder to pending resource request triggered')
+}, null, true, 'Asia/Singapore');
+
 exports.triggerResourceReqsReminder = async function (req, res) {    
     runPendingResourceReqReminder()
 
