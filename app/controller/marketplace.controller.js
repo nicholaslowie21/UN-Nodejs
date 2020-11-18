@@ -1511,10 +1511,10 @@ exports.getDiscoverWeekly = async function (req, res) {
     });
 
     if(!discoverWeekly)
-    return res.status(200).json({
-        status: 'success',
+    return res.status(500).json({
+        status: 'error',
         msg: 'There is no discover weekly projects yet!',
-        data: { discoverweekly: theList }
+        data: { }
     });
 
     var projectIds = discoverWeekly.projectIds;

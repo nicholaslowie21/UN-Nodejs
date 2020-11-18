@@ -125,6 +125,7 @@ exports.postSignup = async function (req, res, next) {
 
     user.save(user)
     .then(data => {
+        Helper.createAuditLog("Sign up", "user",data.id);
         return res.status(200).json({
             status: 'success',
             msg: 'User successfully created',
@@ -326,7 +327,7 @@ exports.userChangePassword = async function (req, res, next) {
         } 
     })
 
-    Helper.createAuditLog("User change password", "user","user.id");
+    Helper.createAuditLog("User change password", "user",user.id);
 }
 
 exports.institutionChangePassword = async function (req, res, next) {

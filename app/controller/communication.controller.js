@@ -5,8 +5,12 @@ const User = db.users
 const Institution = db.institution
 const Chat = db.chat
 const ChatRoom = db.chatroom
+const AuditLog = db.auditlog
 const Notification = db.notification
+const Project = db.project
+const DiscoverWeekly = db.discoverweekly
 const Helper = require('../service/helper.service')
+const CronJob = require('cron').CronJob
 
 exports.createAnnouncement = async function (req, res){
     let account; 
@@ -898,3 +902,112 @@ async function getTargetImg(theItem) {
 
     return owner.ionicImg 
 }
+
+async function runInactiveEmailReminder () {
+    const users = await User.find({ 'status': 'active' }, function (err) {
+        if (err) console.log(err)
+    });
+
+    for(var i = 0; i < users.length; i++) {
+        checkAndSendEmail(users[i].id,"user",users[i].email)
+    }
+
+    const institutions = await Institution.find({ 'status': 'active' }, function (err) {
+        if (err) console.log(err)
+    });
+
+    for(var i = 0; i < institutions.length; i++) {
+        checkAndSendEmail(institutions[i].id,"institution",institutions[i].email)
+    }
+}
+
+async function checkAndSendEmail(targetId, targetType, targetEmail) {
+    const logs = await AuditLog.find({ 'targetId': targetId, 'targetType': targetType }, function (err) {
+        if (err) console.log(err)
+    });
+    
+    if(!logs) return
+    if(logs.length === 0) return
+
+    logs.reverse()
+
+    var lastActiveDate = moment(logs[0].createdAt).tz('Asia/Singapore')
+    var dateNow = moment.tz('Asia/Singapore')
+
+    if(dateNow.diff(lastActiveDate, 'days') >= 30) {
+
+        var projectIds = [];
+        discoverWeekly = await DiscoverWeekly.findOne({ 'accountId': targetId, 'accountType': targetType }, function (err) {
+            if (err) console.log("Error (checkAndSendEmail): [iactiveEmail] "+err)
+        });
+    
+        if(discoverWeekly) 
+        projectIds = discoverWeekly.projectIds;
+
+        var theProjects = ""
+        var count = 0;
+        for(var i = 0; i < projectIds.length; i++) {
+            var temp = await getProject(projectIds[i])
+
+            if(temp){
+                if(count > 0) theProjects = theProjects+", "+temp.title
+                else theProjects += temp.title
+
+                count++;
+            }
+        }
+        
+        theProjects += ".";
+            
+        let subject = 'KoCoSD Platform'
+        let theMessage = `
+            <h1>We missed you!</h1>
+            <p>It's been a while since you last log in. Come back and check out what's new!</p>
+            <br>
+        `
+
+        if(count>0) {
+            theMessage = `
+            <h1>We missed you!</h1>
+            <p>It's been a while since you last log in. Come back and check out what's new!</p>
+            <p>Here are some of the projects that might interest you: <b>${theProjects}</b></p>
+            <br>
+        `
+        }
+
+        Helper.sendEmail(targetEmail, subject, theMessage, function (info) {
+            if (!info) {
+                console.log('Something went wrong while trying to send email!')
+            } 
+        })    
+    } else return
+}
+
+async function getProject(theId) {
+    const project = await Project.findOne({ '_id': theId }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+
+    if(!project) return
+    if(project.status != 'ongoing') return
+
+    return project
+}
+
+exports.triggerInactiveEmail = async function (req, res) {    
+    runInactiveEmailReminder()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Email reminder to inactive user successfully manually triggered',
+        data: { }
+    });
+}
+
+new CronJob('59 23 * * 0', async function () {
+    runInactiveEmailReminder()
+    console.log('Email reminder to inactive user triggered')
+  }, null, true, 'Asia/Singapore');

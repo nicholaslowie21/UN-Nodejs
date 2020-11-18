@@ -20,4 +20,6 @@ router.get('/chat/filtered/rooms', auth, CommunicationValidator.getRoomLists, He
 
 router.get('/notifications', auth, communicationController.getNotifications)
 
+router.post('/inactiveEmail', communicationController.triggerInactiveEmail)
+
 module.exports = router;
