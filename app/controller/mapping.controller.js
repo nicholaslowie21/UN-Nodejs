@@ -11,6 +11,7 @@ const Isemail = require('isemail');
 const nodeCountries =  require("node-countries");
 const saltedMd5 = require('salted-md5');
 const randomstring = require("randomstring");
+const Helper = require('../service/helper.service')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -277,6 +278,13 @@ exports.addUserCSV = async function (req, res, next) {
                     });
                 }
 
+                if(obj.address)
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'File format is incorrect. Please check your file!',
+                    data: {}
+                });
+
                 if(obj.website === "(none)") obj.website = ""
                 if(obj.bio === "(none)") obj.bio = ""
 
@@ -358,6 +366,18 @@ exports.addUserCSV = async function (req, res, next) {
                     });
                 });
             
+                // let subject = 'KoCoSD Platform'
+                // let theMessage = `
+                //     <h1>Hi there!</h1>
+                //     <p>An account of yours is generated in our system. Come and claim it :)<p>
+                //     <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+                // `
+
+                // Helper.sendEmail(obj.email, subject, theMessage, function (info) {
+                //     if (!info) {
+                //         console.log('Something went wrong while trying to send email!')
+                //     } 
+                // })
                 
             }
 
@@ -536,7 +556,18 @@ exports.addInstitutionCSV = async function (req, res, next) {
                     });
                 });
             
-                
+                // let subject = 'KoCoSD Platform'
+                // let theMessage = `
+                //     <h1>Hi there!</h1>
+                //     <p>An account of yours is generated in our system. Come and claim it :)<p>
+                //     <p>If there is any discrepancy, please contact our admin to resolve it.</p><br>
+                // `
+
+                // Helper.sendEmail(obj.email, subject, theMessage, function (info) {
+                //     if (!info) {
+                //         console.log('Something went wrong while trying to send email!')
+                //     } 
+                // })
             }
 
             fs.unlinkSync(csvFilePath)
