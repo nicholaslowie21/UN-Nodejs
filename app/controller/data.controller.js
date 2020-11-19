@@ -1,5 +1,5 @@
 const moment = require('moment-timezone')
-const { item } = require('../models')
+const { contribution } = require('../models')
 const db = require('../models')
 const Target = db.target
 const User = db.users
@@ -70,7 +70,7 @@ exports.getDashboard = async function (req, res){
         });
     });
 
-    var resourcesNum = knowledges.length + manpowers.length + venues.length + item.length
+    var resourcesNum = knowledges.length + manpowers.length + venues.length + items.length
 
     var contributions = await Contribution.find({ 'status': 'active' }, function (err) {
         if (err)
@@ -119,6 +119,33 @@ exports.getDashboard = async function (req, res){
     var projectsOngoingNum = projectsOngoing.length
     var projectsCompletedNum = projectsCompleted.length
 
+    var resourcesTypesNum = []
+    resourcesTypesNum.push(manpowers.length)
+    resourcesTypesNum.push(items.length)
+    resourcesTypesNum.push(venues.length)
+    resourcesTypesNum.push(knowledges.length)
+
+    var fundingContribution = 0;
+    var knowledgeContribution = 0;
+    var itemContribution = 0;
+    var venueContribution = 0;
+    var manpowerContribution = 0;
+
+    for(var i = 0; i < contributions.length; i++){
+        if(contributions[i].resType === "money") fundingContribution++;
+        else if(contributions[i].resType === "knowledge") knowledgeContribution++;
+        else if(contributions[i].resType === "item") itemContribution++;
+        else if(contributions[i].resType === "venue") venueContribution++;
+        else if(contributions[i].resType === "manpower") manpowerContribution;
+    }
+
+    var contributionsTypesNum = []
+    contributionsTypesNum.push(manpowerContribution)
+    contributionsTypesNum.push(itemContribution)
+    contributionsTypesNum.push(venueContribution)
+    contributionsTypesNum.push(knowledgeContribution)
+    contributionsTypesNum.push(fundingContribution)
+
     return res.status(200).json({
         status: 'success',
         msg: 'Dashboard data retrieved',
@@ -128,7 +155,9 @@ exports.getDashboard = async function (req, res){
             contributionsNum: contributionsNum,
             fundingRaised: fundingRaised,
             projectsOngoingNum: projectsOngoingNum,
-            projectsCompletedNum: projectsCompletedNum
+            projectsCompletedNum: projectsCompletedNum,
+            resourcesTypesNum: resourcesTypesNum,
+            contributionsTypesNum: contributionsTypesNum
         }
     });
 }
