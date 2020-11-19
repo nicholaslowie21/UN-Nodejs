@@ -269,7 +269,7 @@ exports.addUserCSV = async function (req, res, next) {
         if (fs.existsSync(csvFilePath)) {
             for (const obj of csvData) {
                 
-                if(!obj.sequence || !obj.name || !obj.email || !obj.country || !obj.website || !obj.SDGs) {
+                if(!obj.sequence || !obj.name || !obj.email || !obj.country || !obj.website || !obj.SDGs || !obj.bio) {
                     return res.status(500).json({
                         status: 'error',
                         msg: 'File format is incorrect. Please check your file!',
@@ -278,6 +278,7 @@ exports.addUserCSV = async function (req, res, next) {
                 }
 
                 if(obj.website === "(none)") obj.website = ""
+                if(obj.bio === "(none)") obj.bio = ""
 
                 let theCountry = nodeCountries.getCountryByName(obj.country);
 
@@ -340,6 +341,7 @@ exports.addUserCSV = async function (req, res, next) {
                     isVerified: "false",
                     country: obj.country,
                     website: obj.website,
+                    bio: obj.bio,
                     SDGs: temp,
                     isVerified: true
                 })
