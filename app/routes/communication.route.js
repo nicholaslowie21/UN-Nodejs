@@ -19,6 +19,7 @@ router.get('/chat/chats', auth, CommunicationValidator.getChats, Helper.ifErrors
 router.get('/chat/filtered/rooms', auth, CommunicationValidator.getRoomLists, Helper.ifErrors, communicationController.getRoomListFiltered)
 
 router.get('/notifications', auth, communicationController.getNotifications)
+router.get('/gotNewNotif', auth, communicationController.gotNewNotif)
 
 router.post('/inactiveEmail', communicationController.triggerInactiveEmail)
 

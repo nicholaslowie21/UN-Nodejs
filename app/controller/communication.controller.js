@@ -688,6 +688,38 @@ exports.getNotifications = async function (req, res) {
     
 }
 
+exports.gotNewNotif = async function (req, res) {
+    var notifications = await Notification.find({ 'accountId':req.id,'accountType':req.type }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err.message,
+            data: {}
+        });
+    });
+
+    if(!notifications) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue while retrieving notifications!',
+            data: {}
+        });
+    } else {
+        notifications.reverse()
+
+        var gotNew = false;
+
+        if(notifications[0].isRead === false) gotNew = true
+        
+        return res.status(200).json({
+            status: 'success',
+            msg: 'New notifications successfully checked',
+            data: { gotNew: gotNew }
+        });
+    }
+    
+}
+
 exports.getRoomList = async function (req, res) {
     var chatRooms = await ChatRoom.find({ 'status':'open', $or: [{user1id: req.id}, {user2id: req.id}]  }, function (err) {
         if (err)
