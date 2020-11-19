@@ -955,8 +955,9 @@ exports.updateReward = async function (req, res){
         data: {}
     });
 
+    var startDate;
     if(reward.status != 'open') {
-        var startDate = moment(req.body.startDate).tz('Asia/Singapore')
+        startDate = moment(req.body.startDate).tz('Asia/Singapore')
         if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
         return res.status(500).json({
             status: 'error',
