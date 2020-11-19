@@ -36,6 +36,26 @@ exports.searchUsers = async function (req, res){
     });
 }
 
+exports.allProjects = async function (req, res){
+    const projects = await Projects.find({ 'status': { $ne: 'closed' } }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!projects) {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'No users found! ',
+            data: {}
+        });
+    }
+    
+    return res.status(200).json({
+        status: 'success',
+        msg: 'You have successfully queried for projects',
+        data: { projects: projects }
+    });
+}
+
 exports.searchInstitutions = async function (req, res){
 
     var rgx = new RegExp(req.query.username, "i");

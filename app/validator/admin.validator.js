@@ -12,6 +12,13 @@ exports.searchUsers = [
     query('username').exists()
 ]
 
+exports.allProjects = [
+    body('role').exists().custom(async value => {
+        if (value == 'user') 
+            return Promise.reject('You are not authorised to access this!')
+    })
+]
+
 exports.suspendUser = [
     body('role').exists().custom(async value => {
         if (value == 'user') 

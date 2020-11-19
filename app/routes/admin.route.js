@@ -50,4 +50,6 @@ router.get('/export/auditLogs', auth, AdminValidator.getAuditLogs, AdminValidato
 router.get('/claims', auth, AdminValidator.getAccountClaims, AdminValidator.ifErrors, adminController.getAccountClaims )
 router.post('/claim', auth, AdminValidator.validateAccountClaim, AdminValidator.ifErrors, adminController.validateAccountClaim )
 
+router.get('/allProjects', auth, AdminValidator.allProjects, AdminValidator.ifErrors, adminController.allProjects)
+
 module.exports = router;
