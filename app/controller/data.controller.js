@@ -34,7 +34,7 @@ exports.getDashboard = async function (req, res){
     
     var activeAccNum = users.length + institutions.length
     
-    var knowledges = await Knowledge.find({ 'status': 'active' }, function (err) {
+    var knowledges = await Knowledge.find( {}, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -43,7 +43,7 @@ exports.getDashboard = async function (req, res){
         });
     });
 
-    var manpowers = await Manpower.find({ 'status': 'active' }, function (err) {
+    var manpowers = await Manpower.find({  }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -52,7 +52,7 @@ exports.getDashboard = async function (req, res){
         });
     });
 
-    var venues = await Venue.find({ 'status': 'active' }, function (err) {
+    var venues = await Venue.find({  }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
@@ -61,7 +61,7 @@ exports.getDashboard = async function (req, res){
         });
     });
 
-    var items = await Item.find({ 'status': 'active' }, function (err) {
+    var items = await Item.find({ }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
