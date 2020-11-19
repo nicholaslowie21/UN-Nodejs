@@ -161,3 +161,96 @@ exports.getDashboard = async function (req, res){
         }
     });
 }
+
+exports.accountsChart = async function (req, res){
+    
+    var startString = req.query.year+"-01-01"
+    var startDate = moment(startString).tz('Asia/Singapore')
+    var endString = req.query.year+"-12-31"
+    var endDate = moment(endString).tz('Asia/Singapore')
+
+    var users = await User.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the users!',
+            data: {}
+        });
+    }); 
+
+    var usersPerMonth = [0,0,0,0,0,0,0,0,0,0,0,0]
+    for(var i = 0; i < users.length; i++) {
+        var theEntryMonth = moment(users[i].createdAt).format("MM")
+        usersPerMonth[theEntryMonth-1]++
+    }
+
+    var institutions = await Institution.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the institutions!',
+            data: {}
+        });
+    }); 
+    
+    var institutionsPerMonth = [0,0,0,0,0,0,0,0,0,0,0,0]
+    for(var i = 0; i < institutions.length; i++) {
+        var theEntryMonth = moment(institutions[i].createdAt).format("MM")
+        institutionsPerMonth[theEntryMonth-1]++
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Accounts Bar Chat data retrieved',
+        data: { 
+            usersPerMonth: usersPerMonth,
+            institutionsPerMonth: institutionsPerMonth
+        }
+    });
+}
+
+exports.cumulativeProjects = async function (req, res){
+    
+    var startString = req.query.year+"-01-01"
+    var startDate = moment(startString).tz('Asia/Singapore')
+    var endString = req.query.year+"-12-31"
+    var endDate = moment(endString).tz('Asia/Singapore')
+
+    var projectsPrior = await Project.find({ createdAt: {$lt: startDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the projects!',
+            data: {}
+        });
+    }); 
+
+    var totalPrior = projectsPrior.length
+
+    var projectsThisYear = await Project.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the projects!',
+            data: {}
+        });
+    }); 
+    
+    var cumulativeThisYear = [0,0,0,0,0,0,0,0,0,0,0,0]
+    for(var i = 0; i < projectsThisYear.length; i++) {
+        var theEntryMonth = moment(projectsThisYear[i].createdAt).format("MM")
+        cumulativeThisYear[theEntryMonth-1]++
+    }
+
+    for(var i = 1; i <= 11; i++) {
+        cumulativeThisYear[i] += cumulativeThisYear[i-1]
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Cumulative projects graph data retrieved',
+        data: { 
+            cumulativeThisYear: cumulativeThisYear
+        }
+    });
+}
