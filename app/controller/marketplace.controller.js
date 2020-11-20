@@ -13,6 +13,7 @@ const ProjectReq = db.projectreq
 const Project = db.project
 const Contribution = db.contribution
 const DiscoverWeekly = db.discoverweekly
+const PaidResource = db.paidresource
 const nodeCountries =  require("node-countries")
 const Helper = require('../service/helper.service')
 const { default: ShortUniqueId } = require('short-unique-id');
@@ -3740,6 +3741,48 @@ exports.cancelResourceReq = async function (req, res) {
             msg: 'Something went wrong! Error: ' + err.message,
             data: {}
         });
+    });
+}
+
+exports.paidResourcesMarketplace = async function (req, res){
+    const paidresources = await PaidResource.find({ 'status': 'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidresources)
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Paid Resources does not exist!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i = 0; i < paidresources.length; i++) {
+        var paidresource = paidresources[i]
+        var theOwner = await getAccount(paidresource.owner, paidresource.ownerType)
+    
+        if(!theOwner) continue
+
+        var thepaidresource = JSON.parse(JSON.stringify(paidresource))
+        thepaidresource.ownerName = theOwner.name
+        thepaidresource.ownerUsername = theOwner.username
+        thepaidresource.ownerImg = theOwner.ionicImg
+
+        theList.push(thepaidresource)
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Paid resources marketplace successfully retrieved!',
+        data: { paidresources: theList }
     });
 }
 

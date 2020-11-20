@@ -18,6 +18,7 @@ const targetRouter = require('./target.route')
 const testimonialRouter = require('./testimonial.route')
 const mappingRouter = require('./mapping.route')
 const dataRouter = require('./data.route')
+const paidresourceRouter = require('./paidresource.route')
 
 router.use('/authorization', authorizationRouter)
 router.use('/user', userRouter)
@@ -36,5 +37,6 @@ router.use('/target', targetRouter)
 router.use('/testimonial', testimonialRouter)
 router.use('/mapping', mappingRouter)
 router.use('/data', dataRouter)
+router.use('/paidresource', paidresourceRouter)
 
 module.exports = router;

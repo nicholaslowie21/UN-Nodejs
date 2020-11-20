@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const resourceController = require('../controller/resource.controller');
 const auth = require('../middleware/auth')
-const updloadMultipleFiles = require('../middleware/uploadMultipleFiles')
 
 const ResourceValidator = require('../validator/resource.validator');
 const Helper = require('../service/helper.service');
@@ -29,12 +28,12 @@ router.get('/private/institution/venue', auth, resourceController.viewPrivateIns
 // router.post('/createItem', auth, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem )
 router.post('/createItem', auth, uploadMultipleFiles, resourceController.multerCreateItem, ResourceValidator.createItemResource, Helper.ifErrors, resourceController.createItem)
 router.post('/updateItem', auth, ResourceValidator.updateItemResource, Helper.ifErrors, resourceController.updateItem )
-router.post('/uploadItemPicture', auth, updloadMultipleFiles, resourceController.multerItemPicUpload, resourceController.itemPicture)
+router.post('/uploadItemPicture', auth, uploadMultipleFiles, resourceController.multerItemPicUpload, resourceController.itemPicture)
 router.post('/deleteItemPicture', auth, ResourceValidator.deleteItemPicture, resourceController.deleteItemPicture)
 
 router.post('/createVenue', auth, uploadMultipleFiles, resourceController.multerCreateVenue, ResourceValidator.createVenueResource, Helper.ifErrors, resourceController.createVenue )
 router.post('/updateVenue', auth, ResourceValidator.updateVenueResource, Helper.ifErrors, resourceController.updateVenue )
-router.post('/uploadVenuePicture', auth, updloadMultipleFiles, resourceController.multerVenuePicUpload, resourceController.venuePicture)
+router.post('/uploadVenuePicture', auth, uploadMultipleFiles, resourceController.multerVenuePicUpload, resourceController.venuePicture)
 router.post('/deleteVenuePicture', auth, ResourceValidator.deleteVenuePicture, resourceController.deleteVenuePicture)
 
 router.post('/createManpower', auth, ResourceValidator.createManpowerResource, Helper.ifErrors, resourceController.createManpower )

@@ -2174,7 +2174,7 @@ exports.deleteItemPicture = async function (req, res){
         if (err)
         return res.status(500).json({
             status: 'error',
-            msg: 'There was no such venue resource!',
+            msg: 'There was no such item resource!',
             data: {}
         });
     });
@@ -2182,7 +2182,7 @@ exports.deleteItemPicture = async function (req, res){
     if(!item)
     return res.status(500).json({
         status: 'error',
-        msg: 'Item does not exists!',
+        msg: 'Item does not exist!',
         data: {}
     });
 

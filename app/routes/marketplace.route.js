@@ -55,6 +55,8 @@ router.post('/triggerDiscoverWeekly', marketController.triggerDiscoverWeekly)
 router.post('/pendingProjReqsReminder', marketController.triggerProjectReqsReminder)
 router.post('/pendingResReqsReminder', marketController.triggerResourceReqsReminder)
 
+router.get('/paidresources', auth, marketController.paidResourcesMarketplace)
+
 router.get('/test', auth, marketController.testEndpoint)
 
 module.exports = router;
