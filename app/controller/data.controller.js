@@ -254,3 +254,84 @@ exports.cumulativeProjects = async function (req, res){
         }
     });
 }
+
+exports.dataBySDG = async function (req, res){
+    
+    var startDate = moment(req.query.startDate).tz('Asia/Singapore')
+    var endDate = moment(req.query.endDate).tz('Asia/Singapore')
+
+    var dataItems = await createDataBySDGItems();
+
+    console.log(dataItems)
+
+    // var projectsPrior = await Project.find({ createdAt: {$lt: startDate} }, function (err) {
+    //     if (err)
+    //     return res.status(500).json({
+    //         status: 'error',
+    //         msg: 'There was an issue retrieving the projects!',
+    //         data: {}
+    //     });
+    // }); 
+
+    // var totalPrior = projectsPrior.length
+
+    // var projectsThisYear = await Project.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+    //     if (err)
+    //     return res.status(500).json({
+    //         status: 'error',
+    //         msg: 'There was an issue retrieving the projects!',
+    //         data: {}
+    //     });
+    // }); 
+    
+    // var cumulativeThisYear = [0,0,0,0,0,0,0,0,0,0,0,0]
+    // for(var i = 0; i < projectsThisYear.length; i++) {
+    //     var theEntryMonth = moment(projectsThisYear[i].createdAt).format("MM")
+    //     cumulativeThisYear[theEntryMonth-1]++
+    // }
+
+    // for(var i = 1; i <= 11; i++) {
+    //     cumulativeThisYear[i] += cumulativeThisYear[i-1]
+    // }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Data by SDGs successfully retrieved',
+        data: { }
+    });
+}
+
+async function createDataBySDGItems () {
+    var theList = []
+
+    for(var i = 0; i < 17; i++){
+        var dataItem = {
+            sdgTitle:'',
+            accountsNum:0, 
+            projectsNum:0, 
+            contributionsNum: 0, 
+            fundingNum: 0
+        }
+        theList.push(dataItem)
+    }
+    
+    theList[0].sdgTitle = '1: No Poverty'
+    theList[1].sdgTitle = '2: Zero Hunger'
+    theList[2].sdgTitle = '3: Good Health and Well-Being'
+    theList[3].sdgTitle = '4: Quality Education'
+    theList[4].sdgTitle = '5: Gender Equality'
+    theList[5].sdgTitle = '6: Clean Water and Sanitation'
+    theList[6].sdgTitle = '7: Affordable and Clean Energy'
+    theList[7].sdgTitle = '8: Decent Work and Economic Growth'
+    theList[8].sdgTitle = '9: Industry, Innovation, and Infrastructure'
+    theList[9].sdgTitle = '10: Reduced Inequalities'
+    theList[10].sdgTitle = '11: Sustainable Cities and Communities'
+    theList[11].sdgTitle = '12: Responsible Consumption and Production'
+    theList[12].sdgTitle = '13: Climate Action'
+    theList[13].sdgTitle = '14: Life Below Water'
+    theList[14].sdgTitle = '15: Life on Land'
+    theList[15].sdgTitle = '16: Peace, Justice, and Strong Institutions'
+    theList[16].sdgTitle = '17: Partnerships for the Goals'
+
+    return theList
+}

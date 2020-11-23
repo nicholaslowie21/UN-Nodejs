@@ -22,3 +22,8 @@ exports.cumulativeProjects = [
         
     })
 ]
+
+exports.dataBySDG = [
+    query('startDate').exists(),
+    query('endDate').exists()
+]
