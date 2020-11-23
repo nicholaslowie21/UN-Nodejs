@@ -3,6 +3,8 @@ const db = require('../models')
 const User = db.users
 const Institution = db.institution
 const PaidResource = db.paidresource
+const PaidRequest = db.paidrequest
+const Project = db.project
 const path = require('path')
 const fs = require('fs')
 const multer = require('multer')
@@ -97,7 +99,7 @@ exports.createPaidResource = async function (req, res) {
         price: price,
 		status: "active",
         ownerType: req.type,
-        imgPaths: req.thePath
+        imgPath: req.thePath
     });
 
     paidresource.save(paidresource)
@@ -154,6 +156,13 @@ exports.updatePaidResource = async function (req, res) {
         });
     });
 
+    if(!paidresource) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such paid resource not found!',
+        data: {}
+    });
+
    	paidresource.title = req.body.title
     paidresource.desc = req.body.desc
     paidresource.country = req.body.country
@@ -166,6 +175,72 @@ exports.updatePaidResource = async function (req, res) {
             status: 'success',
             msg: 'Paid Resource successfully updated',
             data: { paidresource: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+}
+
+exports.purchaseRequest = async function (req, res) {
+    var buyer = await getAccount(req.id,req.type)
+
+    if(!buyer) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    var project = await Project.findOne({ '_id': req.body.projectId, 'status':'ongoing' }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such ongoing project not found!',
+        data: {}
+    });
+
+    var paidresource = await PaidResource.findOne({ '_id': req.body.paidResourceId, 'status':'active' }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidresource) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such active paid resurce not found!',
+        data: {}
+    });
+
+    const paidrequest = new PaidRequest({
+        paidResourceId: req.body.paidResourceId,
+        status:'pending',
+        projectId: req.body.projectId,
+        buyerId: req.id,
+        buyerType: req.type,
+    })
+
+    paidrequest.save(paidrequest)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Paid Resource purchase request successfully created!',
+            data: { paidrequest: data }
         });
     }).catch(err => {
         return res.status(500).json({
@@ -281,7 +356,7 @@ exports.uploadPaidResPic = async function (req, res){
         )
     }
 
-    paidresource.imgPaths = paidresource.imgPaths.concat(req.thePath)
+    paidresource.imgPath = paidresource.imgPath.concat(req.thePath)
 
     paidresource.save(paidresource)
     .then(data => {
@@ -339,7 +414,7 @@ exports.deletePaidResourcePicture = async function (req, res){
         data: {}
     });
 
-    var oldList = paidresource.imgPaths
+    var oldList = paidresource.imgPath
     var toDelete = req.body.indexes
     var newList = []
 
@@ -348,7 +423,7 @@ exports.deletePaidResourcePicture = async function (req, res){
             newList.push(oldList[i])
     }
 
-    paidresource.imgPaths = newList;
+    paidresource.imgPath = newList;
 
     paidresource.save(paidresource)
     .then(data => {

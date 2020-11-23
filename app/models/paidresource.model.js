@@ -9,7 +9,7 @@ module.exports = mongoose => {
         owner: { type: String, default: '' },
         ownerType: { type: String, default: '' },
         country: { type: String, default: '' },
-        imgPaths: [String]
+        imgPath: [String]
       },
       { timestamps: true }
     );

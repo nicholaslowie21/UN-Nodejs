@@ -36,6 +36,11 @@ exports.updatePaidResource = [
     })
 ]
 
+exports.purchaseRequest = [
+    body('paidResourceId').exists(),
+    body('projectId').exists()
+]
+
 exports.deletePaidResPicture = [
     body('paidResourceId').exists(),
     body('indexes').exists()

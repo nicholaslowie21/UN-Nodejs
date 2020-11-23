@@ -12,11 +12,13 @@ router.post('/updatePaidResource', auth, PaidResourceValidator.updatePaidResourc
 router.post('/uploadPaidResourcePicture', auth, uploadMultipleFiles, paidResourceController.multerPaidResourcePic, paidResourceController.uploadPaidResPic)
 router.post('/deletePaidResourcePicture', auth, PaidResourceValidator.deletePaidResPicture, paidResourceController.deletePaidResourcePicture)
 
-router.post('/status', auth, PaidResourceValidator.statusPaidResPicture, paidResourceController.statusPaidResource)
+router.post('/status', auth, PaidResourceValidator.statusPaidResPicture, Helper.ifErrors, paidResourceController.statusPaidResource)
 
 router.get('/details', PaidResourceValidator.paidResDetail, paidResourceController.paidResourceDetail)
 
 router.get('/all/my', auth, paidResourceController.myPaidResources)
 router.get('/all/others', PaidResourceValidator.othersPaidResources, Helper.ifErrors, paidResourceController.othersPaidResources)
+
+router.post('/purchase/request', auth, PaidResourceValidator.purchaseRequest, Helper.ifErrors, paidResourceController.purchaseRequest)
 
 module.exports = router;

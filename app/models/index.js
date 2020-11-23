@@ -41,5 +41,6 @@ db.testimonial = require("./testimonial.model")(mongoose);
 db.notification = require("./notification.model")(mongoose);
 db.accountclaim = require("./accountclaim.model")(mongoose);
 db.paidresource = require("./paidresource.model")(mongoose);
+db.paidrequest = require("./paidrequest.model")(mongoose);
 
 module.exports = db;
