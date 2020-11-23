@@ -11,6 +11,7 @@ const Manpower = db.manpower
 const Venue = db.venue
 const Item = db.item
 const Contribution = db.contribution
+const PaidResource = db.paidresource
 const Helper = require('../service/helper.service')
 
 exports.getDashboard = async function (req, res){
@@ -119,32 +120,16 @@ exports.getDashboard = async function (req, res){
     var projectsOngoingNum = projectsOngoing.length
     var projectsCompletedNum = projectsCompleted.length
 
-    var resourcesTypesNum = []
-    resourcesTypesNum.push(manpowers.length)
-    resourcesTypesNum.push(items.length)
-    resourcesTypesNum.push(venues.length)
-    resourcesTypesNum.push(knowledges.length)
+    var paidresources = await PaidResource.find({ }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: {}
+        });
+    });
 
-    var fundingContribution = 0;
-    var knowledgeContribution = 0;
-    var itemContribution = 0;
-    var venueContribution = 0;
-    var manpowerContribution = 0;
-
-    for(var i = 0; i < contributions.length; i++){
-        if(contributions[i].resType === "money") fundingContribution++;
-        else if(contributions[i].resType === "knowledge") knowledgeContribution++;
-        else if(contributions[i].resType === "item") itemContribution++;
-        else if(contributions[i].resType === "venue") venueContribution++;
-        else if(contributions[i].resType === "manpower") manpowerContribution;
-    }
-
-    var contributionsTypesNum = []
-    contributionsTypesNum.push(manpowerContribution)
-    contributionsTypesNum.push(itemContribution)
-    contributionsTypesNum.push(venueContribution)
-    contributionsTypesNum.push(knowledgeContribution)
-    contributionsTypesNum.push(fundingContribution)
+    var paidResourcesNum = paidresources.length
 
     return res.status(200).json({
         status: 'success',
@@ -156,8 +141,7 @@ exports.getDashboard = async function (req, res){
             fundingRaised: fundingRaised,
             projectsOngoingNum: projectsOngoingNum,
             projectsCompletedNum: projectsCompletedNum,
-            resourcesTypesNum: resourcesTypesNum,
-            contributionsTypesNum: contributionsTypesNum
+            paidResourcesNum: paidResourcesNum
         }
     });
 }
@@ -205,6 +189,110 @@ exports.accountsChart = async function (req, res){
         data: { 
             usersPerMonth: usersPerMonth,
             institutionsPerMonth: institutionsPerMonth
+        }
+    });
+}
+
+exports.resourcesTypesNumbers = async function (req, res){
+    
+    var startString = req.query.year+"-01-01"
+    var startDate = moment(startString).tz('Asia/Singapore')
+    var endString = req.query.year+"-12-31"
+    var endDate = moment(endString).tz('Asia/Singapore')
+
+    var knowledges = await Knowledge.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: {}
+        });
+    });
+
+    var manpowers = await Manpower.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: {}
+        });
+    });
+
+    var venues = await Venue.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: {}
+        });
+    });
+
+    var items = await Item.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: {}
+        });
+    });
+
+    var resourcesTypesNum = []
+    resourcesTypesNum.push(manpowers.length)
+    resourcesTypesNum.push(items.length)
+    resourcesTypesNum.push(venues.length)
+    resourcesTypesNum.push(knowledges.length)
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Resource Types Numbers data retrieved',
+        data: { 
+            resourcesTypesNum: resourcesTypesNum
+        }
+    });
+}
+
+exports.contributionsNumbers = async function (req, res){
+    
+    var startString = req.query.year+"-01-01"
+    var startDate = moment(startString).tz('Asia/Singapore')
+    var endString = req.query.year+"-12-31"
+    var endDate = moment(endString).tz('Asia/Singapore')
+
+    var contributions = await Contribution.find({ 'status': 'active', 'createdAt': {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: '+err,
+            data: {}
+        });
+    });
+
+    var fundingContribution = 0;
+    var knowledgeContribution = 0;
+    var itemContribution = 0;
+    var venueContribution = 0;
+    var manpowerContribution = 0;
+
+    for(var i = 0; i < contributions.length; i++){
+        if(contributions[i].resType === "money") fundingContribution++;
+        else if(contributions[i].resType === "knowledge") knowledgeContribution++;
+        else if(contributions[i].resType === "item") itemContribution++;
+        else if(contributions[i].resType === "venue") venueContribution++;
+        else if(contributions[i].resType === "manpower") manpowerContribution;
+    }
+
+    var contributionsTypesNum = []
+    contributionsTypesNum.push(manpowerContribution)
+    contributionsTypesNum.push(itemContribution)
+    contributionsTypesNum.push(venueContribution)
+    contributionsTypesNum.push(knowledgeContribution)
+    contributionsTypesNum.push(fundingContribution)
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Contributions Numbers data retrieved',
+        data: { 
+            contributionsTypesNum: contributionsTypesNum
         }
     });
 }
