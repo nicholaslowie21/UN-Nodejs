@@ -20,5 +20,12 @@ router.get('/all/my', auth, paidResourceController.myPaidResources)
 router.get('/all/others', PaidResourceValidator.othersPaidResources, Helper.ifErrors, paidResourceController.othersPaidResources)
 
 router.post('/purchase/request', auth, PaidResourceValidator.purchaseRequest, Helper.ifErrors, paidResourceController.purchaseRequest)
+router.post('/buyer/purchase/status', auth, PaidResourceValidator.buyerUpdateStatus, Helper.ifErrors, paidResourceController.updateBuyerStatus)
+router.post('/seller/purchase/status', auth, PaidResourceValidator.sellerUpdateStatus, Helper.ifErrors, paidResourceController.updateSellerStatus)
+
+router.get('/my/purchase', auth, PaidResourceValidator.myPurchase, Helper.ifErrors, paidResourceController.myPurchase )
+router.get('/seller/requests', auth, PaidResourceValidator.sellerRequests, Helper.ifErrors, paidResourceController.sellerRequests)
+
+router.get('/project/purchase', PaidResourceValidator.projectPurchase, Helper.ifErrors, paidResourceController.projectPurchase)
 
 module.exports = router;

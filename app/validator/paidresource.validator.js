@@ -41,13 +41,48 @@ exports.purchaseRequest = [
     body('projectId').exists()
 ]
 
+exports.buyerUpdateStatus = [
+    body('paidRequestId').exists(),
+    body('status').exists().custom(async value => {
+        if(value != 'paid' && value != 'cancelled')
+        return Promise.reject('Status is invalid!')
+    })
+]
+
+exports.sellerUpdateStatus = [
+    body('paidRequestId').exists(),
+    body('status').exists().custom(async value => {
+        if(value != 'accepted' && value != 'declined' && value != 'cancelled')
+        return Promise.reject('Status is invalid!')
+    })
+]
+
+exports.projectPurchase = [
+    query('projectId').exists(),
+]
+
+exports.myPurchase = [
+    query('status').exists().custom(async value => {
+        if(value != 'accepted' && value != 'declined' && value != 'cancelled' && value != 'pending' && value != 'paid')
+        return Promise.reject('Status is invalid!')
+    })
+]
+
+exports.sellerRequests = [
+    query('paidResourceId').exists(),
+    query('status').exists().custom(async value => {
+        if(value != 'accepted' && value != 'declined' && value != 'cancelled' && value != 'pending' && value != 'paid')
+        return Promise.reject('Status is invalid!')
+    })
+]
+
 exports.deletePaidResPicture = [
     body('paidResourceId').exists(),
     body('indexes').exists()
 ]
 
 exports.statusPaidResPicture = [
-    body('paidResourceId').exists(),
+    body('paidRequestId').exists(),
     body('status').exists().custom(async value => {
         if(value != 'active' && value != 'inactive' && value !='deleted')
         return Promise.reject('Status is invalid!')

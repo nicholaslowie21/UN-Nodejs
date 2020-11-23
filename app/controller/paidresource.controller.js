@@ -249,6 +249,268 @@ exports.purchaseRequest = async function (req, res) {
             data: {}
         });
     });
+
+    var notifDesc = "Somebody requested to purchase " +paidresource.title
+    Helper.createNotification("Paid Resource", notifDesc, paidresource.owner, paidresource.ownerType )
+}
+
+exports.updateBuyerStatus = async function (req, res) {
+    var buyer = await getAccount(req.id,req.type)
+
+    if(!buyer) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    var paidrequest = await PaidRequest.findOne({ '_id': req.body.paidRequestId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidrequest) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such paid request not found!',
+        data: {}
+    });
+
+    paidrequest.status = req.body.status
+
+    if(req.body.status === 'cancelled')
+        paidrequest.cancelType = 'buyer'
+
+    paidrequest.save(paidrequest)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Paid Resource purchase request status successfully updated!',
+            data: { paidrequest: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    var paidresource = await PaidResource.findOne({ '_id': paidrequest.paidResourceId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidresource) return 
+    var notifDesc = ""
+    
+    if(req.body.status === 'cancelled')
+        notifDesc = "Somebody cancelled their request to purchase " +paidresource.title
+    else 
+        notifDesc = "Yeah! Somebody paid their request to purchase "+paidresource.title
+    Helper.createNotification("Paid Resource", notifDesc, paidresource.owner, paidresource.ownerType )
+}
+
+exports.updateSellerStatus = async function (req, res) {
+    var buyer = await getAccount(req.id,req.type)
+
+    if(!buyer) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
+    var paidrequest = await PaidRequest.findOne({ '_id': req.body.paidRequestId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidrequest) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such paid request not found!',
+        data: {}
+    });
+
+    paidrequest.status = req.body.status
+
+    if(req.body.status === 'cancelled')
+        paidrequest.cancelType = 'seller'
+
+    paidrequest.save(paidrequest)
+    .then(data => {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'Paid Resource purchase request status successfully updated!',
+            data: { paidrequest: data }
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! Error: ' + err.message,
+            data: {}
+        });
+    });
+
+    var paidresource = await PaidResource.findOne({ '_id': paidrequest.paidResourceId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidresource) return
+
+    var notifDesc = paidresource.title + " owner updated your purchase request status to " + req.body.status
+    Helper.createNotification("Paid Resource", notifDesc, paidrequest.buyerId, paidrequest.buyerType )
+}
+
+exports.myPurchase = async function (req, res) {
+    var paidrequests = await PaidRequest.find({ 'status': req.query.status, 'buyerId':req.id, 'buyerType': req.type }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidrequests) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such paid requests not found!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i = 0; i < paidrequests.length; i++) {
+        var temp = JSON.parse(JSON.stringify(paidrequests[i]))
+        var paidresource = await getPaidResource(paidrequests[i].paidResourceId)
+
+        if(!paidresource) continue
+        else temp.paidresource = paidresource
+
+        theList.push(temp)
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'My purchase successfully retrived!',
+        data: { paidrequests: theList }
+    });
+}
+
+exports.sellerRequests = async function (req, res) {
+    var paidrequests = await PaidRequest.find({ 'status': req.query.status, 'paidResourceId':req.query.paidResourceId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidrequests) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such paid requests not found!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i = 0; i < paidrequests.length; i++) {
+        var temp = JSON.parse(JSON.stringify(paidrequests[i]))
+        var buyer = await getAccount(paidrequests[i].buyerId, paidrequests[i].buyerType )
+
+        if(!buyer) continue
+        
+        var project = await getProject(paidrequests[i].projectId)
+
+        if(!project) continue
+
+        temp.projectTitle = project.title
+        temp.buyerName = buyer.name
+        temp.buyerUsername = buyer.username
+        temp.buyerImg = buyer.ionicImg
+        
+        theList.push(temp)
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Paid Resource requests successfully retrived!',
+        data: { paidrequests: theList }
+    });
+}
+
+exports.projectPurchase = async function (req, res) {
+    var paidrequests = await PaidRequest.find({ 'status': 'paid', 'projectId':req.query.projectId }, function (err) {
+        if (err) 
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    if(!paidrequests) 
+    return res.status(500).json({
+        status: 'error',
+        msg: 'Such paid requests not found!',
+        data: {}
+    });
+
+    var theList = []
+
+    for(var i = 0; i < paidrequests.length; i++) {
+        var temp = JSON.parse(JSON.stringify(paidrequests[i]))
+
+        var buyer = await getAccount(paidrequests[i].buyerId, paidrequests[i].buyerType )
+        if(!buyer) continue
+        
+        var project = await getProject(paidrequests[i].projectId)
+        if(!project) continue
+        
+        var paidresource = await getPaidResource(paidrequests[i].paidResourceId)
+        if(!paidresource) continue
+        
+        temp.projectTitle = project.title
+        temp.buyerName = buyer.name
+        temp.buyerUsername = buyer.username
+        temp.buyerImg = buyer.ionicImg
+        temp.paidresource = paidresource
+        
+        theList.push(temp)
+    }
+
+    theList.reverse()
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Project Paid Resource purchase successfully retrived!',
+        data: { paidrequests: theList }
+    });
 }
 
 var paidResStorage = multer.diskStorage({
@@ -606,4 +868,36 @@ async function getAccount(theId, theType) {
     }
 
     return account
+}
+
+async function getPaidResource(theId) {
+    var paidresource = await PaidResource.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [paidresource]: (getPaidResource)" + err.toString())
+                return
+            }
+    });
+    
+    if(!paidresource) {
+        console.log("Error: Something went wrong when retrieving paid resource")
+        return
+    }
+
+    return paidresource
+}
+
+async function getProject(theId) {
+    var project = await Project.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [paidresource]: (getProject)" + err.toString())
+                return
+            }
+    });
+    
+    if(!project) {
+        console.log("Error: Something went wrong when retrieving project")
+        return
+    }
+
+    return project
 }
