@@ -1,5 +1,5 @@
 const moment = require('moment-timezone')
-const { contribution } = require('../models')
+const { contribution, institution } = require('../models')
 const db = require('../models')
 const Target = db.target
 const User = db.users
@@ -12,6 +12,7 @@ const Venue = db.venue
 const Item = db.item
 const Contribution = db.contribution
 const PaidResource = db.paidresource
+const ProjectReq = db.projectreq
 const Helper = require('../service/helper.service')
 
 exports.getDashboard = async function (req, res){
@@ -350,43 +351,116 @@ exports.dataBySDG = async function (req, res){
 
     var dataItems = await createDataBySDGItems();
 
-    console.log(dataItems)
+    var users = await User.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
 
-    // var projectsPrior = await Project.find({ createdAt: {$lt: startDate} }, function (err) {
-    //     if (err)
-    //     return res.status(500).json({
-    //         status: 'error',
-    //         msg: 'There was an issue retrieving the projects!',
-    //         data: {}
-    //     });
-    // }); 
+    var institutions = await Institution.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
 
-    // var totalPrior = projectsPrior.length
+    for(var i = 0; i < users.length; i++) {
+        var accountSDGs = users[i].SDGs
 
-    // var projectsThisYear = await Project.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
-    //     if (err)
-    //     return res.status(500).json({
-    //         status: 'error',
-    //         msg: 'There was an issue retrieving the projects!',
-    //         data: {}
-    //     });
-    // }); 
-    
-    // var cumulativeThisYear = [0,0,0,0,0,0,0,0,0,0,0,0]
-    // for(var i = 0; i < projectsThisYear.length; i++) {
-    //     var theEntryMonth = moment(projectsThisYear[i].createdAt).format("MM")
-    //     cumulativeThisYear[theEntryMonth-1]++
-    // }
+        for(var j = 0; j < accountSDGs.length; j++) {
+            dataItems[accountSDGs[j]-1].accountsNum++
+        }
+    }
 
-    // for(var i = 1; i <= 11; i++) {
-    //     cumulativeThisYear[i] += cumulativeThisYear[i-1]
-    // }
+    for(var i = 0; i < institutions.length; i++) {
+        var accountSDGs = institutions[i].SDGs
+
+        for(var j = 0; j < accountSDGs.length; j++) {
+            dataItems[accountSDGs[j]-1].accountsNum++
+        }
+    }
+
+    var projects = await Project.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < projects.length; i++) {
+        var projectSDGs = projects[i].SDGs
+
+        for(var j = 0; j < projectSDGs.length; j++) {
+            dataItems[projectSDGs[j]-1].projectsNum++
+        }
+    }
+
+    var contributions = await Contribution.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < contributions.length; i++) {
+        var projectId = contributions[i].projectId
+
+        var project = await getProject(projectId)
+        if(!project) continue
+
+        var projectSDGs = projects[i].SDGs
+
+        for(var j = 0; j < projectSDGs.length; j++) {
+            dataItems[projectSDGs[j]-1].contributionsNum++
+        }
+
+        if(contributions[i].resType != 'money') continue
+        var projectRequest = await getProjectReq(contributions[i].requestId)
+        if(!projectRequest) continue
+
+        for(var j = 0; j < projectSDGs.length; j++) {
+            dataItems[projectSDGs[j]-1].fundingRaisedSum += projectRequest.moneySum
+        }
+    }
 
     return res.status(200).json({
         status: 'success',
         msg: 'Data by SDGs successfully retrieved',
-        data: { }
+        data: { dataBySDGs: dataItems }
     });
+}
+
+async function getProjectReq(projectReqId) {
+    var projectreq = await ProjectReq.findOne({ '_id': projectReqId }, function (err) {
+        if (err){
+            console.log(err)
+            return
+        } 
+    });
+
+    if(!projectreq) return
+    return projectreq
+}
+
+async function getProject(projectId) {
+    var project = await Project.findOne({ '_id': projectId }, function (err) {
+        if (err){
+            console.log(err)
+            return
+        } 
+    });
+
+    if(!project) return
+    return project
 }
 
 async function createDataBySDGItems () {
@@ -398,7 +472,7 @@ async function createDataBySDGItems () {
             accountsNum:0, 
             projectsNum:0, 
             contributionsNum: 0, 
-            fundingNum: 0
+            fundingRaisedSum: 0
         }
         theList.push(dataItem)
     }
