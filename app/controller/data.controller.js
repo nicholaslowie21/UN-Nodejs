@@ -410,14 +410,14 @@ exports.dataBySDG = async function (req, res){
             data: {}
         });
     });
-
+    
     for(var i = 0; i < contributions.length; i++) {
         var projectId = contributions[i].projectId
 
         var project = await getProject(projectId)
         if(!project) continue
 
-        var projectSDGs = projects[i].SDGs
+        var projectSDGs = project.SDGs
 
         for(var j = 0; j < projectSDGs.length; j++) {
             dataItems[projectSDGs[j]-1].contributionsNum++
@@ -426,7 +426,7 @@ exports.dataBySDG = async function (req, res){
         if(contributions[i].resType != 'money') continue
         var projectRequest = await getProjectReq(contributions[i].requestId)
         if(!projectRequest) continue
-
+        
         for(var j = 0; j < projectSDGs.length; j++) {
             dataItems[projectSDGs[j]-1].fundingRaisedSum += projectRequest.moneySum
         }
