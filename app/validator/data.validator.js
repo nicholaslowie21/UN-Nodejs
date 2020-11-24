@@ -27,3 +27,8 @@ exports.dataBySDG = [
     query('startDate').exists(),
     query('endDate').exists()
 ]
+
+exports.dataByCountries = [
+    query('startDate').exists(),
+    query('endDate').exists()
+]

@@ -13,5 +13,6 @@ router.get('/resourcesTypesNumbers', DataValidator.accountsChart, Helper.ifError
 router.get('/contributionsTypesNumbers', DataValidator.accountsChart, Helper.ifErrors, dataController.contributionsNumbers)
 
 router.get('/dataBySDGs', DataValidator.dataBySDG, Helper.ifErrors, dataController.dataBySDG)
+router.get('/dataByCountries', DataValidator.dataByCountries, Helper.ifErrors, dataController.dataByCountries )
 
 module.exports = router;

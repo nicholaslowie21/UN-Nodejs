@@ -439,6 +439,121 @@ exports.dataBySDG = async function (req, res){
     });
 }
 
+exports.dataByCountries = async function (req, res){
+    
+    var startDate = moment(req.query.startDate).tz('Asia/Singapore')
+    var endDate = moment(req.query.endDate).tz('Asia/Singapore')
+
+    let dataItemsMap = new Map()
+    
+    var users = await User.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    var institutions = await Institution.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < users.length; i++) {
+        var country = users[i].country
+        if(country ==='') continue
+
+        updateItemMap(dataItemsMap,country,1,0,0,0)
+    }
+
+    for(var i = 0; i < institutions.length; i++) {
+        var country = institutions[i].country
+        if(country ==='') continue
+
+        updateItemMap(dataItemsMap,country,1,0,0,0)
+    }
+
+    var projects = await Project.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < projects.length; i++) {
+        var country = projects[i].country
+        if(country ==='') continue
+
+        updateItemMap(dataItemsMap,country,0,1,0,0)
+    }
+
+    var contributions = await Contribution.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
+    });
+
+    for(var i = 0; i < contributions.length; i++) {
+        var country = projects[i].country
+        if(country ==='') continue
+
+        updateItemMap(dataItemsMap,country,0,0,1,0)
+
+        if(contributions[i].resType != 'money') continue
+        var projectRequest = await getProjectReq(contributions[i].requestId)
+        if(!projectRequest) continue
+        
+        updateItemMap(dataItemsMap,country,0,0,0,projectRequest.moneySum)
+    }
+
+    var theList = [];
+    for(let value of dataItemsMap.values()){
+        theList.push(value)
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        msg: 'Data by countries successfully retrieved',
+        data: { dataByCountries: theList }
+    });
+}
+
+function updateItemMap(hm, country, accountsNum, projectsNum, contributionsNum, fundingRaised) {
+    var dataItem;
+
+    if(!hm.has(country)) dataItem = createDataByCountryItem(country)
+    else dataItem = hm.get(country)
+    
+    dataItem.accountsNum += accountsNum
+    dataItem.projectsNum += projectsNum
+    dataItem.contributionsNum += contributionsNum,
+    dataItem.fundingRaised += fundingRaised
+
+    hm.set(country, dataItem)
+}
+
+function createDataByCountryItem(country) {
+    var dataItem = {
+        country: country, 
+        accountsNum: 0, 
+        projectsNum: 0, 
+        contributionsNum: 0, 
+        fundingRaised: 0
+    }
+
+    return dataItem
+}
+
 async function getProjectReq(projectReqId) {
     var projectreq = await ProjectReq.findOne({ '_id': projectReqId }, function (err) {
         if (err){
