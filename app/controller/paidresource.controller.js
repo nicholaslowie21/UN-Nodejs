@@ -11,6 +11,10 @@ const multer = require('multer')
 const nodeCountries =  require("node-countries")
 const Helper = require("../service/helper.service")
 const sharp = require('sharp')
+const paypal = require('@paypal/payouts-sdk')
+const clientId = "ATYIGhVI_8iXzrGnY_2ppcz1AJR8mpQp6IxHxdWXRVXwbcVFamkz-6qjBiYSOHidvvRjvxwkir2jvIka";
+const clientSecret = "EHvXx89Gq4SxIuMeW_5TsuC5RN_58jfY2D41LctgbLtwqY2vT0DPS1a3a6QIBC8ZbqUKHeEUc_rp9ZUA";
+    
 
 var createPaidStorage = multer.diskStorage({
     destination: (req, file, callback) => {
@@ -316,7 +320,60 @@ exports.updateBuyerStatus = async function (req, res) {
         notifDesc = "Somebody cancelled their request to purchase " +paidresource.title
     else 
         notifDesc = "Yeah! Somebody paid their request to purchase "+paidresource.title
-    Helper.createNotification("Paid Resource", notifDesc, paidresource.owner, paidresource.ownerType )
+    Helper.createNotification("Paid Resource", notifDesc, paidresource.owner, paidresource.ownerType)
+    
+    if(req.body.status != 'paid') return
+    var owner = await getAccount(paidresource.owner, paidresource.ownerType)
+
+    let subject = 'KoCoSD Paid Resource Transaction'
+    let theMessage = `
+        <h1>You received a payment for your paid resource!</h1>
+        <p>You have just received a payment for your paid resource: ${paidresource.title}</p>
+        <p>Amount: USD$ ${paidresource.price - 4}</p>
+        <p>You should be able to check this in your inbox or paypal account registered with this email.</P>
+        <p>If there is any discrepancy, please contact our admin to resolve this.</p><br>
+    `
+
+    Helper.sendEmail(owner.email, subject, theMessage, function (info) {
+        if (!info) {
+            console.log('Something went wrong while trying to send email!')
+        } 
+    })
+    
+    let environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
+    let client = new paypal.core.PayPalHttpClient(environment);
+
+    let requestBody = {
+        "sender_batch_header": {
+        "sender_batch_id": paidrequest.id+"-"+Date.now(),
+        "recipient_type": "EMAIL",
+        "email_subject": "KoCoSD Paid Resource Payment",
+        "email_message": "You received a payment for a paid resource of yours in KoCoSD!"
+      },
+      "items": [
+        {
+          "amount": {
+            "value": paidresource.price-4,
+            "currency": "USD"
+          },
+          "sender_item_id": paidrequest.id+"-"+Date.now(),
+          "receiver": owner.email
+        }
+      ]
+    }
+    
+    let request = new paypal.payouts.PayoutsPostRequest();
+    request.requestBody(requestBody);
+
+    // Call API with your client and get a response for your call
+    let createPayouts  = async function(){
+            let response = await client.execute(request);
+            console.log(`Response: ${JSON.stringify(response)}`);
+            // If call returns body in response, you can get the deserialized version from the result attribute of the response.
+        console.log(`Payouts Create Response: ${JSON.stringify(response.result)}`);
+    }
+    await createPayouts();
+    console.log('finsihed');
 }
 
 exports.updateSellerStatus = async function (req, res) {
