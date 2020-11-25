@@ -111,7 +111,7 @@ exports.createPost = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -130,7 +130,7 @@ exports.createPost = async function (req, res){
     } else if (project.host=== req.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to create this project post!',
         data: {}
@@ -210,7 +210,7 @@ exports.updatePost = async function (req, res){
     });
 
     if(!projectPost) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project post not found!',
         data: {}
@@ -226,7 +226,7 @@ exports.updatePost = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -245,7 +245,7 @@ exports.updatePost = async function (req, res){
     } else if (project.host=== req.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project post!',
         data: {}
@@ -318,7 +318,7 @@ exports.deletePost = async function (req, res){
     });
 
     if(!projectPost) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project post not found!',
         data: {}
@@ -334,7 +334,7 @@ exports.deletePost = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -353,7 +353,7 @@ exports.deletePost = async function (req, res){
     } else if (project.host=== req.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project post!',
         data: {}
@@ -396,7 +396,7 @@ exports.deletePostPic = async function (req, res){
     });
 
     if(!projectPost) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project post not found!',
         data: {}
@@ -412,7 +412,7 @@ exports.deletePostPic = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -431,7 +431,7 @@ exports.deletePostPic = async function (req, res){
     } else if (project.host=== req.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project post!',
         data: {}
@@ -474,7 +474,7 @@ exports.getPosts = async function (req, res){
     });
 
     if(!projectPosts) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project post not found!',
         data: {}
@@ -537,7 +537,7 @@ exports.getPostDetail = async function (req, res){
     });
 
     if(!theprojectPost) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project post not found!',
         data: {}
@@ -572,7 +572,7 @@ exports.getPostDetail = async function (req, res){
     
     await getAccountInfo(projectPost)
     if(projectPost.accountName === "")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was an issue with retrieving the post creator!',
         data: {}
@@ -598,7 +598,7 @@ exports.createPostComment = async function (req, res){
     });
 
     if(!projectPost) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project post not found!',
         data: {}
@@ -643,7 +643,7 @@ exports.createProjectEvent = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such ongoing project not found!',
         data: {}
@@ -697,7 +697,7 @@ exports.updateProjectEvent = async function (req, res){
     });
 
     if(!projectEvent) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project event not found!',
         data: {}
@@ -746,7 +746,7 @@ exports.deleteProjectEvent = async function (req, res){
     });
 
     if(!projectEvent) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project event not found!',
         data: {}
@@ -790,7 +790,7 @@ exports.getPublicEvents = async function (req, res){
     });
 
     if(!projectEvents) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project events not found!',
         data: {}
@@ -815,7 +815,7 @@ exports.getAllEvents = async function (req, res){
     });
 
     if(!projectEvents) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project events not found!',
         data: {}
@@ -840,14 +840,14 @@ exports.deletePostComment = async function (req, res){
     });
 
     if(!postComment) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active project post comment not found!',
         data: {}
     });
 
     if(postComment.accountId != req.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete this comment!',
         data: {}
@@ -886,7 +886,7 @@ exports.getComments = async function (req, res){
     });
 
     if(!postComments) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active post comments not found!',
         data: {}
@@ -978,7 +978,7 @@ exports.multerUpload = upload.single('projectPic');
 
 exports.projectPicture = async function (req, res){
     if(!req.body.projectId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Project id is empty! ',
             data: {}
@@ -987,7 +987,7 @@ exports.projectPicture = async function (req, res){
 
     
     if(!req.file) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No picture uploaded! ',
             data: {}
@@ -1026,7 +1026,7 @@ exports.projectPicture = async function (req, res){
     });
 
     if(!project || project.status!='ongoing')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Project is suspended or currently not ongoing!',
         data: {}
@@ -1045,14 +1045,14 @@ exports.projectPicture = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -1074,7 +1074,7 @@ exports.projectPicture = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -1100,7 +1100,7 @@ exports.projectPicture = async function (req, res){
     } else if (project.host=== req.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project!',
         data: {}
@@ -1143,7 +1143,7 @@ exports.viewProject = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -1170,7 +1170,7 @@ exports.searchProjects = async function (req, res){
     });
 
     if(!projects) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No project found! ',
             data: {}
@@ -1202,14 +1202,14 @@ exports.createProject = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -1231,14 +1231,14 @@ exports.createProject = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(user.isVerified != "true")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account not authorized to create project! Not verified yet.',
             data: {}
@@ -1335,7 +1335,7 @@ exports.postUpdateProject = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -1354,7 +1354,7 @@ exports.postUpdateProject = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project!',
         data: {}
@@ -1431,7 +1431,7 @@ exports.completeProject = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -1439,7 +1439,7 @@ exports.completeProject = async function (req, res) {
 
 
     if(project.host != req.body.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to mark this project as completed!',
         data: {}
@@ -1667,14 +1667,14 @@ exports.deleteProject = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.host != req.body.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to closed this project!',
         data: {}
@@ -1693,14 +1693,14 @@ exports.deleteProject = async function (req, res) {
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -1719,14 +1719,14 @@ exports.deleteProject = async function (req, res) {
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(user.isVerified != "true" || user.status != 'active')
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account not authorized to create project!',
             data: {}
@@ -1752,7 +1752,7 @@ exports.deleteProject = async function (req, res) {
         })
 
         if (!user) {
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Such user is not found!',
                 data: {}
@@ -1851,21 +1851,21 @@ exports.editAdmin = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing") 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not active!',
         data: {}
     });
 
     if(project.host != req.body.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit admin for this project!',
         data: {}
@@ -1886,7 +1886,7 @@ exports.editAdmin = async function (req, res) {
         })
 
         if (!user) {
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Such user is not found!',
                 data: {}
@@ -1894,7 +1894,7 @@ exports.editAdmin = async function (req, res) {
         }
 
         if(user.id === req.body.id) {
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'You cannot add yourself as admin!',
                 data: {}
@@ -2136,7 +2136,7 @@ exports.deleteAdmin = async function (req, res) {
     })
 
     if (!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Such user is not found!',
             data: {}
@@ -2144,7 +2144,7 @@ exports.deleteAdmin = async function (req, res) {
     }
 
     if(user.id === req.body.id) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'You cannot add yourself as admin!',
             data: {}
@@ -2154,7 +2154,7 @@ exports.deleteAdmin = async function (req, res) {
     var tempAdmins = project.admins
 
     if(!tempAdmins.includes(user.id)){
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'This user is not an admin',
             data: {}
@@ -2221,7 +2221,7 @@ exports.searchUsers = async function (req, res){
     });
 
     if(!users) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -2247,7 +2247,7 @@ exports.getAdmins = async function (req, res){
     });
 
     if(!project) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No project found! ',
             data: {}
@@ -2287,7 +2287,7 @@ exports.getProjectHost = async function (req, res){
     });
 
     if(!project) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No project found! ',
             data: {}
@@ -2328,21 +2328,21 @@ exports.createKPI = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing") 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not active!',
         data: {}
     });
 
     if(project.host != req.body.id && !project.admins.includes(req.body.id))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit KPI for this project!',
         data: {}
@@ -2390,7 +2390,7 @@ exports.updateKPI = async function (req, res) {
     });
 
     if(!kpi) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such kpi not found!',
         data: {}
@@ -2406,14 +2406,14 @@ exports.updateKPI = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.host != req.body.id && !project.admins.includes(req.body.id))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit KPI for this project!',
         data: {}
@@ -2458,7 +2458,7 @@ exports.deleteKPI = async function (req, res) {
     });
 
     if(!kpi) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such kpi not found!',
         data: {}
@@ -2474,14 +2474,14 @@ exports.deleteKPI = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.host != req.body.id && !project.admins.includes(req.body.id))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit KPI for this project!',
         data: {}
@@ -2523,7 +2523,7 @@ exports.getKPIs = async function (req, res) {
     });
 
     if(!kpis) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'KPIs not found!',
         data: {}
@@ -2541,14 +2541,14 @@ exports.createResourceNeed = async function (req, res){
     let actor
 
     if(req.body.resourceType === "money" && !req.body.total)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Invalid input! The total sum is not declared.',
         data: {}
     });
 
     if(req.body.resourceType === "money" && req.body.total <= 0)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Invalid input! The total sum is invalid.',
         data: {}
@@ -2565,14 +2565,14 @@ exports.createResourceNeed = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -2590,7 +2590,7 @@ exports.createResourceNeed = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -2600,7 +2600,7 @@ exports.createResourceNeed = async function (req, res){
     }
 
     if(!actor)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -2616,7 +2616,7 @@ exports.createResourceNeed = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -2635,7 +2635,7 @@ exports.createResourceNeed = async function (req, res){
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to create resource need for this project!',
         data: {}
@@ -2695,7 +2695,7 @@ exports.editResourceNeed = async function (req, res){
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such resource need!',
         data: {}
@@ -2712,14 +2712,14 @@ exports.editResourceNeed = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -2737,7 +2737,7 @@ exports.editResourceNeed = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -2747,7 +2747,7 @@ exports.editResourceNeed = async function (req, res){
     }
 
     if(!actor)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -2763,7 +2763,7 @@ exports.editResourceNeed = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -2782,21 +2782,21 @@ exports.editResourceNeed = async function (req, res){
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to create resource need for this project!',
         data: {}
     });
 
     if(resourceneed.status === "closed")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not allowed to change the details of a deleted resourceneed!',
         data: {}
     });
 
     if(resourceneed.type === "money" && req.body.total <= 0)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Invalid input! The total sum is invalid.',
         data: {}
@@ -2804,7 +2804,7 @@ exports.editResourceNeed = async function (req, res){
 
     if(resourceneed.type === "money") {
         if(req.body.total < resourceneed.pendingSum+resourceneed.receivedSum)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Invalid input! The total sum is invalid. It is lower than the received sum',
             data: {}
@@ -2866,7 +2866,7 @@ exports.deleteResourceNeed = async function (req, res){
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such resource need!',
         data: {}
@@ -2883,14 +2883,14 @@ exports.deleteResourceNeed = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -2908,7 +2908,7 @@ exports.deleteResourceNeed = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -2919,7 +2919,7 @@ exports.deleteResourceNeed = async function (req, res){
     }
 
     if(!actor)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -2935,7 +2935,7 @@ exports.deleteResourceNeed = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -2954,14 +2954,14 @@ exports.deleteResourceNeed = async function (req, res){
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete resource need for this project!',
         data: {}
     });
 
     if(resourceneed.status === "closed")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You have deleted this resource need!',
         data: {}
@@ -3028,7 +3028,7 @@ exports.removeContribution = async function (req, res){
     });
 
     if(!contribution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such contribution!',
         data: {}
@@ -3045,14 +3045,14 @@ exports.removeContribution = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -3070,7 +3070,7 @@ exports.removeContribution = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3080,7 +3080,7 @@ exports.removeContribution = async function (req, res){
     }
 
     if(!actor)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -3096,7 +3096,7 @@ exports.removeContribution = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -3115,14 +3115,14 @@ exports.removeContribution = async function (req, res){
     } else if (project.host === req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete this contribution!',
         data: {}
     });
 
     if(contribution.status === "closed")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You have deleted this contribution!',
         data: {}
@@ -3200,7 +3200,7 @@ exports.updateContributionRating = async function (req, res){
     });
 
     if(!contribution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such contribution!',
         data: {}
@@ -3217,14 +3217,14 @@ exports.updateContributionRating = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -3242,7 +3242,7 @@ exports.updateContributionRating = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3252,7 +3252,7 @@ exports.updateContributionRating = async function (req, res){
     }
 
     if(!actor)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -3268,7 +3268,7 @@ exports.updateContributionRating = async function (req, res){
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
@@ -3287,14 +3287,14 @@ exports.updateContributionRating = async function (req, res){
     } else if (project.host === req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete this contribution!',
         data: {}
     });
 
     if(contribution.status === "closed")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You have deleted this contribution!',
         data: {}
@@ -3408,7 +3408,7 @@ exports.getResourceNeeds = async function (req, res){
     });
 
     if(!resourceneeds)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no resource needs for this project or something went wrong!',
         data: {}
@@ -3432,7 +3432,7 @@ exports.getContributions = async function (req, res){
     });
 
     if(!contributions)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no contributions or something went wrong!',
         data: {}
@@ -3495,7 +3495,7 @@ exports.getAccountContributions = async function (req, res){
     });
 
     if(!contributions)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no contributions or something went wrong!',
         data: {}
@@ -3573,7 +3573,7 @@ exports.getContributors = async function (req, res){
     });
 
     if(!contributions)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no contributions or something went wrong!',
         data: {}
@@ -3592,7 +3592,7 @@ exports.getContributors = async function (req, res){
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such project or something went wrong!',
         data: {}
@@ -3622,7 +3622,7 @@ exports.getContributors = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3641,7 +3641,7 @@ exports.getContributors = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3885,7 +3885,7 @@ exports.getAccNewsFeed = async function (req, res){
     }
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no contributions or something went wrong!',
         data: {}

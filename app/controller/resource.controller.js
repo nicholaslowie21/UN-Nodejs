@@ -113,7 +113,7 @@ exports.multerIPUpload = uploadIPAttachment.single('attachment');
 
 exports.itemPicture = async function (req, res){
     if(!req.body.itemId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Item id is empty! ',
             data: {}
@@ -122,7 +122,7 @@ exports.itemPicture = async function (req, res){
 
     
     if(req.files.length === 0) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No picture uploaded! ',
             data: {}
@@ -139,7 +139,7 @@ exports.itemPicture = async function (req, res){
     });
 
     if(!item)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Item does not exists!',
         data: {}
@@ -158,14 +158,14 @@ exports.itemPicture = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform this action right now!',
             data: {}
@@ -183,7 +183,7 @@ exports.itemPicture = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -192,7 +192,7 @@ exports.itemPicture = async function (req, res){
     }
 
     if(theOwner.id!=item.owner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -242,7 +242,7 @@ exports.itemPicture = async function (req, res){
 
 exports.IPupload = async function (req, res){
     if(!req.body.knowledgeId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Knowledge id is empty! ',
             data: {}
@@ -251,7 +251,7 @@ exports.IPupload = async function (req, res){
 
     
     if(!req.file) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No file uploaded! ',
             data: {}
@@ -268,7 +268,7 @@ exports.IPupload = async function (req, res){
     });
 
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Knowledge does not exists!',
         data: {}
@@ -287,14 +287,14 @@ exports.IPupload = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform this action right now!',
             data: {}
@@ -312,7 +312,7 @@ exports.IPupload = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -328,7 +328,7 @@ exports.IPupload = async function (req, res){
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to upload file for this knowledge resource',
         data: {}
@@ -363,7 +363,7 @@ exports.viewUserKnowledge = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -379,7 +379,7 @@ exports.viewUserKnowledge = async function (req, res) {
     });
 
     if(!knowledges) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -403,7 +403,7 @@ exports.viewPrivateUserKnowledge = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -419,7 +419,7 @@ exports.viewPrivateUserKnowledge = async function (req, res) {
     });
 
     if(!knowledges) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -443,7 +443,7 @@ exports.viewUserManpower = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -459,7 +459,7 @@ exports.viewUserManpower = async function (req, res) {
     });
 
     if(!manpowers) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -483,7 +483,7 @@ exports.viewPrivateUserManpower = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -499,7 +499,7 @@ exports.viewPrivateUserManpower = async function (req, res) {
     });
 
     if(!manpowers) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -523,7 +523,7 @@ exports.viewUserItem = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -539,7 +539,7 @@ exports.viewUserItem = async function (req, res) {
     });
 
     if(!items) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -563,7 +563,7 @@ exports.viewPrivateUserItem = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -579,7 +579,7 @@ exports.viewPrivateUserItem = async function (req, res) {
     });
 
     if(!items) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -603,7 +603,7 @@ exports.viewUserVenue = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -619,7 +619,7 @@ exports.viewUserVenue = async function (req, res) {
     });
 
     if(!venues) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -643,7 +643,7 @@ exports.viewPrivateUserVenue = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -659,7 +659,7 @@ exports.viewPrivateUserVenue = async function (req, res) {
     });
 
     if(!venues) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -683,7 +683,7 @@ exports.viewInstitutionKnowledge = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -699,7 +699,7 @@ exports.viewInstitutionKnowledge = async function (req, res) {
     });
 
     if(!knowledges) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -723,7 +723,7 @@ exports.viewPrivateInstitutionKnowledge = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -739,7 +739,7 @@ exports.viewPrivateInstitutionKnowledge = async function (req, res) {
     });
 
     if(!knowledges) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -763,7 +763,7 @@ exports.viewInstitutionItem = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -779,7 +779,7 @@ exports.viewInstitutionItem = async function (req, res) {
     });
 
     if(!items) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -803,7 +803,7 @@ exports.viewPrivateInstitutionItem = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -819,7 +819,7 @@ exports.viewPrivateInstitutionItem = async function (req, res) {
     });
 
     if(!items) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -843,7 +843,7 @@ exports.viewInstitutionVenue = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -859,7 +859,7 @@ exports.viewInstitutionVenue = async function (req, res) {
     });
 
     if(!venues) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -883,7 +883,7 @@ exports.viewPrivateInstitutionVenue = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -899,7 +899,7 @@ exports.viewPrivateInstitutionVenue = async function (req, res) {
     });
 
     if(!venues) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -986,7 +986,7 @@ exports.createItem = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1108,7 +1108,7 @@ exports.createVenue = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1196,7 +1196,7 @@ exports.createManpower = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1258,7 +1258,7 @@ exports.createKnowledge = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1343,7 +1343,7 @@ exports.updateItem = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1360,14 +1360,14 @@ exports.updateItem = async function (req, res) {
 
     
     if(!item)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(item.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this item resource',
         data: {}
@@ -1421,7 +1421,7 @@ exports.updateVenue = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1438,14 +1438,14 @@ exports.updateVenue = async function (req, res) {
 
     
     if(!venue)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such venue resource not found!',
         data: {}
     });
     
     if(venue.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this venue resource',
         data: {}
@@ -1500,7 +1500,7 @@ exports.updateManpower = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1516,14 +1516,14 @@ exports.updateManpower = async function (req, res) {
     });
     
     if(!manpower)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such manpower resource not found!',
         data: {}
     });
 
     if(manpower.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this manpower resource',
         data: {}
@@ -1573,7 +1573,7 @@ exports.updateKnowledge = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1589,7 +1589,7 @@ exports.updateKnowledge = async function (req, res) {
     });
     
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
@@ -1603,7 +1603,7 @@ exports.updateKnowledge = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this knowledge resource',
         data: {}
@@ -1659,7 +1659,7 @@ exports.updateKnowledgeOwner = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1675,7 +1675,7 @@ exports.updateKnowledgeOwner = async function (req, res) {
     });
     
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
@@ -1689,7 +1689,7 @@ exports.updateKnowledgeOwner = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this knowledge resource',
         data: {}
@@ -1700,7 +1700,7 @@ exports.updateKnowledgeOwner = async function (req, res) {
 
     for(var i = 0; i < owner.length; i++) {
         if(!owner[i].theId || !owner[i].ownerType) {
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'There is an invalid field!',
                 data: {}
@@ -1734,7 +1734,7 @@ exports.updateKnowledgeOwner = async function (req, res) {
         }
 
         if(!tempAcc)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was an invalid owner field',
             data: {}
@@ -1785,7 +1785,7 @@ exports.addKnowledgeOwner = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1801,7 +1801,7 @@ exports.addKnowledgeOwner = async function (req, res) {
     });
     
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
@@ -1815,7 +1815,7 @@ exports.addKnowledgeOwner = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this knowledge resource',
         data: {}
@@ -1831,7 +1831,7 @@ exports.addKnowledgeOwner = async function (req, res) {
     });
 
     if(!targetuser)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong! User does not exists! ',
         data: {}
@@ -1845,7 +1845,7 @@ exports.addKnowledgeOwner = async function (req, res) {
         }
     }
     if(valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are already inside the list of owner',
         data: {}
@@ -1892,7 +1892,7 @@ exports.deleteKnowledgeOwner = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1908,7 +1908,7 @@ exports.deleteKnowledgeOwner = async function (req, res) {
     });
     
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
@@ -1922,7 +1922,7 @@ exports.deleteKnowledgeOwner = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this knowledge resource',
         data: {}
@@ -1951,7 +1951,7 @@ exports.deleteKnowledgeOwner = async function (req, res) {
     }
 
     if(!target)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong! Account does not exists! ',
         data: {}
@@ -1965,14 +1965,14 @@ exports.deleteKnowledgeOwner = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The user is not inside the list of owner',
         data: {}
     });
 
     if(knowledge.owner.length === 1)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are the sole owner, please delete this resource instead!',
         data: {}
@@ -2034,7 +2034,7 @@ var venueStorage = multer.diskStorage({
 
   exports.venuePicture = async function (req, res){
     if(!req.body.venueId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Venue id is empty! ',
             data: {}
@@ -2043,7 +2043,7 @@ var venueStorage = multer.diskStorage({
 
     
     if(req.files.length === 0) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No picture uploaded! ',
             data: {}
@@ -2060,7 +2060,7 @@ var venueStorage = multer.diskStorage({
     });
 
     if(!venue)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Venue does not exists!',
         data: {}
@@ -2079,14 +2079,14 @@ var venueStorage = multer.diskStorage({
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform this action right now!',
             data: {}
@@ -2104,7 +2104,7 @@ var venueStorage = multer.diskStorage({
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -2113,7 +2113,7 @@ var venueStorage = multer.diskStorage({
     }
 
     if(theOwner.id!=venue.owner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -2163,7 +2163,7 @@ var venueStorage = multer.diskStorage({
 
 exports.deleteItemPicture = async function (req, res){
     if(!req.body.itemId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Item id is empty! ',
             data: {}
@@ -2180,7 +2180,7 @@ exports.deleteItemPicture = async function (req, res){
     });
 
     if(!item)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Item does not exist!',
         data: {}
@@ -2199,14 +2199,14 @@ exports.deleteItemPicture = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform this action right now!',
             data: {}
@@ -2224,7 +2224,7 @@ exports.deleteItemPicture = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -2233,7 +2233,7 @@ exports.deleteItemPicture = async function (req, res){
     }
 
     if(theOwner.id!=item.owner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -2268,7 +2268,7 @@ exports.deleteItemPicture = async function (req, res){
 
 exports.deleteVenuePicture = async function (req, res){
     if(!req.body.venueId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Venue id is empty! ',
             data: {}
@@ -2285,7 +2285,7 @@ exports.deleteVenuePicture = async function (req, res){
     });
 
     if(!venue)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Venue does not exists!',
         data: {}
@@ -2304,14 +2304,14 @@ exports.deleteVenuePicture = async function (req, res){
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(institution.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform this action right now!',
             data: {}
@@ -2329,7 +2329,7 @@ exports.deleteVenuePicture = async function (req, res){
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -2338,7 +2338,7 @@ exports.deleteVenuePicture = async function (req, res){
     }
 
     if(theOwner.id!=venue.owner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -2394,7 +2394,7 @@ exports.activateItem = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2411,14 +2411,14 @@ exports.activateItem = async function (req, res) {
 
     
     if(!item)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(item.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this item resource',
         data: {}
@@ -2466,7 +2466,7 @@ exports.deactivateItem = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2483,14 +2483,14 @@ exports.deactivateItem = async function (req, res) {
 
     
     if(!item)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(item.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this item resource',
         data: {}
@@ -2538,7 +2538,7 @@ exports.deleteItem = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2555,14 +2555,14 @@ exports.deleteItem = async function (req, res) {
 
     
     if(!item)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(item.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete this item resource',
         data: {}
@@ -2610,7 +2610,7 @@ exports.activateManpower = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2626,14 +2626,14 @@ exports.activateManpower = async function (req, res) {
     });
     
     if(!manpower)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such manpower resource not found!',
         data: {}
     });
 
     if(manpower.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this manpower resource',
         data: {}
@@ -2681,7 +2681,7 @@ exports.deactivateManpower = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2697,14 +2697,14 @@ exports.deactivateManpower = async function (req, res) {
     });
     
     if(!manpower)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such manpower resource not found!',
         data: {}
     });
 
     if(manpower.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this manpower resource',
         data: {}
@@ -2752,7 +2752,7 @@ exports.deleteManpower = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2768,14 +2768,14 @@ exports.deleteManpower = async function (req, res) {
     });
     
     if(!manpower)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such manpower resource not found!',
         data: {}
     });
 
     if(manpower.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete this manpower resource',
         data: {}
@@ -2823,7 +2823,7 @@ exports.activateKnowledge = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2839,7 +2839,7 @@ exports.activateKnowledge = async function (req, res) {
     });
     
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
@@ -2853,7 +2853,7 @@ exports.activateKnowledge = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this knowledge resource',
         data: {}
@@ -2901,7 +2901,7 @@ exports.deactivateKnowledge = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2917,7 +2917,7 @@ exports.deactivateKnowledge = async function (req, res) {
     });
     
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
@@ -2931,7 +2931,7 @@ exports.deactivateKnowledge = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this knowledge resource',
         data: {}
@@ -2979,7 +2979,7 @@ exports.deleteKnowledge = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2995,7 +2995,7 @@ exports.deleteKnowledge = async function (req, res) {
     });
     
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
@@ -3009,7 +3009,7 @@ exports.deleteKnowledge = async function (req, res) {
         }
     }
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete this knowledge resource',
         data: {}
@@ -3057,7 +3057,7 @@ exports.activateVenue = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -3074,14 +3074,14 @@ exports.activateVenue = async function (req, res) {
 
     
     if(!venue)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such venue resource not found!',
         data: {}
     });
     
     if(venue.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this venue resource',
         data: {}
@@ -3129,7 +3129,7 @@ exports.deactivateVenue = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -3146,14 +3146,14 @@ exports.deactivateVenue = async function (req, res) {
 
     
     if(!venue)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such venue resource not found!',
         data: {}
     });
     
     if(venue.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this venue resource',
         data: {}
@@ -3201,7 +3201,7 @@ exports.deleteVenue = async function (req, res) {
     }
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -3218,14 +3218,14 @@ exports.deleteVenue = async function (req, res) {
 
     
     if(!venue)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such venue resource not found!',
         data: {}
     });
     
     if(venue.owner != theOwner.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to delete this venue resource',
         data: {}
@@ -3260,7 +3260,7 @@ exports.viewItemDetails = async function (req, res) {
     });
 
     if(!item)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'No such item found!',
         data: {}
@@ -3279,7 +3279,7 @@ exports.viewItemDetails = async function (req, res) {
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3297,7 +3297,7 @@ exports.viewItemDetails = async function (req, res) {
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3323,7 +3323,7 @@ exports.viewManpowerDetails = async function (req, res) {
     });
 
     if(!manpower)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'No such manpower found!',
         data: {}
@@ -3342,7 +3342,7 @@ exports.viewManpowerDetails = async function (req, res) {
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3360,7 +3360,7 @@ exports.viewManpowerDetails = async function (req, res) {
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3386,7 +3386,7 @@ exports.viewVenueDetails = async function (req, res) {
     });
 
     if(!venue)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'No such venue found!',
         data: {}
@@ -3405,7 +3405,7 @@ exports.viewVenueDetails = async function (req, res) {
         });
 
         if(!institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3423,7 +3423,7 @@ exports.viewVenueDetails = async function (req, res) {
         });
 
         if(!user)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -3449,7 +3449,7 @@ exports.viewKnowledgeDetails = async function (req, res) {
     });
 
     if(!knowledge)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'No such knowledge found!',
         data: {}
@@ -3471,7 +3471,7 @@ exports.viewKnowledgeDetails = async function (req, res) {
             });
 
             if(!institution)
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'There was no such account!',
                 data: {}
@@ -3489,7 +3489,7 @@ exports.viewKnowledgeDetails = async function (req, res) {
             });
 
             if(!user)
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'There was no such account!',
                 data: {}
@@ -3520,7 +3520,7 @@ exports.searchItem = async function (req, res){
     });
 
     if(!items) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No item found! ',
             data: {}
@@ -3548,7 +3548,7 @@ exports.searchVenue = async function (req, res){
     });
 
     if(!venues) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No venue found! ',
             data: {}
@@ -3576,7 +3576,7 @@ exports.searchManpower = async function (req, res){
     });
 
     if(!manpowers) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No manpower found! ',
             data: {}
@@ -3604,7 +3604,7 @@ exports.searchKnowledge = async function (req, res){
     });
 
     if(!knowledges) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No knowledge found! ',
             data: {}

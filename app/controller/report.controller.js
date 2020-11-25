@@ -20,14 +20,14 @@ exports.createReport = async function (req, res){
     else if(req.body.reportType === "reward") theCountry =  await checkRewardCountry(req.body.targetId)
     
     if(theCountry === "false")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such target!',
         data: {}
     });
 
     if(req.id === req.body.targetId)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You cannot report your own account!',
         data: {}
@@ -56,7 +56,7 @@ exports.createReport = async function (req, res){
     }
 
     if(!reporter)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -102,7 +102,7 @@ exports.filteredStatus = async function (req, res){
     });
 
     if(!reports)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such reports!',
         data: {}
@@ -160,14 +160,14 @@ exports.updateReport = async function (req, res){
     });
 
     if(!report)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such report!',
         data: {}
     });
 
     if(req.role === "user" || req.role === "institution")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized!',
         data: {}
@@ -210,7 +210,7 @@ exports.filteredRegional = async function (req, res){
     });
 
     if(!reports)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such reports!',
         data: {}
@@ -269,7 +269,7 @@ exports.reportDetail = async function (req, res){
     });
 
     if(!report)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such report!',
         data: {}
@@ -284,7 +284,7 @@ exports.reportDetail = async function (req, res){
     else if(theReport.reportType === "reward") await getRewardInfo(theReport)
 
     if(theReport.targetUsername === "" && theReport.targetTitle === "")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong when retrieving target!',
         data: {}
@@ -309,7 +309,7 @@ exports.myReport = async function (req, res){
     });
 
     if(!reports)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such reports!',
         data: {}
@@ -410,6 +410,7 @@ async function getUserInfo(theItem) {
     theItem.targetUsername = user.username
     theItem.targetImg = user.ionicImg
     theItem.targetStatus = user.status
+    theItem.targetRole = user.role
 }
 
 async function getProjectInfo(theItem) {
