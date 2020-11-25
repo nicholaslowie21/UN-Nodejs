@@ -892,7 +892,8 @@ exports.exportAuditLog = async function (req, res) {
         header: {
             height: "45mm",
             contents: '<div style="text-align: center;"><h1>KoCoSD Audit Logs</h1></div>'
-        }
+        },
+        timeout: "120000"
     };
 
     var theData = []
