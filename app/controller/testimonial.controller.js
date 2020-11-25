@@ -11,7 +11,7 @@ exports.getCommonProject = async function (req, res){
     
     var targetAccount = await getAccount(req.id, req.type)
     if(!targetAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving your account',
         data: { }
@@ -19,7 +19,7 @@ exports.getCommonProject = async function (req, res){
 
     var creatorAccount = await getAccount(req.query.accountId, req.query.accountType)
     if(!creatorAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account',
         data: { }
@@ -60,7 +60,7 @@ exports.getOutgoingTestimonial = async function (req, res){
     
     var myAccount = await getAccount(req.id, req.type)
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving your account',
         data: { }
@@ -76,7 +76,7 @@ exports.getOutgoingTestimonial = async function (req, res){
     });
 
     if (!testimonials)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving testimonials',
         data: { }
@@ -110,7 +110,7 @@ exports.getMyTestimonial = async function (req, res){
     
     var myAccount = await getAccount(req.id, req.type)
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving your account',
         data: { }
@@ -126,7 +126,7 @@ exports.getMyTestimonial = async function (req, res){
     });
 
     if (!testimonials)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving testimonials',
         data: { }
@@ -163,7 +163,7 @@ exports.requestTestimonial = async function (req, res){
     
     var targetAccount = await getAccount(req.id, req.type)
     if(!targetAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving your account',
         data: { }
@@ -171,7 +171,7 @@ exports.requestTestimonial = async function (req, res){
 
     var creatorAccount = await getAccount(req.body.accountId, req.body.accountType)
     if(!creatorAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account',
         data: { }
@@ -180,14 +180,14 @@ exports.requestTestimonial = async function (req, res){
     var theProject = await getProject(req.body.projectId)
 
     if(!theProject)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while verifying project',
         data: { }
     });
     
     if(!targetAccount.projects.includes(theProject.id) || !creatorAccount.projects.includes(theProject.id))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not mutual',
         data: { }
@@ -205,7 +205,7 @@ exports.requestTestimonial = async function (req, res){
     });
 
     if(theRequest)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was already such testimonial query',
         data: { }
@@ -242,7 +242,7 @@ exports.writeTestimonial = async function (req, res){
     
     var targetAccount = await getAccount(req.body.accountId, req.body.accountType)
     if(!targetAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account',
         data: { }
@@ -250,7 +250,7 @@ exports.writeTestimonial = async function (req, res){
 
     var creatorAccount = await getAccount(req.id, req.type)
     if(!creatorAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account',
         data: { }
@@ -259,14 +259,14 @@ exports.writeTestimonial = async function (req, res){
     var theProject = await getProject(req.body.projectId)
 
     if(!theProject)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while verifying project',
         data: { }
     });
     
     if(!targetAccount.projects.includes(theProject.id) || !creatorAccount.projects.includes(theProject.id))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not mutual',
         data: { }
@@ -284,7 +284,7 @@ exports.writeTestimonial = async function (req, res){
     });
 
     if(theRequest)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was already such testimonial query',
         data: { }
@@ -323,7 +323,7 @@ exports.updateTestimonialStatus = async function (req, res){
     
     var myAccount = await getAccount(req.id, req.type)
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving your account',
         data: { }
@@ -339,28 +339,28 @@ exports.updateTestimonialStatus = async function (req, res){
     });
 
     if(!testimonial)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such testimonial',
         data: { }
     });
 
     if(testimonial.targetId != req.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action',
         data: { }
     });
 
     if( req.body.status === 'open' && testimonial.status != 'pending')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This update is invalid',
         data: { }
     });
 
     if( req.body.status === 'dismissed' && testimonial.status != 'pending')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This update is invalid',
         data: { }
@@ -390,7 +390,7 @@ exports.updateOutgoingTestimonialStatus = async function (req, res){
     
     var myAccount = await getAccount(req.id, req.type)
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving your account',
         data: { }
@@ -406,28 +406,28 @@ exports.updateOutgoingTestimonialStatus = async function (req, res){
     });
 
     if(!testimonial)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such testimonial',
         data: { }
     });
 
     if(req.id != testimonial.creatorId)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: { }
     });
 
     if( req.body.status === 'pending' && testimonial.status != 'requested')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This update is invalid',
         data: { }
     });
 
     if(req.body.status === 'pending' && req.body.desc.length === 0)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This desc field is invalid',
         data: { }
@@ -555,7 +555,7 @@ exports.updateAccountTarget = async function (req, res){
     }
 
     if(!account) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account!',
         data: {}
@@ -605,7 +605,7 @@ exports.updateProjectTarget = async function (req, res){
     
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving project!',
         data: {}
@@ -669,7 +669,7 @@ exports.accountTargetLists = async function (req, res){
     }
 
     if(!account) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account!',
         data: {}
@@ -723,7 +723,7 @@ exports.getProjectTarget = async function (req, res){
 
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving project!',
         data: {}

@@ -109,7 +109,7 @@ exports.requestReward = async function (req, res){
     req.body.country = theCountry.name;
 
     if(!req.files.rewardFile)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'A file is needed for verification!',
         data: {}
@@ -126,14 +126,14 @@ exports.requestReward = async function (req, res){
         });
 
         if(!account)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(account.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -149,14 +149,14 @@ exports.requestReward = async function (req, res){
         });
 
         if(!account)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(account.isVerified != "true")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account not authorized to request reward! Not verified yet.',
             data: {}
@@ -193,7 +193,7 @@ exports.requestReward = async function (req, res){
     var theDate = moment(req.body.endDate)
     
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The end date is invalid! ',
         data: {}
@@ -201,14 +201,14 @@ exports.requestReward = async function (req, res){
     
     var startDate = moment(req.body.startDate).tz('Asia/Singapore')
     if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The start date is invalid! ',
         data: {}
     });
 
     if(theDate.isBefore(startDate))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The start date is invalid! ',
         data: {}
@@ -267,14 +267,14 @@ exports.cancelReward = async function (req, res){
         });
 
         if(!account)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(account.status != "active")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is not authorized to perform project creation right now!',
             data: {}
@@ -290,14 +290,14 @@ exports.cancelReward = async function (req, res){
         });
 
         if(!account)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
         });
 
         if(account.isVerified != "true")
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account not authorized to request reward! Not verified yet.',
             data: {}
@@ -315,14 +315,14 @@ exports.cancelReward = async function (req, res){
     });
 
     if(!reward)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such reward not found!',
         data: {}
     });
     
     if(reward.status != "pending")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The reward is no longer pending!',
         data: {}
@@ -364,7 +364,7 @@ exports.getRewardList = async function (req, res){
     });
 
     if(!rewards)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Rewards not found!',
         data: {}
@@ -390,7 +390,7 @@ exports.getMarketplace = async function (req, res){
     });
 
     if(!rewards)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Rewards not found!',
         data: {}
@@ -464,7 +464,7 @@ exports.getFilteredMarketplace = async function (req, res){
     });
 
     if(!rewards)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Rewards not found!',
         data: {}
@@ -552,14 +552,14 @@ exports.redeemReward = async function (req, res){
     });
 
     if(!reward)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such valid reward not found!',
         data: {}
     });
 
     if(reward.claimedNum >= reward.quota) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Reward not found!',
             data: {}
@@ -577,7 +577,7 @@ exports.redeemReward = async function (req, res){
     });
         
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -595,14 +595,14 @@ exports.redeemReward = async function (req, res){
     else if(reward.minTier === 'gold') targetTierLevel = 3
 
     if(tierLevel<targetTierLevel)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Your account tier is not eligible!',
         data: {}
     });
 
     if(reward.point > theOwner.wallet)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Your account wallet point is not sufficient!',
         data: {}
@@ -672,7 +672,7 @@ exports.getRewardDetail = async function (req, res){
     });
 
     if(!reward)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Reward not found!',
         data: {}
@@ -696,7 +696,7 @@ exports.getMarketplaceRewardDetail = async function (req, res){
     });
 
     if(!theReward)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Reward not found!',
         data: {}
@@ -743,7 +743,7 @@ exports.getMarketplaceRewardDetail = async function (req, res){
 
     await getRequesterInfo(reward)
     if(reward.accountName === "" && reward.sponsorType != "external") 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving the sponsor info!',
         data: { }
@@ -772,14 +772,14 @@ exports.createReward = async function (req, res){
     });
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
     });
 
     if(account.role === "user")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Only admin is authorized to perform this!',
         data: {}
@@ -814,7 +814,7 @@ exports.createReward = async function (req, res){
 
     var theDate = moment(req.body.endDate).tz('Asia/Singapore')
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The end date is invalid! ',
         data: {}
@@ -822,14 +822,14 @@ exports.createReward = async function (req, res){
 
     var startDate = moment(req.body.startDate).tz('Asia/Singapore')
     if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The start date is invalid! ',
         data: {}
     });
 
     if(theDate.isBefore(startDate))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The start date is invalid! ',
         data: {}
@@ -891,14 +891,14 @@ exports.updateReward = async function (req, res){
     });
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
     });
 
     if(account.role === "user")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Only admin is authorized to perform this!',
         data: {}
@@ -914,7 +914,7 @@ exports.updateReward = async function (req, res){
     });
 
     if(!reward)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such reward!',
         data: {}
@@ -949,7 +949,7 @@ exports.updateReward = async function (req, res){
 
     var theDate = moment(req.body.endDate) 
     if(theDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The end date is invalid! ',
         data: {}
@@ -959,7 +959,7 @@ exports.updateReward = async function (req, res){
     if(reward.status != 'open') {
         startDate = moment(req.body.startDate).tz('Asia/Singapore')
         if(startDate.isSameOrBefore(moment.tz('Asia/Singapore')))
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'The start date is invalid! ',
             data: {}
@@ -967,7 +967,7 @@ exports.updateReward = async function (req, res){
     }
 
     if(req.body.quota < reward.claimedSum)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The new quota is invalid! It is lower than the claimed number.',
         data: {}

@@ -11,7 +11,7 @@ exports.institutionRequest = async function (req, res){
     });
 
     if(!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}
@@ -35,7 +35,7 @@ exports.institutionRequestRegional = async function (req, res){
     });
 
     if(!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}
@@ -59,7 +59,7 @@ exports.userRequest = async function (req, res){
     });
 
     if(!admin) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}
@@ -122,7 +122,7 @@ exports.userRequestRegional = async function (req, res){
     });
 
     if(!admin) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}
@@ -184,7 +184,7 @@ exports.rejectInstitution = async function (req, res){
     });
 
     if(!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}
@@ -196,7 +196,7 @@ exports.rejectInstitution = async function (req, res){
     });
 
     if(!institution) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such account found! ',
             data: {}
@@ -235,7 +235,7 @@ exports.verifyInstitution = async function (req, res){
     });
 
     if(!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}
@@ -247,7 +247,7 @@ exports.verifyInstitution = async function (req, res){
     });
 
     if(!institution) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such account found! ',
             data: {}
@@ -290,7 +290,7 @@ exports.acceptUserRequest = async function (req, res){
     });
 
     if(!admin) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such admin found! ',
             data: {}
@@ -302,7 +302,7 @@ exports.acceptUserRequest = async function (req, res){
     });
 
     if(!verifyrequest || verifyrequest.status != "pending") {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such request found! ',
             data: {}
@@ -314,7 +314,7 @@ exports.acceptUserRequest = async function (req, res){
     });
 
     if(!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}
@@ -374,7 +374,7 @@ exports.declineUserRequest = async function (req, res){
     });
 
     if(!admin) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such admin found! ',
             data: {}
@@ -386,7 +386,7 @@ exports.declineUserRequest = async function (req, res){
     });
 
     if(!verifyrequest || verifyrequest.status != "pending") {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such request found! ',
             data: {}
@@ -398,7 +398,7 @@ exports.declineUserRequest = async function (req, res){
     });
 
     if(!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No such user found! ',
             data: {}

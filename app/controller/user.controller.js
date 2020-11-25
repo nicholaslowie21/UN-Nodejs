@@ -64,7 +64,7 @@ exports.profilePicture = async function (req, res){
     });
     
     if(!req.file) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No picture uploaded! ',
             data: {}
@@ -72,7 +72,7 @@ exports.profilePicture = async function (req, res){
     }
 
     if(!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'User not found! ',
             data: {}
@@ -130,7 +130,7 @@ exports.updateUserProfile = async function (req, res, next) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -209,7 +209,7 @@ exports.updateUsername = async function (req, res, next) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -239,7 +239,7 @@ exports.updateEmail = async function (req, res, next) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -269,7 +269,7 @@ exports.currProjects = async function (req, res, next) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -317,7 +317,7 @@ exports.pastProjects = async function (req, res, next) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -361,7 +361,7 @@ exports.viewUser = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -406,7 +406,7 @@ exports.viewUserById = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -431,7 +431,7 @@ exports.getFeeds = async function (req, res) {
     });
 
     if(!feeds) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Feeds not found!',
         data: {}
@@ -456,7 +456,7 @@ exports.getBadges = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -485,7 +485,7 @@ exports.getAffiliations = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -516,7 +516,7 @@ exports.shareProfile = async function (req, res) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}

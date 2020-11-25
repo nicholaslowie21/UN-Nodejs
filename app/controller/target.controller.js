@@ -68,7 +68,7 @@ exports.updateAccountTarget = async function (req, res){
     }
 
     if(!account) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account!',
         data: {}
@@ -118,7 +118,7 @@ exports.updateProjectTarget = async function (req, res){
     
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving project!',
         data: {}
@@ -182,7 +182,7 @@ exports.accountTargetLists = async function (req, res){
     }
 
     if(!account) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving account!',
         data: {}
@@ -236,7 +236,7 @@ exports.getProjectTarget = async function (req, res){
 
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving project!',
         data: {}
