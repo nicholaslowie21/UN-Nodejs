@@ -326,6 +326,7 @@ exports.cumulativeProjects = async function (req, res){
     }); 
     
     var cumulativeThisYear = [0,0,0,0,0,0,0,0,0,0,0,0]
+    cumulativeThisYear[0] += totalPrior
     for(var i = 0; i < projectsThisYear.length; i++) {
         var theEntryMonth = moment(projectsThisYear[i].createdAt).format("MM")
         cumulativeThisYear[theEntryMonth-1]++
