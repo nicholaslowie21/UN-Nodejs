@@ -389,6 +389,7 @@ async function getInstitutionInfo(theItem) {
     theItem.targetName = institution.name
     theItem.targetUsername = institution.username
     theItem.targetImg = institution.ionicImg
+    theItem.targetStatus = institution.status
 }
 
 async function getUserInfo(theItem) {
@@ -408,6 +409,7 @@ async function getUserInfo(theItem) {
     theItem.targetName = user.name
     theItem.targetUsername = user.username
     theItem.targetImg = user.ionicImg
+    theItem.targetStatus = user.status
 }
 
 async function getProjectInfo(theItem) {
@@ -425,6 +427,7 @@ async function getProjectInfo(theItem) {
     }
 
     theItem.targetTitle = project.title
+    theItem.targetStatus = project.status
 }
 
 async function getRewardInfo(theItem) {
@@ -442,6 +445,7 @@ async function getRewardInfo(theItem) {
     }
 
     theItem.targetTitle = reward.title
+    theItem.targetStatus = reward.status
 }
 
 async function checkUserCountry(theId) {
