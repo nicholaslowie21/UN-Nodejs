@@ -465,11 +465,16 @@ exports.myPurchase = async function (req, res) {
 
         var owner = await getAccount(paidresource.owner, paidresource.ownerType)
         if(!owner) continue
-        
+
+        var theProject = await getProject(paidrequests[i].projectId)
+        if(!theProject) continue
+
         temp.ownerImg = owner.ionicImg
         temp.ownerName = owner.name
         temp.ownerUsername = owner.username
-    
+        
+        temp.projectTitle = theProject.title
+
         theList.push(temp)
     }
 
