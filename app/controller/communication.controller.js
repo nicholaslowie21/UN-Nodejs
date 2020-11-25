@@ -25,14 +25,14 @@ exports.createAnnouncement = async function (req, res){
     });
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
     });
 
     if(account.role === "user")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Only admin is authorized to perform this!',
         data: {}
@@ -65,7 +65,7 @@ exports.editAnnouncement = async function (req, res) {
 
     account = await User.findOne({ '_id': req.id }, function (err) {
         if (err)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was no such account!',
             data: {}
@@ -73,14 +73,14 @@ exports.editAnnouncement = async function (req, res) {
     });
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
     });
 
     if(account.role === "user")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Only admin is authorized to perform this!',
         data: {}
@@ -96,7 +96,7 @@ exports.editAnnouncement = async function (req, res) {
     });
 
     if(!announcement)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such announcement!',
         data: {}
@@ -135,14 +135,14 @@ exports.deleteAnnouncement = async function (req, res) {
     });
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
     });
 
     if(account.role === "user")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Only admin is authorized to perform this!',
         data: {}
@@ -158,7 +158,7 @@ exports.deleteAnnouncement = async function (req, res) {
     });
 
     if(!announcement) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such announcement!',
         data: {}
@@ -195,7 +195,7 @@ exports.getAnnouncement = async function (req, res) {
     });
 
     if(!announcements) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such announcements!',
         data: {}
@@ -234,7 +234,7 @@ exports.chatAccount = async function (req, res) {
     }
 
     if(!targetAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -263,7 +263,7 @@ exports.chatAccount = async function (req, res) {
     }  
 
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -386,7 +386,7 @@ exports.sendChat = async function (req, res) {
     });
 
     if(!chatRoom)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such chat room!',
         data: {}
@@ -415,7 +415,7 @@ exports.sendChat = async function (req, res) {
     }  
 
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -503,7 +503,7 @@ exports.markRead = async function (req, res) {
     });
 
     if(!chatRoom)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such chat room!',
         data: {}
@@ -532,7 +532,7 @@ exports.markRead = async function (req, res) {
     }  
 
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -573,7 +573,7 @@ exports.getRoomListFiltered = async function (req, res) {
     });
 
     if(!chatRooms)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such chat room!',
         data: {}
@@ -602,7 +602,7 @@ exports.getRoomListFiltered = async function (req, res) {
     }  
 
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -666,7 +666,7 @@ exports.getNotifications = async function (req, res) {
     });
 
     if(!notifications) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was an issue while retrieving notifications!',
             data: {}
@@ -699,7 +699,7 @@ exports.gotNewNotif = async function (req, res) {
     });
 
     if(!notifications) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There was an issue while retrieving notifications!',
             data: {}
@@ -731,7 +731,7 @@ exports.getRoomList = async function (req, res) {
     });
 
     if(!chatRooms)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such chat room!',
         data: {}
@@ -760,7 +760,7 @@ exports.getRoomList = async function (req, res) {
     }  
 
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -825,7 +825,7 @@ exports.getChats = async function (req, res) {
     });
 
     if(!chatRoom)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such chat room!',
         data: {}
@@ -854,7 +854,7 @@ exports.getChats = async function (req, res) {
     }  
 
     if(!myAccount)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}

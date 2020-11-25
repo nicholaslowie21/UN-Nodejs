@@ -18,7 +18,7 @@ exports.searchUsers = async function (req, res){
     });
 
     if(!users) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -42,7 +42,7 @@ exports.allProjects = async function (req, res){
     });
 
     if(!projects) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -65,7 +65,7 @@ exports.searchInstitutions = async function (req, res){
     });
 
     if(!institutions) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -89,7 +89,7 @@ exports.getRegionalAdmins = async function (req, res){
     });
 
     if(!users) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -109,7 +109,7 @@ exports.getAdmins = async function (req, res){
     });
 
     if(!users) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -129,7 +129,7 @@ exports.getAdminLeads = async function (req, res){
     });
 
     if(!users) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -150,7 +150,7 @@ exports.assignRegionalAdmin = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -200,7 +200,7 @@ exports.assignAdmin = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -250,7 +250,7 @@ exports.assignAdminLead = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -302,7 +302,7 @@ exports.assignUser = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -352,7 +352,7 @@ exports.suspendUser = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -405,7 +405,7 @@ exports.suspendInstitution = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -453,7 +453,7 @@ exports.activateUser = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -506,7 +506,7 @@ exports.activateInstitution = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -553,7 +553,7 @@ exports.suspendProject = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Project not found!',
         data: {}
@@ -615,7 +615,7 @@ exports.activateProject = async function (req, res) {
     });
 
     if(!target) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Project not found!',
         data: {}
@@ -677,7 +677,7 @@ exports.getAuditLogs = async function (req, res) {
     });
 
     if(!logs) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Logs not found!',
         data: {}
@@ -702,7 +702,7 @@ exports.getAccountClaims = async function (req, res) {
     });
 
     if(!claims) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Claims not found!',
         data: {}
@@ -733,7 +733,7 @@ exports.validateAccountClaim = async function (req, res) {
     });
 
     if(!claim) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Claim not found!',
         data: {}
@@ -741,7 +741,7 @@ exports.validateAccountClaim = async function (req, res) {
 
     var account = await getAccount(claim.accountId, claim.accountType)
     if(!account) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -753,7 +753,7 @@ exports.validateAccountClaim = async function (req, res) {
         account.status = 'active'
         account.save().catch(err => {
             gotError = true
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Something went wrong! Error: '+err,
                 data: {}
@@ -829,7 +829,7 @@ exports.exportAuditLog = async function (req, res) {
     });
 
     if(!logs) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Logs not found!',
         data: {}
@@ -862,7 +862,7 @@ exports.exportAuditLog = async function (req, res) {
     }
 
     if(!target)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong! Target not found.',
         data: {}

@@ -108,14 +108,14 @@ exports.profilePicture = async function (req, res){
     });
 
     if(!institution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
     });
 
     if(!req.file) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No picture uploaded! ',
             data: {}
@@ -177,7 +177,7 @@ exports.updateProfile = async function (req, res, next) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -248,7 +248,7 @@ exports.updateUsername = async function (req, res, next) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -278,7 +278,7 @@ exports.updateEmail = async function (req, res, next) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -313,7 +313,7 @@ exports.getMembers = async function(req,res) {
     });
 
     if(!institution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such account not found!',
         data: {}
@@ -350,7 +350,7 @@ exports.addMembers = async function(req,res) {
     });
 
     if(!institution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such account not found!',
         data: {}
@@ -366,14 +366,14 @@ exports.addMembers = async function(req,res) {
     });
 
     if(!member)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such account not found!',
         data: {}
     });
 
     if(institution.members.includes(member.id)) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Member already added!',
         data: {}
@@ -424,7 +424,7 @@ exports.delMembers = async function(req,res) {
     });
 
     if(!institution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such account not found!',
         data: {}
@@ -440,7 +440,7 @@ exports.delMembers = async function(req,res) {
     });
 
     if(!member)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such account not found!',
         data: {}
@@ -483,7 +483,7 @@ exports.delMembers = async function(req,res) {
         });
 
     } else {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Such member is not affiliated',
             data: {}
@@ -498,7 +498,7 @@ exports.currProjects = async function (req, res, next) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -542,7 +542,7 @@ exports.pastProjects = async function (req, res, next) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -588,7 +588,7 @@ exports.membersCSVProcessing = async function (req, res, next) {
     });
 
     if(!institution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such account not found!',
         data: {}
@@ -604,7 +604,7 @@ exports.membersCSVProcessing = async function (req, res, next) {
             for (const obj of csvData) {
                 
                 if(!obj.memberUsername) {
-                    return res.status(500).json({
+                    return res.status(400).json({
                         status: 'error',
                         msg: 'File format is incorrect. Please check your file!',
                         data: {}
@@ -678,7 +678,7 @@ exports.viewInstitution = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -724,7 +724,7 @@ exports.getFeeds = async function (req, res) {
     });
 
     if(!feeds) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Feeds not found!',
         data: {}
@@ -749,7 +749,7 @@ exports.viewInstitutionById = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Institution not found!',
         data: {}
@@ -790,7 +790,7 @@ exports.getBadges = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -817,7 +817,7 @@ exports.searchUsers = async function (req, res){
     });
 
     if(!users) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No users found! ',
             data: {}
@@ -837,7 +837,7 @@ exports.shareProfile = async function (req, res) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such account not found!',
         data: {}

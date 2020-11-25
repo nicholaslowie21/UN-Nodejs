@@ -41,7 +41,7 @@ exports.claimUpload = uploadClaim.single('verifyFile');
 
 exports.accountClaim = async function(req,res) {
     if(!req.file || req.file.fieldname != 'verifyFile') 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'No file uploaded',
         data: {}
@@ -57,7 +57,7 @@ exports.accountClaim = async function(req,res) {
     });
 
     if(accountClaim) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'There is already a pending claim!',
             data: {}
@@ -67,7 +67,7 @@ exports.accountClaim = async function(req,res) {
     var account = await getAccount(req.body.accountId, req.body.accountType)
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There is no such account!',
         data: {}
@@ -89,7 +89,7 @@ exports.accountClaim = async function(req,res) {
       });
     
     if (user || institution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Email already exists in the system. Please input another one!'
     });
@@ -111,7 +111,7 @@ exports.accountClaim = async function(req,res) {
       });
     
     if (user || institution)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Username already exists in the system. Please input another one!'
     });
@@ -271,7 +271,7 @@ exports.addUserCSV = async function (req, res, next) {
             for (const obj of csvData) {
                 
                 if(!obj.sequence || !obj.name || !obj.email || !obj.country || !obj.website || !obj.SDGs || !obj.bio) {
-                    return res.status(500).json({
+                    return res.status(400).json({
                         status: 'error',
                         msg: 'File format is incorrect. Please check your file!',
                         data: {}
@@ -279,7 +279,7 @@ exports.addUserCSV = async function (req, res, next) {
                 }
 
                 if(obj.address)
-                return res.status(500).json({
+                return res.status(400).json({
                     status: 'error',
                     msg: 'File format is incorrect. Please check your file!',
                     data: {}
@@ -291,7 +291,7 @@ exports.addUserCSV = async function (req, res, next) {
                 let theCountry = nodeCountries.getCountryByName(obj.country);
 
                 if (!theCountry)
-                    return res.status(500).json({
+                    return res.status(400).json({
                         status: 'error',
                         msg: 'All the data uploaded up until this sequence: '+obj.sequence +". The country is invalid for this sequence."
                     });
@@ -299,7 +299,7 @@ exports.addUserCSV = async function (req, res, next) {
                 obj.country = theCountry.name;
 
                 if(Isemail.validate(obj.email) === false) 
-                return res.status(500).json({
+                return res.status(400).json({
                     status: 'error',
                     msg: 'All the data uploaded up until this sequence: '+obj.sequence +". The email is invalid for this sequence."
                 });
@@ -525,7 +525,7 @@ exports.addInstitutionCSV = async function (req, res, next) {
                 })
 
                 if(!valid) 
-                return res.status(500).json({
+                return res.status(400).json({
                     status: 'error',
                     msg: 'All the data uploaded up until this sequence: '+obj.sequence +". This SDGs are invalid."
                 });
@@ -579,7 +579,7 @@ exports.addInstitutionCSV = async function (req, res, next) {
             });
         }
         else {
-            res.status(500).json({
+            res.status(400).json({
                 status: 'error',
                 msg: 'There was an issue in the upload please try again'
             });

@@ -1981,21 +1981,21 @@ exports.addAdmin = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing") 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not active!',
         data: {}
     });
 
     if(project.host != req.body.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit admin for this project!',
         data: {}
@@ -2011,7 +2011,7 @@ exports.addAdmin = async function (req, res) {
     })
 
     if (!user) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Such user is not found!',
             data: {}
@@ -2019,7 +2019,7 @@ exports.addAdmin = async function (req, res) {
     }
 
     if(user.id === req.body.id) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'You cannot add yourself as admin!',
             data: {}
@@ -2032,7 +2032,7 @@ exports.addAdmin = async function (req, res) {
         tempAdmins.push(user.id)
         user.projects.push(project.id)
     } else {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'This user is already added as admin',
             data: {}
@@ -2106,21 +2106,21 @@ exports.deleteAdmin = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing") 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not active!',
         data: {}
     });
 
     if(project.host != req.body.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit admin for this project!',
         data: {}

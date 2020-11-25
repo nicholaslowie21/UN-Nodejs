@@ -44,7 +44,7 @@ exports.reqResource = async function (req, res) {
     }
     
     if(!theRequester) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -83,14 +83,14 @@ exports.reqResource = async function (req, res) {
     
 
     if(!resource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(resource.status != "active")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You cannot request for this resource!',
         data: {}
@@ -106,21 +106,21 @@ exports.reqResource = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource need not found!',
         data: {}
     });
 
     if(resourceneed.type != req.body.resType)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Type mismatch! Resource need type and the resource type are different',
         data: {}
     });
 
     if(resourceneed.status != "progress")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Your resource need status is no longer in progress',
         data: {}
@@ -136,14 +136,14 @@ exports.reqResource = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not ongoing!',
         data: {}
@@ -160,7 +160,7 @@ exports.reqResource = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project!',
         data: {}
@@ -176,7 +176,7 @@ exports.reqResource = async function (req, res) {
     });
 
     if(temp)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such resource request have been created! ',
         data: {}
@@ -242,7 +242,7 @@ exports.reqAutoResource = async function (req, res) {
     }
     
     if(!theRequester) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -280,14 +280,14 @@ exports.reqAutoResource = async function (req, res) {
     }
     
     if(!resource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(resource.status != "active")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You cannot request for this resource!',
         data: {}
@@ -303,14 +303,14 @@ exports.reqAutoResource = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not ongoing!',
         data: {}
@@ -329,7 +329,7 @@ exports.reqAutoResource = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project!',
         data: {}
@@ -423,7 +423,7 @@ exports.useKnowledgeResource = async function (req, res) {
     }
     
     if(!theRequester) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -441,14 +441,14 @@ exports.useKnowledgeResource = async function (req, res) {
     });    
 
     if(!resource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(resource.status != "active")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You cannot use this resource!',
         data: {}
@@ -464,21 +464,21 @@ exports.useKnowledgeResource = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource need not found!',
         data: {}
     });
 
     if(resourceneed.type != "knowledge")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Type mismatch! Resource need type and the resource type are different',
         data: {}
     });
 
     if(resourceneed.status != "progress")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Your resource need status is no longer in progress',
         data: {}
@@ -486,7 +486,7 @@ exports.useKnowledgeResource = async function (req, res) {
 
     const project = await Project.findOne({ '_id': resourceneed.projectId }, function (err) {
         if (err)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Something went wrong! '+err,
             data: {}
@@ -494,14 +494,14 @@ exports.useKnowledgeResource = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not ongoing!',
         data: {}
@@ -518,7 +518,7 @@ exports.useKnowledgeResource = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project!',
         data: {}
@@ -628,7 +628,7 @@ exports.useAutoKnowledgeResource = async function (req, res) {
     }
     
     if(!theRequester) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -646,14 +646,14 @@ exports.useAutoKnowledgeResource = async function (req, res) {
     });    
 
     if(!resource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such knowledge resource not found!',
         data: {}
     });
     
     if(resource.status != "active")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You cannot use this resource!',
         data: {}
@@ -669,14 +669,14 @@ exports.useAutoKnowledgeResource = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not ongoing!',
         data: {}
@@ -693,7 +693,7 @@ exports.useAutoKnowledgeResource = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to edit this project!',
         data: {}
@@ -834,7 +834,7 @@ exports.getManpowerList = async function (req, res) {
     });
 
     if(!manpowers) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -894,7 +894,7 @@ exports.getItemList = async function (req, res) {
     });
 
     if(!items) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -955,7 +955,7 @@ exports.getVenueList = async function (req, res) {
     });
 
     if(!venues) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -1015,7 +1015,7 @@ exports.getKnowledgeList = async function (req, res) {
     });
 
     if(!knowledges) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -1089,7 +1089,7 @@ exports.getResourceSuggestion = async function (req, res) {
     });
 
     if(!resourcneed) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving resourceneed!',
         data: {}
@@ -1237,7 +1237,7 @@ exports.getResourceNeedSuggestion = async function (req, res){
     }
 
     if(!resource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such resource not found!',
         data: {}
@@ -1259,7 +1259,7 @@ exports.getResourceNeedSuggestion = async function (req, res){
     });
 
     if(!resourceneeds)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was an issue retrieving resource needs!',
         data: {}
@@ -1495,7 +1495,7 @@ exports.getDiscoverWeekly = async function (req, res) {
     }
 
     if(!actor)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -1513,7 +1513,7 @@ exports.getDiscoverWeekly = async function (req, res) {
     });
 
     if(!discoverWeekly)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There is no discover weekly projects yet!',
         data: { }
@@ -1569,7 +1569,7 @@ exports.getProjectList = async function (req, res) {
     });
 
     if(!projects) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -1629,7 +1629,7 @@ exports.getProjectListFiltered = async function (req, res) {
     var theFilter = req.body.filterSDGs
 
     if(!theFilter || !theFilter.length)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The list of SDGs filter is invalid!',
         data: {}
@@ -1645,7 +1645,7 @@ exports.getProjectListFiltered = async function (req, res) {
     });
 
     if(!projects) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving!',
         data: {}
@@ -1802,7 +1802,7 @@ exports.getFilteredFundingNeeds = async function (req, res) {
     var theFilter = req.body.filterSDGs
 
     if(!theFilter.length)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The list of SDGs filter is invalid!',
         data: {}
@@ -1925,7 +1925,7 @@ exports.reqProject = async function (req, res) {
     }
     
     if(!theRequester) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -1944,7 +1944,7 @@ exports.reqProject = async function (req, res) {
         });
 
         if(resource.owner!=req.body.id)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'You are not authorized to contribute this resource! ',
             data: {}
@@ -1960,7 +1960,7 @@ exports.reqProject = async function (req, res) {
         });
 
         if(resource.owner!=req.body.id)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'You are not authorized to contribute this resource! ',
             data: {}
@@ -1976,7 +1976,7 @@ exports.reqProject = async function (req, res) {
         });
 
         if(resource.owner!=req.body.id)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'You are not authorized to contribute this resource! ',
             data: {}
@@ -2002,7 +2002,7 @@ exports.reqProject = async function (req, res) {
         }
 
         if(!valid)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'You are not authorized to contribute this resource! ',
             data: {}
@@ -2011,14 +2011,14 @@ exports.reqProject = async function (req, res) {
     
 
     if(!resource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource not found!',
         data: {}
     });
     
     if(resource.status != "active")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You cannot request for this resource!',
         data: {}
@@ -2034,21 +2034,21 @@ exports.reqProject = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such item resource need not found!',
         data: {}
     });
 
     if(resourceneed.type != req.body.resType)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Type mismatch! Resource need type and the resource type are different',
         data: {}
     });
 
     if(resourceneed.status != "progress")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Your resource need status is no longer in progress',
         data: {}
@@ -2064,14 +2064,14 @@ exports.reqProject = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not ongoing!',
         data: {}
@@ -2087,7 +2087,7 @@ exports.reqProject = async function (req, res) {
     });
 
     if(temp)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project request have been created! ',
         data: {}
@@ -2150,7 +2150,7 @@ exports.contributeMoney = async function (req, res) {
     }
     
     if(!theRequester) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2166,21 +2166,21 @@ exports.contributeMoney = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such money resource need not found!',
         data: {}
     });
 
     if(resourceneed.type != "money")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Type mismatch! Resource need type is not money',
         data: {}
     });
 
     if(resourceneed.status != "progress")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Your resource need status is no longer in progress',
         data: {}
@@ -2196,14 +2196,14 @@ exports.contributeMoney = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project not found!',
         data: {}
     });
 
     if(project.status != "ongoing")
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'This project is not ongoing!',
         data: {}
@@ -2219,21 +2219,21 @@ exports.contributeMoney = async function (req, res) {
     });
 
     if(temp)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such project request have been created! ',
         data: {}
     }); 
 
     if(req.body.moneySum <= 0 ) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The amount input is invalid! ',
         data: {}
     }); 
 
     if(req.body.moneySum + resourceneed.pendingSum + resourceneed.receivedSum > resourceneed.total)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The amount input is too high! ',
         data: {}
@@ -2356,7 +2356,7 @@ exports.currProjects = async function (req, res, next) {
 
 
     if(!theRequester) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -2953,7 +2953,7 @@ exports.acceptProjectReq = async function (req, res) {
     });
 
     if(!projectReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such pending Project Request ',
         data: {}
@@ -2969,14 +2969,14 @@ exports.acceptProjectReq = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such project',
         data: {}
     });
 
     if(project.status != 'ongoing')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The project is no longer ongoing!',
         data: {}
@@ -2995,7 +2995,7 @@ exports.acceptProjectReq = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to accept this project request!',
         data: {}
@@ -3010,14 +3010,14 @@ exports.acceptProjectReq = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need is not found!',
         data: {}
     });
 
     if(resourceneed.status != 'progress')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need completion is no longer in progress!',
         data: {}
@@ -3064,7 +3064,7 @@ exports.declineProjectReq = async function (req, res) {
     });
 
     if(!projectReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such pending Project Request ',
         data: {}
@@ -3080,14 +3080,14 @@ exports.declineProjectReq = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such project',
         data: {}
     });
 
     if(project.status != 'ongoing')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The project is no longer ongoing!',
         data: {}
@@ -3106,7 +3106,7 @@ exports.declineProjectReq = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to decline this project request!',
         data: {}
@@ -3154,14 +3154,14 @@ exports.cancelProjectReq = async function (req, res) {
     });
 
     if(!projectReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such Project Request ',
         data: {}
     });
 
     if(projectReq.status != 'pending' && projectReq.status != 'accepted')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You can no longer cancel this project request ',
         data: {}
@@ -3178,7 +3178,7 @@ exports.cancelProjectReq = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such project',
         data: {}
@@ -3198,7 +3198,7 @@ exports.cancelProjectReq = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid && projectReq.ownerId != req.body.id)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to cancel this project request!',
         data: {}
@@ -3213,7 +3213,7 @@ exports.cancelProjectReq = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need is not found!',
         data: {}
@@ -3263,7 +3263,7 @@ exports.completeProjectReq = async function (req, res) {
     });
 
     if(!projectReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such accepted Project Request ',
         data: {}
@@ -3279,14 +3279,14 @@ exports.completeProjectReq = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such project',
         data: {}
     });
 
     if(project.status != 'ongoing')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The project is no longer ongoing!',
         data: {}
@@ -3305,7 +3305,7 @@ exports.completeProjectReq = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to update this project request!',
         data: {}
@@ -3320,14 +3320,14 @@ exports.completeProjectReq = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need is not found!',
         data: {}
     });
 
     if(resourceneed.status != 'progress')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need completion is no longer in progress!',
         data: {}
@@ -3384,7 +3384,7 @@ exports.completeProjectReq = async function (req, res) {
         if(req.body.theRating >=1 && req.body.theRating <=5) {
             theRating = req.body.theRating
         } else {
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'The rating is invalid!',
                 data: {}
@@ -3458,7 +3458,7 @@ exports.acceptResourceReq = async function (req, res) {
     });
 
     if(!resourceReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such pending Resource Request ',
         data: {}
@@ -3472,14 +3472,14 @@ exports.acceptResourceReq = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need is not found!',
         data: {}
     });
 
     if(resourceneed.status != 'progress')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need completion is no longer in progress!',
         data: {}
@@ -3501,7 +3501,7 @@ exports.acceptResourceReq = async function (req, res) {
     }
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to update this resource request!',
         data: {}
@@ -3543,7 +3543,7 @@ exports.declineResourceReq = async function (req, res) {
     });
 
     if(!resourceReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such pending Resource Request ',
         data: {}
@@ -3557,14 +3557,14 @@ exports.declineResourceReq = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need is not found!',
         data: {}
     });
 
     if(resourceneed.status != 'progress')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need completion is no longer in progress!',
         data: {}
@@ -3586,7 +3586,7 @@ exports.declineResourceReq = async function (req, res) {
     }
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to update this resource request!',
         data: {}
@@ -3628,14 +3628,14 @@ exports.cancelResourceReq = async function (req, res) {
     });
 
     if(!resourceReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such Resource Request ',
         data: {}
     });
 
     if(resourceReq.status != 'pending' && resourceReq.status != 'accepted')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You can no longer cancel this resource request ',
         data: {}
@@ -3651,7 +3651,7 @@ exports.cancelResourceReq = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such project',
         data: {}
@@ -3690,7 +3690,7 @@ exports.cancelResourceReq = async function (req, res) {
     }
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to update this resource request!',
         data: {}
@@ -3706,7 +3706,7 @@ exports.cancelResourceReq = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need is not found!',
         data: {}
@@ -3755,7 +3755,7 @@ exports.paidResourcesMarketplace = async function (req, res){
     });
 
     if(!paidresources)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Paid Resources does not exist!',
         data: {}
@@ -3797,7 +3797,7 @@ exports.completeResourceReq = async function (req, res) {
     });
 
     if(!resourceReq)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such accepted Resource Request ',
         data: {}
@@ -3813,14 +3813,14 @@ exports.completeResourceReq = async function (req, res) {
     });
 
     if(!project)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such project',
         data: {}
     });
 
     if(project.status != 'ongoing')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The project is no longer ongoing!',
         data: {}
@@ -3839,7 +3839,7 @@ exports.completeResourceReq = async function (req, res) {
     } else if (project.host=== req.body.id) valid = true;
 
     if(!valid)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to update this resource request!',
         data: {}
@@ -3854,14 +3854,14 @@ exports.completeResourceReq = async function (req, res) {
     });
 
     if(!resourceneed)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need is not found!',
         data: {}
     });
 
     if(resourceneed.status != 'progress')
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The resource need completion is no longer in progress!',
         data: {}
@@ -3874,7 +3874,7 @@ exports.completeResourceReq = async function (req, res) {
         if(req.body.theRating >=1 && req.body.theRating <=5) {
             theRating = req.body.theRating
         } else {
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'The rating is invalid!',
                 data: {}

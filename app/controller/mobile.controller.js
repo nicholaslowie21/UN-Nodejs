@@ -23,14 +23,14 @@ exports.institutionChoice = async function (req, res){
     });
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such user account!',
         data: {}
     });
 
     if(!account.institutionIds.includes(req.body.institutionId))
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not affiliated to this institution!',
         data: {}
@@ -65,7 +65,7 @@ exports.deleteInsitutionChoice = async function (req, res){
     });
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such user account!',
         data: {}
@@ -94,7 +94,7 @@ exports.addContact = async function (req, res){
     let qrhash = req.body.qrhash.split(";")
     
     if(qrhash.length != 2)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'The qr hash is invalid!',
         data: {}
@@ -126,7 +126,7 @@ exports.addContact = async function (req, res){
     }
 
     if(!account)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'There was no such account!',
         data: {}
@@ -145,7 +145,7 @@ exports.addContact = async function (req, res){
     });
 
     if(temp)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such card has been created!',
         data: {}
@@ -187,14 +187,14 @@ exports.deleteContact = async function (req, res){
     });
 
     if(!card)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such card is not found!',
         data: {}
     });
 
     if(req.id != card.ownerId && req.type != card.ownerType)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -229,7 +229,7 @@ exports.contactList = async function (req, res){
     });
 
     if(!cards)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such cards not found!',
         data: {}

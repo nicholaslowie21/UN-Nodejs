@@ -50,7 +50,7 @@ exports.multerInstitutionSignUp = institutionSignUp.single('verifyDoc');
 
 exports.institutionSignUpMulter = async function (req, res){
     if(!req.file) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No file uploaded! ',
             data: {}
@@ -199,7 +199,7 @@ exports.postLogin = async function (req, res, next) {
         });
 
         if (!user && !institution)
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Account with such email is not found!',
                 data: {}
@@ -213,7 +213,7 @@ exports.postLogin = async function (req, res, next) {
             if (err) return handleError(err);
         });
         if (!user && !institution)
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Account with such username is not found!',
                 data: {}
@@ -223,7 +223,7 @@ exports.postLogin = async function (req, res, next) {
 
    if(user) { 
         if(user.status != 'active') {
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Account is currently suspended!',
                 data: {}
@@ -234,7 +234,7 @@ exports.postLogin = async function (req, res, next) {
    if(institution){ 
 
         if(institution.status != 'active') {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account is currently not verified or suspended!',
             data: {}
@@ -262,7 +262,7 @@ exports.postLogin = async function (req, res, next) {
 
     Helper.createAuditLog("Account attempted login password mismatch", type, user.id)
 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Password mismatch!',
         data: {}
@@ -278,7 +278,7 @@ exports.userChangePassword = async function (req, res, next) {
     });
 
     if(!user) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'User not found!',
         data: {}
@@ -286,7 +286,7 @@ exports.userChangePassword = async function (req, res, next) {
 
     let verifyOldPassword = saltedMd5(user.salt,req.body.oldpassword);
     if(verifyOldPassword != user.password) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'The old password mismatched!',
             data: {}
@@ -336,7 +336,7 @@ exports.institutionChangePassword = async function (req, res, next) {
     });
 
     if(!institution) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -344,7 +344,7 @@ exports.institutionChangePassword = async function (req, res, next) {
 
     let verifyOldPassword = saltedMd5(institution.salt,req.body.oldpassword);
     if(verifyOldPassword != institution.password) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'The old password mismatched!',
             data: {}
@@ -392,7 +392,7 @@ exports.postChangePasswordRequest = async function (req, res) {
 	let email = req.body.email;
 
     if(!email) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Email is empty!',
         data: {}
@@ -410,7 +410,7 @@ exports.postChangePasswordRequest = async function (req, res) {
     });
 
     if (!user && !institution)
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Account with such email is not found!',
             data: {}
@@ -541,7 +541,7 @@ exports.postUpdatePassword = async function(req, res) {
             });
 
             if(!user)
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Something went wrong!',
                 data: {}
@@ -576,7 +576,7 @@ exports.postUpdatePassword = async function(req, res) {
             });
 
             if(!institution)
-            return res.status(500).json({
+            return res.status(400).json({
                 status: 'error',
                 msg: 'Something went wrong!',
                 data: {}
@@ -654,7 +654,7 @@ exports.multerUpload = upload.single('verifyPic');
 
 exports.verifyRequest = async function(req,res) {
     if(!req.file || req.file.fieldname != 'verifyPic') 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'No image uploaded',
         data: {}
@@ -683,7 +683,7 @@ exports.verifyRequest = async function(req,res) {
     )
 
     if(req.type != 'user') {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Only user can request for verification',
             data: {}
@@ -695,7 +695,7 @@ exports.verifyRequest = async function(req,res) {
     });
 
     if(!user)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such user not found!',
         data: {}
@@ -711,7 +711,7 @@ exports.verifyRequest = async function(req,res) {
     });
 
     if(gotRequest) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'You have already created a request!',
             data: {}

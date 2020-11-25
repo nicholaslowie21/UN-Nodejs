@@ -55,7 +55,7 @@ exports.createPaidResource = async function (req, res) {
     req.body.country = theCountry.name;
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -88,7 +88,7 @@ exports.createPaidResource = async function (req, res) {
     var price = Math.round((parseFloat(req.body.price)+Number.EPSILON)*100)/100
     
     if(price < 5)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Price is too low! Not sufficient to cover transaction fee. Minimal: $5.',
         data: {}
@@ -136,7 +136,7 @@ exports.updatePaidResource = async function (req, res) {
     req.body.country = theCountry.name;
     
     if(!theOwner) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -145,7 +145,7 @@ exports.updatePaidResource = async function (req, res) {
     var price = Math.round((parseFloat(req.body.price)+Number.EPSILON)*100)/100
     
     if(price < 5)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Price is too low! Not sufficient to cover transaction fee. Minimal: $5.',
         data: {}
@@ -161,7 +161,7 @@ exports.updatePaidResource = async function (req, res) {
     });
 
     if(!paidresource) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such paid resource not found!',
         data: {}
@@ -193,7 +193,7 @@ exports.purchaseRequest = async function (req, res) {
     var buyer = await getAccount(req.id,req.type)
 
     if(!buyer) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -209,7 +209,7 @@ exports.purchaseRequest = async function (req, res) {
     });
 
     if(!project) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such ongoing project not found!',
         data: {}
@@ -225,7 +225,7 @@ exports.purchaseRequest = async function (req, res) {
     });
 
     if(!paidresource) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such active paid resurce not found!',
         data: {}
@@ -262,7 +262,7 @@ exports.updateBuyerStatus = async function (req, res) {
     var buyer = await getAccount(req.id,req.type)
 
     if(!buyer) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -278,7 +278,7 @@ exports.updateBuyerStatus = async function (req, res) {
     });
 
     if(!paidrequest) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such paid request not found!',
         data: {}
@@ -380,7 +380,7 @@ exports.updateSellerStatus = async function (req, res) {
     var buyer = await getAccount(req.id,req.type)
 
     if(!buyer) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Account not found!',
         data: {}
@@ -396,7 +396,7 @@ exports.updateSellerStatus = async function (req, res) {
     });
 
     if(!paidrequest) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such paid request not found!',
         data: {}
@@ -448,7 +448,7 @@ exports.myPurchase = async function (req, res) {
     });
 
     if(!paidrequests) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such paid requests not found!',
         data: {}
@@ -498,7 +498,7 @@ exports.sellerRequests = async function (req, res) {
     });
 
     if(!paidrequests) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such paid requests not found!',
         data: {}
@@ -544,7 +544,7 @@ exports.projectPurchase = async function (req, res) {
     });
 
     if(!paidrequests) 
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such paid requests not found!',
         data: {}
@@ -616,7 +616,7 @@ exports.multerPaidResourcePic = uploadPaidResPics;
 
 exports.uploadPaidResPic = async function (req, res){
     if(!req.body.paidResourceId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Paid Resource id is empty! ',
             data: {}
@@ -625,7 +625,7 @@ exports.uploadPaidResPic = async function (req, res){
 
     
     if(req.files.length === 0) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'No picture uploaded! ',
             data: {}
@@ -642,7 +642,7 @@ exports.uploadPaidResPic = async function (req, res){
     });
 
     if(!paidresource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Such paid resource does not exist!',
         data: {}
@@ -650,14 +650,14 @@ exports.uploadPaidResPic = async function (req, res){
 
     var theOwner = await getAccount(req.id,req.type)
     if(!theOwner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving owner!',
         data: {}
     });
 
     if(theOwner.id != paidresource.owner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -707,7 +707,7 @@ exports.uploadPaidResPic = async function (req, res){
 
 exports.deletePaidResourcePicture = async function (req, res){
     if(!req.body.paidResourceId) {
-        return res.status(500).json({
+        return res.status(400).json({
             status: 'error',
             msg: 'Paid Resource id is empty! ',
             data: {}
@@ -724,7 +724,7 @@ exports.deletePaidResourcePicture = async function (req, res){
     });
 
     if(!paidresource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Paid Resource does not exist!',
         data: {}
@@ -732,14 +732,14 @@ exports.deletePaidResourcePicture = async function (req, res){
 
     var theOwner = await getAccount(req.id, req.type)
     if(!theOwner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving owner!',
         data: {}
     });
 
     if(theOwner.id != paidresource.owner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -783,7 +783,7 @@ exports.statusPaidResource = async function (req, res){
     });
 
     if(!paidresource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Paid Resource does not exist!',
         data: {}
@@ -791,14 +791,14 @@ exports.statusPaidResource = async function (req, res){
 
     var theOwner = await getAccount(req.id, req.type)
     if(!theOwner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving owner!',
         data: {}
     });
 
     if(theOwner.id != paidresource.owner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'You are not authorized to perform this action!',
         data: {}
@@ -833,7 +833,7 @@ exports.paidResourceDetail = async function (req, res){
     });
 
     if(!paidresource)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Paid Resource does not exist!',
         data: {}
@@ -842,7 +842,7 @@ exports.paidResourceDetail = async function (req, res){
     var theOwner = await getAccount(paidresource.owner, paidresource.ownerType)
     
     if(!theOwner)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Something went wrong while retrieving owner!',
         data: {}
@@ -871,7 +871,7 @@ exports.myPaidResources = async function (req, res){
     });
 
     if(!paidresources)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Paid Resource does not exist!',
         data: {}
@@ -897,7 +897,7 @@ exports.othersPaidResources = async function (req, res){
     });
 
     if(!paidresources)
-    return res.status(500).json({
+    return res.status(400).json({
         status: 'error',
         msg: 'Paid Resource does not exist!',
         data: {}
