@@ -14,7 +14,8 @@ const sharp = require('sharp')
 const paypal = require('@paypal/payouts-sdk')
 const clientId = "ATYIGhVI_8iXzrGnY_2ppcz1AJR8mpQp6IxHxdWXRVXwbcVFamkz-6qjBiYSOHidvvRjvxwkir2jvIka";
 const clientSecret = "EHvXx89Gq4SxIuMeW_5TsuC5RN_58jfY2D41LctgbLtwqY2vT0DPS1a3a6QIBC8ZbqUKHeEUc_rp9ZUA";
-    
+const { promisify } = require('util')
+const sleep = promisify(setTimeout)
 
 var createPaidStorage = multer.diskStorage({
     destination: (req, file, callback) => {
@@ -343,6 +344,13 @@ exports.updateBuyerStatus = async function (req, res) {
     let environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
     let client = new paypal.core.PayPalHttpClient(environment);
 
+    var amountReceived = paidresource.price*0.966  - 0.3
+
+    var sendOut = amountReceived * 0.9751
+    var roundedSendOut = Math.round((parseFloat(sendOut)+Number.EPSILON)*100)/100
+    
+    await sleep(10000)
+
     let requestBody = {
         "sender_batch_header": {
         "sender_batch_id": paidrequest.id+"-"+Date.now(),
@@ -353,7 +361,7 @@ exports.updateBuyerStatus = async function (req, res) {
       "items": [
         {
           "amount": {
-            "value": paidresource.price-4,
+            "value": roundedSendOut,
             "currency": "USD"
           },
           "sender_item_id": paidrequest.id+"-"+Date.now(),
@@ -368,12 +376,12 @@ exports.updateBuyerStatus = async function (req, res) {
     // Call API with your client and get a response for your call
     let createPayouts  = async function(){
             let response = await client.execute(request);
-            console.log(`Response: ${JSON.stringify(response)}`);
+            // console.log(`Response: ${JSON.stringify(response)}`);
             // If call returns body in response, you can get the deserialized version from the result attribute of the response.
-        console.log(`Payouts Create Response: ${JSON.stringify(response.result)}`);
+        // console.log(`Payouts Create Response: ${JSON.stringify(response.result)}`);
     }
     await createPayouts();
-    console.log('finsihed');
+    // console.log('finsihed');
 }
 
 exports.updateSellerStatus = async function (req, res) {
