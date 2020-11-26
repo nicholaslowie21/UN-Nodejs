@@ -429,6 +429,39 @@ async function getProjectInfo(theItem) {
 
     theItem.targetTitle = project.title
     theItem.targetStatus = project.status
+    theItem.targetHost = project.host
+    theItem.targetHostType = project.hostType
+    var hostAccount = await getAccount(project.host, project.hostType)
+    if(!hostAccount) return
+    theItem.hostAccount = hostAccount
+
+}
+
+async function getAccount(theId, theType) {
+    var account;
+
+    if(theType === "user") {
+        account = await User.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [report]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    } else if (theType === 'institution') {
+        account = await Institution.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [report]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    }
+
+    if(!account) {
+        console.log("Error: Something went wrong when retrieving account")
+        return
+    }
+
+    return account
 }
 
 async function getRewardInfo(theItem) {
