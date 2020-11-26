@@ -1386,7 +1386,7 @@ async function suggestDiscoverWeekly(account, accountType) {
             if(titleMap.get(theTitles[j])) projectItem.matchPoint += 10
         }
 
-        if(projects[i].country === account.country) projectItem.matchPoint += 10
+        if(projects[i].country === account.country) projectItem.matchPoint += 20
 
         if(!account.projects.includes(projectItem.projectId))
             theList.push(projectItem)
