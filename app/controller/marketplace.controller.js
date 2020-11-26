@@ -1320,11 +1320,15 @@ exports.getResourceNeedSuggestion = async function (req, res){
 
     theList.reverse()
     theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+    
+    var theFinalList = []
+
+    for(var i = 0; i < theList.length && i<5; i++) theFinalList.push(theList[i])
 
     return res.status(200).json({
         status: 'success',
         msg: 'Resource need suggestion successfully retrieved!',
-        data: { resourceneedSuggestion: theList }
+        data: { resourceneedSuggestion: theFinalList }
     });
 }
 
