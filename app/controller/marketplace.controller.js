@@ -1186,6 +1186,10 @@ exports.getResourceSuggestion = async function (req, res) {
 
     theList.reverse()
     theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
+    
+    var theFinalList = []
+
+    for(var i = 0; i < theList.length && i<5; i++) theFinalList.push(theList[i])
 
     var theFinalList = []
 
@@ -1397,7 +1401,6 @@ async function suggestDiscoverWeekly(account, accountType) {
         }
 
         if(projects[i].country === account.country) projectItem.matchPoint += 20
-
 
         theList.push(projectItem)
     }
