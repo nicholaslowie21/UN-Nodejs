@@ -12,7 +12,7 @@ router.post('/updatePaidResource', auth, PaidResourceValidator.updatePaidResourc
 router.post('/uploadPaidResourcePicture', auth, uploadMultipleFiles, paidResourceController.multerPaidResourcePic, paidResourceController.uploadPaidResPic)
 router.post('/deletePaidResourcePicture', auth, PaidResourceValidator.deletePaidResPicture, paidResourceController.deletePaidResourcePicture)
 
-router.post('/status', auth, PaidResourceValidator.statusPaidResPicture, Helper.ifErrors, paidResourceController.statusPaidResource)
+router.post('/status', auth, PaidResourceValidator.statusPaidRes, Helper.ifErrors, paidResourceController.statusPaidResource)
 
 router.get('/details', PaidResourceValidator.paidResDetail, paidResourceController.paidResourceDetail)
 

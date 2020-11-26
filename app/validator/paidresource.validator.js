@@ -81,8 +81,8 @@ exports.deletePaidResPicture = [
     body('indexes').exists()
 ]
 
-exports.statusPaidResPicture = [
-    body('paidRequestId').exists(),
+exports.statusPaidRes = [
+    body('paidResourceId').exists(),
     body('status').exists().custom(async value => {
         if(value != 'active' && value != 'inactive' && value !='deleted')
         return Promise.reject('Status is invalid!')
