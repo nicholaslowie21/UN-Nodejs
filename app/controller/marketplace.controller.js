@@ -1381,6 +1381,8 @@ async function suggestDiscoverWeekly(account, accountType) {
         }
 
         projectItem.projectId = projects[i].id
+        
+        if(account.projects.includes(projectItem.projectId)) continue
         var theTitles = projects[i].title.toLowerCase().split(" ")
         for(var j = 0; j < theTitles.length; j++) {
             if(titleMap.get(theTitles[j])) projectItem.matchPoint += 10
@@ -1388,8 +1390,8 @@ async function suggestDiscoverWeekly(account, accountType) {
 
         if(projects[i].country === account.country) projectItem.matchPoint += 20
 
-        if(!account.projects.includes(projectItem.projectId))
-            theList.push(projectItem)
+
+        theList.push(projectItem)
     }
     
     theList.reverse()
