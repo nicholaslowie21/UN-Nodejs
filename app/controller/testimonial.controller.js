@@ -383,7 +383,7 @@ exports.updateTestimonialStatus = async function (req, res){
         });
     });
     
-    Helper.createNotification("Testimonial", myAccount.name + " updated the status of the testimonial you wrote about them to "+req.body.status, testimonial.creatorId, testimonial.creatorType)
+    Helper.createNotification("Testimonial", myAccount.name + " " +req.body.status +" the testimonial you wrote about them.", testimonial.creatorId, testimonial.creatorType)
 }
 
 exports.updateOutgoingTestimonialStatus = async function (req, res){
@@ -451,7 +451,7 @@ exports.updateOutgoingTestimonialStatus = async function (req, res){
         });
     });
     
-    Helper.createNotification("Testimonial", myAccount.name + " updated the status of the testimonial they wrote about you to "+req.body.status, testimonial.targetId, testimonial.targetType)
+    Helper.createNotification("Testimonial", myAccount.name + " " +req.body.status + " the testimonial they wrote about you.", testimonial.targetId, testimonial.targetType)
 }
 
 async function getProject(theId) {

@@ -254,7 +254,7 @@ exports.purchaseRequest = async function (req, res) {
         });
     });
 
-    var notifDesc = "Somebody requested to purchase " +paidresource.title
+    var notifDesc = buyer.username+" requested to purchase " +paidresource.title
     Helper.createNotification("Paid Resource", notifDesc, paidresource.owner, paidresource.ownerType )
 }
 
@@ -317,9 +317,9 @@ exports.updateBuyerStatus = async function (req, res) {
     var notifDesc = ""
     
     if(req.body.status === 'cancelled')
-        notifDesc = "Somebody cancelled their request to purchase " +paidresource.title
+        notifDesc = buyer.username + " cancelled their request to purchase " +paidresource.title
     else 
-        notifDesc = "Yeah! Somebody paid their request to purchase "+paidresource.title
+        notifDesc = "Yeah! "+buyer.username+" paid their request to purchase "+paidresource.title
     Helper.createNotification("Paid Resource", notifDesc, paidresource.owner, paidresource.ownerType)
     
     if(req.body.status != 'paid') return
@@ -433,7 +433,7 @@ exports.updateSellerStatus = async function (req, res) {
 
     if(!paidresource) return
 
-    var notifDesc = paidresource.title + " owner updated your purchase request status to " + req.body.status
+    var notifDesc = paidresource.title + " owner "+req.body.status+" your purchase request"
     Helper.createNotification("Paid Resource", notifDesc, paidrequest.buyerId, paidrequest.buyerType )
 }
 
@@ -563,13 +563,19 @@ exports.projectPurchase = async function (req, res) {
         
         var paidresource = await getPaidResource(paidrequests[i].paidResourceId)
         if(!paidresource) continue
-        
+
+        var seller = await getAccount(paidresource.owner, paidresource.ownerType)
+        if(!paidresource) continue
+
         temp.projectTitle = project.title
         temp.buyerName = buyer.name
         temp.buyerUsername = buyer.username
         temp.buyerImg = buyer.ionicImg
         temp.paidresource = paidresource
-        
+        temp.sellerName = seller.name
+        temp.sellerUsername = seller.username
+        temp.sellerImg = seller.ionicImg
+
         theList.push(temp)
     }
 
