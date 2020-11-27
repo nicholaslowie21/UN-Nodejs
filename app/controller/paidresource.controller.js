@@ -62,7 +62,7 @@ exports.createPaidResource = async function (req, res) {
         data: {}
     });
 
-    if(theOwner.isVerified == false)
+    if(theOwner.isVerified === "false" || theOwner.isVerified === false)
     return res.status(400).json({
         status: 'error',
         msg: 'This is only available for verified account. Please request for verification!',
