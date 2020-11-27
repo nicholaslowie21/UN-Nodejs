@@ -63,7 +63,7 @@ exports.createAuditLog = async function(action, targetType, targetId) {
     targetId: targetId
   });
 
-  await log.save(log).catch(err => {
+  log.save(log).catch(err => {
     console.log('Error: (auditLogHelper) '+err.message)
     return
   });
