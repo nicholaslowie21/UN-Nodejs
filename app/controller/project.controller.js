@@ -1507,7 +1507,7 @@ exports.completeProject = async function (req, res) {
             contributorType: "user"
         }
         var theAdminTotalPoint = (project.rating * 5) + 10;
-        awardContributionPoint(adminContribution, theAdminTotalPoint)
+        await awardContributionPoint(adminContribution, theAdminTotalPoint)
     }
     
     var action = "Account mark project as completed for a project: "+project.title+" ("+project.id+", "+project.code+")"
@@ -1523,7 +1523,7 @@ exports.completeProject = async function (req, res) {
         contributorType: project.hostType
     }
     var theTotalPoint = (project.rating * 5) + 15;
-    awardContributionPoint(founderContribution, theTotalPoint)
+    await awardContributionPoint(founderContribution, theTotalPoint)
     
     const contributions = await Contribution.find({ 'projectId': req.body.projectId, 'status': 'active' }, function (err) {
         if (err) console.log('error: (completeProject) Something went wrong when retrieving contributions')
@@ -1532,7 +1532,7 @@ exports.completeProject = async function (req, res) {
     for(var x = 0; x < contributions.length; x++) {
         var thePoint = contributions[i].rating * project.rating
         console.log(contributions[i])
-        awardContributionPoint(contributions[i],thePoint)
+        await awardContributionPoint(contributions[i],thePoint)
         
         Helper.createNotification("Project", "Congratzz! Project: "+ project.title+" has been completed.", contributions[i].contributor, contributions[i].contributorType )
 
@@ -1565,7 +1565,7 @@ async function awardContributionPoint(contribution, totalPoint) {
 
     if(contribution.contributorType === "user") owner.wallet = owner.wallet + totalPoint
     owner.points = owner.points + totalPoint
-    owner.save().catch(err => {
+    await owner.save().catch(err => {
         console.log("Something went wrong when saving points!")
         return
     });
@@ -1589,7 +1589,7 @@ async function awardContributionPoint(contribution, totalPoint) {
             tier: 'bronze'
         })
 
-        newBadge.save(newBadge).catch(err => {
+        await newBadge.save(newBadge).catch(err => {
             console.log("Something went wrong when creating badge!")
         });
 
@@ -1615,11 +1615,11 @@ async function awardContributionPoint(contribution, totalPoint) {
             tier: 'silver'
         })
 
-        newBadge.save(newBadge).catch(err => {
+        await newBadge.save(newBadge).catch(err => {
             console.log("Something went wrong when creating badge!")
         });
 
-        owner.tier = 'bronze'
+        owner.tier = 'silver'
     }
 
     if(owner.points>=800) {
@@ -1641,14 +1641,14 @@ async function awardContributionPoint(contribution, totalPoint) {
             tier: 'gold'
         })
 
-        newBadge.save(newBadge).catch(err => {
+        await newBadge.save(newBadge).catch(err => {
             console.log("Something went wrong when creating badge!")
         });
 
-        owner.tier = 'bronze'
+        owner.tier = 'gold'
     }
 
-    owner.save().catch(err => {
+    await owner.save().catch(err => {
         console.log("Something went wrong when saving account's tier!")
         return
     });
