@@ -56,14 +56,14 @@ exports.createProfileFeed = function(title, desc, accountId, accountType) {
     });
 }
 
-exports.createAuditLog = function(action, targetType, targetId) {
+exports.createAuditLog = async function(action, targetType, targetId) {
   const log = new AuditLog({
 		action: action,
     targetType: targetType,
     targetId: targetId
   });
 
-  log.save(log).catch(err => {
+  await log.save(log).catch(err => {
     console.log('Error: (auditLogHelper) '+err.message)
     return
   });
