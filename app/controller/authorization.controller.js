@@ -111,7 +111,7 @@ exports.postSignup = async function (req, res, next) {
 		status: 'active',
 		bio: '',
         occupation: '',
-        isVerified: "false",
+        isVerified: false,
         profilePic: '',
         country: req.body.country,
         points: 0,
