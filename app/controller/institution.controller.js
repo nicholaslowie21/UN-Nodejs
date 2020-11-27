@@ -785,18 +785,18 @@ exports.viewInstitutionById = async function (req, res) {
 }
 
 exports.getBadges = async function (req, res) {
-    const institution = await Institution.findOne({ '_id': req.query.institutionId }, function (err) {
-        if (err) return handleError(err);
-    });
+    var account = await getAccount(req.query.accountId, req.query.accountType)
 
-    if(!institution) 
+    if(!account)
     return res.status(400).json({
         status: 'error',
-        msg: 'Account not found!',
-        data: {}
+        msg: 'Account not found',
+        data: { }
     });
 
-    let badges = await Badges.find({ 'accountId': req.query.institutionId, 'accountType':'institution' }, function (err) {
+    await checkBadges(account, req.query.accountType)
+
+    let badges = await Badges.find({ 'accountId': req.query.accountId, 'accountType':req.query.accountType }, function (err) {
         if (err) return handleError(err);
     });
 
@@ -805,7 +805,121 @@ exports.getBadges = async function (req, res) {
         msg: 'Account\'s badges successfully retrieved',
         data: { badges: badges }
     });
+}
 
+async function getAccount(theId, theType) {
+    var account;
+
+    if(theType === "user") {
+        account = await User.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [institution]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    } else if (theType === 'institution') {
+        account = await Institution.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [institution]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    }
+
+    if(!account) {
+        console.log("Error: Something went wrong when retrieving account")
+        return
+    }
+
+    return account
+}
+
+async function checkBadges(owner, accountType) {
+    if(owner.points>=100) {
+        const badge = await Badges.findOne({ 'accountId': owner.id, 'accountType': accountType, 'tier':'bronze' }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        if(!badge){
+
+            const newBadge = new Badges({
+                title : 'Bronze',
+                description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
+                imgPath : "/public/badges/bronze.png",
+                accountId: owner.id,
+                accountType: accountType,
+                tier: 'bronze'
+            })
+
+            await newBadge.save(newBadge).catch(err => {
+                console.log("Something went wrong when creating badge!")
+            });
+
+            owner.tier = 'bronze'
+        }
+    }
+
+    if(owner.points>=400) {
+        const badge = await Badges.findOne({ 'accountId': owner.id, 'accountType': accountType, 'tier':'silver' }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        if(!badge) {
+
+            const newBadge = new Badges({
+                title : 'Silver',
+                description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
+                imgPath : "/public/badges/silver.png",
+                accountId: owner.id,
+                accountType: accountType,
+                tier: 'silver'
+            })
+
+            await newBadge.save(newBadge).catch(err => {
+                console.log("Something went wrong when creating badge!")
+            });
+
+            owner.tier = 'silver'
+        }
+    }
+
+    if(owner.points>=800) {
+        const badge = await Badges.findOne({ 'accountId': owner.id, 'accountType': accountType, 'tier':'gold' }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+
+        if(!badge) {
+
+            const newBadge = new Badges({
+                title : 'Gold',
+                description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
+                imgPath : "/public/badges/gold.png",
+                accountId: owner.id,
+                accountType: accountType,
+                tier: 'gold'
+            })
+
+            await newBadge.save(newBadge).catch(err => {
+                console.log("Something went wrong when creating badge!")
+            });
+
+            owner.tier = 'gold'
+        }
+    }
+
+    await owner.save().catch(err => {
+        console.log("Something went wrong when saving account's tier!")
+        return
+    });
 }
 
 exports.searchUsers = async function (req, res){

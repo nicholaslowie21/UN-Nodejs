@@ -147,7 +147,8 @@ exports.viewUserById = [
 ]
 
 exports.getBadges = [
-    query('userId').exists()
+    query('accountId').exists(),
+    query('accountType').exists()
 ]
 
 exports.getAffiliations = [

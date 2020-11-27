@@ -13,7 +13,8 @@ const multer = require('multer');
 const nodeHtmlToImage = require('node-html-to-image');
 const Helper = require('../service/helper.service');
 const path = require('path')
-const sharp = require('sharp')
+const sharp = require('sharp');
+const { userChangePassword } = require('../validator/user.validator');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -447,25 +448,18 @@ exports.getFeeds = async function (req, res) {
 }
 
 exports.getBadges = async function (req, res) {
-    const user = await Users.findOne({ '_id': req.query.userId }, function (err) {
-        if (err)
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Something went wrong, please try again in a while!',
-            data: {}
-        });
-    });
+    var account = await getAccount(req.query.accountId, req.query.accountType)
 
-    if(!user) 
+    if(!account)
     return res.status(400).json({
         status: 'error',
-        msg: 'User not found!',
-        data: {}
+        msg: 'Account not found',
+        data: { }
     });
 
-    await checkBadges(user)
+    await checkBadges(account, req.query.accountType)
 
-    let badges = await Badges.find({ 'accountId': req.query.userId, 'accountType':'user' }, function (err) {
+    let badges = await Badges.find({ 'accountId': req.query.accountId, 'accountType':req.query.accountType }, function (err) {
         if (err) return handleError(err);
     });
 
@@ -477,9 +471,36 @@ exports.getBadges = async function (req, res) {
 
 }
 
-async function checkBadges(owner) {
+async function getAccount(theId, theType) {
+    var account;
+
+    if(theType === "user") {
+        account = await Users.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [user]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    } else if (theType === 'institution') {
+        account = await Institutions.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error [user]: (getAccount)" + err.toString())
+                return
+            }
+        });
+    }
+
+    if(!account) {
+        console.log("Error: Something went wrong when retrieving account")
+        return
+    }
+
+    return account
+}
+
+async function checkBadges(owner, accountType) {
     if(owner.points>=100) {
-        const badge = await Badge.findOne({ 'accountId': contribution.contributor, 'accountType': contribution.contributorType, 'tier':'bronze' }, function (err) {
+        const badge = await Badge.findOne({ 'accountId': owner.id, 'accountType': accountType, 'tier':'bronze' }, function (err) {
             if (err) {
                 console.log("error: "+err.message)
                 return
@@ -492,8 +513,8 @@ async function checkBadges(owner) {
                 title : 'Bronze',
                 description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
                 imgPath : "/public/badges/bronze.png",
-                accountId: contribution.contributor,
-                accountType: contribution.contributorType,
+                accountId: owner.id,
+                accountType: accountType,
                 tier: 'bronze'
             })
 
@@ -506,7 +527,7 @@ async function checkBadges(owner) {
     }
 
     if(owner.points>=400) {
-        const badge = await Badge.findOne({ 'accountId': contribution.contributor, 'accountType': contribution.contributorType, 'tier':'silver' }, function (err) {
+        const badge = await Badge.findOne({ 'accountId': owner.id, 'accountType': accountType, 'tier':'silver' }, function (err) {
             if (err) {
                 console.log("error: "+err.message)
                 return
@@ -519,8 +540,8 @@ async function checkBadges(owner) {
                 title : 'Silver',
                 description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
                 imgPath : "/public/badges/silver.png",
-                accountId: contribution.contributor,
-                accountType: contribution.contributorType,
+                accountId: owner.id,
+                accountType: accountType,
                 tier: 'silver'
             })
 
@@ -533,7 +554,7 @@ async function checkBadges(owner) {
     }
 
     if(owner.points>=800) {
-        const badge = await Badge.findOne({ 'accountId': contribution.contributor, 'accountType': contribution.contributorType, 'tier':'gold' }, function (err) {
+        const badge = await Badge.findOne({ 'accountId': owner.id, 'accountType': accountType, 'tier':'gold' }, function (err) {
             if (err) {
                 console.log("error: "+err.message)
                 return
@@ -546,8 +567,8 @@ async function checkBadges(owner) {
                 title : 'Gold',
                 description : 'Achieved this on ' + moment().tz('Asia/Singapore').format('YYYY-MM-DD'),
                 imgPath : "/public/badges/gold.png",
-                accountId: contribution.contributor,
-                accountType: contribution.contributorType,
+                accountId: owner.id,
+                accountType: accountType,
                 tier: 'gold'
             })
 

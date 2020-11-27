@@ -121,6 +121,11 @@ exports.currProject = [
     query('institutionId').exists()
 ]
 
+exports.getBadges = [
+    query('accountId').exists(),
+    query('accountType').exists()
+]
+
 exports.getMembers = [
     query('institutionId').exists()
 ]
