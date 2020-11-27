@@ -1276,7 +1276,7 @@ exports.createProject = async function (req, res){
     });
 
     project.save(project)
-    .then(data => {
+    .then(async data => {
 
         let tempProjects = target.projects
         tempProjects.push(data.id); 
@@ -1293,11 +1293,11 @@ exports.createProject = async function (req, res){
         
         var action = "Account created a project: "+project.title+" ("+data.id+", "+project.code+")"
     
-        Helper.createAuditLog(action,req.type,req.id)
+        await Helper.createAuditLog(action,req.type,req.id)
 
         action = "Project created"
     
-        Helper.createAuditLog(action,"project",data.id)
+        await Helper.createAuditLog(action,"project",data.id)
 
         return res.status(200).json({
             status: 'success',
