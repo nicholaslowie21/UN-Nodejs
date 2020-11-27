@@ -62,6 +62,13 @@ exports.createPaidResource = async function (req, res) {
         data: {}
     });
 
+    if(theOwner.isVerified == false)
+    return res.status(400).json({
+        status: 'error',
+        msg: 'This is only available for verified account. Please request for verification!',
+        data: {}
+    });
+
     for(var i = 0; i < req.files.length; i++) {
         await sharp("./"+req.files[i].path).toBuffer().then(
             async data => {

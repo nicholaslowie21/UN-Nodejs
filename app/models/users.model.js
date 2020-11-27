@@ -9,7 +9,7 @@ module.exports = mongoose => {
         status: { type: String, default: '' },
         bio: { type: String, default: '' },
         occupation: { type: String, default: '' },
-        isVerified: { type: String, default: '' },
+        isVerified: { type: Boolean, default: false },
         profilePic: { type: String, default: '' },
         country: { type: String, default: '' },
         website: { type: String, default: '' },
