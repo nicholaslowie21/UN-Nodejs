@@ -1237,7 +1237,7 @@ exports.createProject = async function (req, res){
             data: {}
         });
 
-        if(user.isVerified != "true")
+        if(user.isVerified != true)
         return res.status(400).json({
             status: 'error',
             msg: 'Account not authorized to create project! Not verified yet.',
@@ -1728,7 +1728,7 @@ exports.deleteProject = async function (req, res) {
             data: {}
         });
 
-        if(user.isVerified != "true" || user.status != 'active')
+        if(user.isVerified != true || user.status != 'active')
         return res.status(400).json({
             status: 'error',
             msg: 'Account not authorized to create project!',
