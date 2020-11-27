@@ -346,12 +346,11 @@ exports.addUserCSV = async function (req, res, next) {
                     email: obj.email.toLowerCase(),
                     role: 'user',
                     status: 'unclaimed',
-                    isVerified: "false",
+                    isVerified: "true",
                     country: obj.country,
                     website: obj.website,
                     bio: obj.bio,
-                    SDGs: temp,
-                    isVerified: true
+                    SDGs: temp
                 })
                 
                 await newUser.save(newUser)
