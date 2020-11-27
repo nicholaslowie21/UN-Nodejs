@@ -50,7 +50,7 @@ exports.createProfileFeed = function(title, desc, accountId, accountType) {
     accountType: accountType
   });
 
-  pf.save(pf).catch(err => {
+  await pf.save(pf).catch(err => {
       console.log('Error: (profileFeedHelper) '+err.message)
       return
     });
@@ -63,7 +63,7 @@ exports.createAuditLog = function(action, targetType, targetId) {
     targetId: targetId
   });
 
-  log.save(log).catch(err => {
+  await log.save(log).catch(err => {
     console.log('Error: (auditLogHelper) '+err.message)
     return
   });
@@ -78,7 +78,7 @@ exports.createNotification = function(title, desc, accountId, accountType) {
     isRead: false
   });
 
-  notif.save(notif).catch(err => {
+  await notif.save(notif).catch(err => {
     console.log('Error: (notifCreationHelper) '+err.message)
     return
   });

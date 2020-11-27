@@ -476,7 +476,7 @@ exports.getBadges = async function (req, res) {
 
 }
 
-async function checkBadges() {
+async function checkBadges(owner) {
     if(owner.points>=100) {
         const badge = await Badge.findOne({ 'accountId': contribution.contributor, 'accountType': contribution.contributorType, 'tier':'bronze' }, function (err) {
             if (err) {
