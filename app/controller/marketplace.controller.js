@@ -1191,6 +1191,10 @@ exports.getResourceSuggestion = async function (req, res) {
 
     for(var i = 0; i < theList.length && i<5; i++) theFinalList.push(theList[i])
 
+    var theFinalList = []
+
+    for(var i = 0; i < theList.length && i<5; i++) theFinalList.push(theList[i])
+
     return res.status(200).json({
         status: 'success',
         msg: 'Suggested resource list successfully retrieved',
