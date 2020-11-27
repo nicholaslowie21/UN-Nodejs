@@ -6,6 +6,7 @@ const Badges = db.badge;
 const Institutions = db.institution;
 const Feed = db.profilefeed
 const Target = db.target
+const Badge = db.badge
 const nodeCountries = require('node-countries');
 const fs = require('fs');
 const multer = require('multer');
