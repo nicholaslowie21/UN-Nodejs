@@ -428,6 +428,17 @@ exports.viewUserById = async function (req, res) {
 }
 
 exports.getFeeds = async function (req, res) {
+    const user = await Users.findOne({ '_id': req.query.userId }, function (err) {
+        if (err) return handleError(err);
+    });
+
+    if(!user) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'User not found!',
+        data: {}
+    });
+    
     const feeds = await Feed.find({ 'accountId': req.query.userId, "accountType":"user" }, function (err) {
         if (err)
         return res.status(500).json({
