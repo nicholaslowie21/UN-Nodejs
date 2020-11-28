@@ -1185,13 +1185,10 @@ exports.createManpower = async function (req, res) {
             });
         });
     } else if (req.body.type === "institution") {
-        theOwner = await Institution.findOne({ '_id': req.body.id }, function (err) {
-            if (err)
-            return res.status(500).json({
-                status: 'error',
-                msg: 'Something went wrong! '+err,
-                data: {}
-            });
+        return res.status(400).json({
+            status: 'error',
+            msg: 'Only user account can create manpower resource!',
+            data: {}
         });
     }
     
