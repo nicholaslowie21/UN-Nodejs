@@ -505,7 +505,7 @@ exports.dataByCountries = async function (req, res){
     });
 
     for(var i = 0; i < contributions.length; i++) {
-        var country = projects[i].country
+        var country = contributions[i].country
         if(country ==='') continue
 
         updateItemMap(dataItemsMap,country,0,0,1,0)
