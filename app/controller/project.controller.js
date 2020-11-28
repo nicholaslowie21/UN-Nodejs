@@ -14,6 +14,7 @@ const Item = db.item
 const Venue = db.venue
 const Money = db.money
 const Badge = db.badge
+const Target = db.target
 const ProjectPost = db.projectpost
 const PostComment = db.postcomment
 const ProjectEvent = db.projectevent
