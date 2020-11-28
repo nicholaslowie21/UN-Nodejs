@@ -714,6 +714,17 @@ exports.viewInstitution = async function (req, res) {
 }
 
 exports.getFeeds = async function (req, res) {
+    const institution = await Institution.findOne({ 'username': req.query.username }, function (err, person) {
+        if (err) return handleError(err);
+    });
+
+    if(!institution) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Institution not found!',
+        data: {}
+    });
+    
     const feeds = await Feed.find({ 'accountId': req.query.institutionId, "accountType":"institution" }, function (err) {
         if (err)
         return res.status(500).json({
