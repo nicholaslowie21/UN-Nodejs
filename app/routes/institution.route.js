@@ -13,7 +13,7 @@ router.post('/updateEmail', auth, InstitutionValidator.updateEmail, InstitutionV
 
 router.post('/uploadProfilePicture', auth, institutionController.multerUpload, institutionController.profilePicture);
 
-router.get('/getMembers', auth, InstitutionValidator.getMembers, InstitutionValidator.ifErrors ,institutionController.getMembers)
+router.get('/getMembers', InstitutionValidator.getMembers, InstitutionValidator.ifErrors ,institutionController.getMembers)
 
 router.post('/addMember', auth, InstitutionValidator.addMember, InstitutionValidator.ifErrors ,institutionController.addMembers )
 
