@@ -1566,6 +1566,8 @@ exports.transferVoucher = async function (req, res){
             data: {}
         });
     });
+
+    Helper.createNotification("Reward", account.username+" transferred you a voucher "+ voucher.title, targetAccount.id, "user")
 }
 
 async function getRequesterInfo(theItem) {

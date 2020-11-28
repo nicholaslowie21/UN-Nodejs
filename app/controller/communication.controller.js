@@ -46,6 +46,10 @@ exports.createAnnouncement = async function (req, res){
     
     announcement.save(announcement)
     .then(data => {
+        
+        var action = "Account created an Announcement: "+ announcement.title +";"+data.id
+        Helper.createAuditLog(action,"admin",req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Announcement successfully created',
@@ -58,6 +62,8 @@ exports.createAnnouncement = async function (req, res){
             data: {}
         });
     });
+
+
 }
 
 exports.editAnnouncement = async function (req, res) {
@@ -107,6 +113,10 @@ exports.editAnnouncement = async function (req, res) {
     
     announcement.save(announcement)
     .then(data => {
+        
+        var action = "Account edited an Announcement: "+ announcement.title +";"+data.id
+        Helper.createAuditLog(action,"admin",req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Announcement successfully updated',
@@ -168,6 +178,10 @@ exports.deleteAnnouncement = async function (req, res) {
 
     announcement.save(announcement)
     .then(data => {
+
+        var action = "Account deleted an Announcement: "+ announcement.title +";"+data.id
+        Helper.createAuditLog(action,"admin",req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Announcement successfully deleted',

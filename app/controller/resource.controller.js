@@ -238,6 +238,9 @@ exports.itemPicture = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account added pictures for Item Resource: "+ item.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.IPupload = async function (req, res){
@@ -350,6 +353,9 @@ exports.IPupload = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account uploaded an attachment for Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.viewUserKnowledge = async function (req, res) {
@@ -1047,6 +1053,9 @@ exports.createItem = async function (req, res) {
     accountType = req.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+
+    var action = "Account created an Item Resource: "+ item.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 var createVenueStorage = multer.diskStorage({
@@ -1170,6 +1179,9 @@ exports.createVenue = async function (req, res) {
     accountType = req.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+
+    var action = "Account created a Venue Resource: "+ venue.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.createManpower = async function (req, res) {
@@ -1229,6 +1241,9 @@ exports.createManpower = async function (req, res) {
     accountType = req.body.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+
+    var action = "Account created a Manpower Resource: "+ manpower.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.createKnowledge = async function (req, res) {
@@ -1310,6 +1325,9 @@ exports.createKnowledge = async function (req, res) {
     accountType = req.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+
+    var action = "Account created a Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateItem = async function (req, res) {
@@ -1388,6 +1406,9 @@ exports.updateItem = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account updated an Item Resource: "+ item.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateVenue = async function (req, res) {
@@ -1467,6 +1488,9 @@ exports.updateVenue = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account updated a Venue Resource: "+ venue.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateManpower = async function (req, res) {
@@ -1544,6 +1568,9 @@ exports.updateManpower = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account updated a Manpower Resource: "+ manpower.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateKnowledge = async function (req, res) {
@@ -1630,6 +1657,9 @@ exports.updateKnowledge = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account updated a Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateKnowledgeOwner = async function (req, res) {
@@ -1864,6 +1894,9 @@ exports.addKnowledgeOwner = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account added owners for Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deleteKnowledgeOwner = async function (req, res) {
@@ -1995,6 +2028,9 @@ exports.deleteKnowledgeOwner = async function (req, res) {
             
         }
     )
+
+    var action = "Account removed some owners for Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 var venueStorage = multer.diskStorage({
@@ -2156,6 +2192,9 @@ var venueStorage = multer.diskStorage({
             data: {}
         });
     });
+
+    var action = "Account added pictures for Venue Resource: "+ venue.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deleteItemPicture = async function (req, res){
@@ -2261,6 +2300,9 @@ exports.deleteItemPicture = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account removed some pictures for Item Resource: "+ item.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deleteVenuePicture = async function (req, res){
@@ -2365,6 +2407,9 @@ exports.deleteVenuePicture = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account removed some pictures for Venue Resource: "+ venue.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.activateItem = async function (req, res) {
@@ -2437,6 +2482,9 @@ exports.activateItem = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account activated an Item Resource: "+ item.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deactivateItem = async function (req, res) {
@@ -2509,6 +2557,9 @@ exports.deactivateItem = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deactivated an Item Resource: "+ item.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deleteItem = async function (req, res) {
@@ -2581,6 +2632,9 @@ exports.deleteItem = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deleted an Item Resource: "+ item.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.activateManpower = async function (req, res) {
@@ -2652,6 +2706,9 @@ exports.activateManpower = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account activated a Manpower Resource: "+ manpower.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deactivateManpower = async function (req, res) {
@@ -2723,6 +2780,9 @@ exports.deactivateManpower = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deactivated a Manpower Resource: "+ manpower.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deleteManpower = async function (req, res) {
@@ -2794,6 +2854,9 @@ exports.deleteManpower = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deleted a Manpower Resource: "+ manpower.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.activateKnowledge = async function (req, res) {
@@ -2872,6 +2935,9 @@ exports.activateKnowledge = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account activated a Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deactivateKnowledge = async function (req, res) {
@@ -2950,6 +3016,9 @@ exports.deactivateKnowledge = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deactivated a Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deleteKnowledge = async function (req, res) {
@@ -3028,6 +3097,9 @@ exports.deleteKnowledge = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deleted a Knowledge Resource: "+ knowledge.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.activateVenue = async function (req, res) {
@@ -3100,6 +3172,9 @@ exports.activateVenue = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account activated a Venue Resource: "+ venue.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deactivateVenue = async function (req, res) {
@@ -3172,6 +3247,9 @@ exports.deactivateVenue = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deactivated a Venue Resource: "+ venue.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deleteVenue = async function (req, res) {
@@ -3244,6 +3322,9 @@ exports.deleteVenue = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account deleted a Venue Resource: "+ venue.title 
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.viewItemDetails = async function (req, res) {

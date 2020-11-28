@@ -382,6 +382,9 @@ exports.addUserCSV = async function (req, res, next) {
 
             fs.unlinkSync(csvFilePath)
 
+            var action = "Account uploaded a user mapping csv: "+ csvFilePath
+            Helper.createAuditLog(action,"admin",req.id)
+
             return res.status(200).json({
                 status: 'success',
                 msg: 'Users successfully added to the system.',
@@ -570,6 +573,9 @@ exports.addInstitutionCSV = async function (req, res, next) {
             }
 
             fs.unlinkSync(csvFilePath)
+
+            var action = "Account uploaded an institution mapping csv: "+ csvFilePath
+            Helper.createAuditLog(action,"admin",req.id)
 
             return res.status(200).json({
                 status: 'success',
