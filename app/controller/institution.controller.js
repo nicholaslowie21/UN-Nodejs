@@ -96,7 +96,7 @@ function checkCSVFileType(file, cb){
     if(extname){
       return cb(null,true);
     } else {
-      cb('Error: CSV Only!');
+      cb('Error: File Uploaded is not CSV!');
     }
 }
 
