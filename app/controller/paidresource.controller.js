@@ -135,6 +135,9 @@ exports.createPaidResource = async function (req, res) {
     accountType = req.type
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
+
+    var action = "Account created a paid resource: "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updatePaidResource = async function (req, res) {
@@ -195,6 +198,9 @@ exports.updatePaidResource = async function (req, res) {
             data: {}
         });
     });
+
+    var action = "Account updateed a paid resource: "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.purchaseRequest = async function (req, res) {
@@ -264,6 +270,9 @@ exports.purchaseRequest = async function (req, res) {
 
     var notifDesc = buyer.username+" requested to purchase " +paidresource.title
     Helper.createNotification("Paid Resource", notifDesc, paidresource.owner, paidresource.ownerType )
+
+    var action = "Account requested to purchase a paid resource: "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateBuyerStatus = async function (req, res) {
@@ -322,6 +331,14 @@ exports.updateBuyerStatus = async function (req, res) {
     });
 
     if(!paidresource) return 
+
+    var action = ""
+    if(req.body.status === 'cancelled')
+        action = "Account cancelled a paid resource request with id: "+ paidrequest.id+ " of paid resource with title "+ paidresource.title
+    else
+        action = "Account completed payment for a paid resource request with id: "+ paidrequest.id+ " of paid resource with title "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)
+
     var notifDesc = ""
     
     if(req.body.status === 'cancelled')
@@ -450,6 +467,9 @@ exports.updateSellerStatus = async function (req, res) {
 
     var notifDesc = paidresource.title + " owner "+req.body.status+" your purchase request"
     Helper.createNotification("Paid Resource", notifDesc, paidrequest.buyerId, paidrequest.buyerType )
+
+    var action = "Account "+ req.body.status+ " a paid resource request with id: "+ paidrequest.id +" of a paid resource: "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)    
 }
 
 exports.myPurchase = async function (req, res) {
@@ -724,6 +744,9 @@ exports.uploadPaidResPic = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account uploaded pictures to a paid resource: "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.deletePaidResourcePicture = async function (req, res){
@@ -791,6 +814,9 @@ exports.deletePaidResourcePicture = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account removed some pictures of a paid resource: "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.statusPaidResource = async function (req, res){
@@ -841,6 +867,9 @@ exports.statusPaidResource = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account updated status of a paid resource: "+ paidresource.title
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.paidResourceDetail = async function (req, res){

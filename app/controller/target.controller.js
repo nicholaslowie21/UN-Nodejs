@@ -102,6 +102,9 @@ exports.updateAccountTarget = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account updated their SDG target!"
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateProjectTarget = async function (req, res){
@@ -153,6 +156,12 @@ exports.updateProjectTarget = async function (req, res){
             data: {}
         });
     });
+
+    var action = "Account updated the project SDG target! project title and id: "+project.title+";"+project.id
+    Helper.createAuditLog(action,req.type,req.id)
+
+    var action = "Project SDG targets updated"
+    Helper.createAuditLog(action,"project",req.id)
 }
 
 exports.accountTargetLists = async function (req, res){

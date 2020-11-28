@@ -76,6 +76,10 @@ exports.createReport = async function (req, res){
     
     report.save(report)
     .then(data => {
+        
+        var action = "Account created a report with the id: "+ data.id
+        Helper.createAuditLog(action,req.type,req.id)
+
         return res.status(200).json({
             status: 'success',
             msg: 'Report successfully created',
@@ -193,6 +197,8 @@ exports.updateReport = async function (req, res){
     
     Helper.createNotification("Report", "Your report: "+ report.title + " status has been updated to "+req.body.status+" on "+theTime, report.reporterId, report.reporterType )
 
+    var action = "Account updated the status of report with id: "+ report.id+" to "+ req.body.status
+    Helper.createAuditLog(action,"admin",req.id)
 }
 
 exports.filteredRegional = async function (req, res){

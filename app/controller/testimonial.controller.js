@@ -236,6 +236,9 @@ exports.requestTestimonial = async function (req, res){
     });   
 
     Helper.createNotification("Testimonial", targetAccount.name + " requested for your testimonial. Check them out!", creatorAccount.id, req.body.accountType)
+
+    var action = "Account requested testimonial to "+creatorAccount.username+" for the project "+theProject.title+" ("+theProject.id+")"
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.writeTestimonial = async function (req, res){
@@ -317,6 +320,8 @@ exports.writeTestimonial = async function (req, res){
 
     Helper.createNotification("Testimonial", creatorAccount.name + " write a testimonial for you. Check them out!", targetAccount.id, req.body.accountType)
     
+    var action = "Account wrote testimonial to "+targetAccount.username+" for the project "+theProject.title+" ("+theProject.id+")"
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateTestimonialStatus = async function (req, res){
@@ -384,6 +389,9 @@ exports.updateTestimonialStatus = async function (req, res){
     });
     
     Helper.createNotification("Testimonial", myAccount.name + " " +req.body.status +" the testimonial you wrote about them.", testimonial.creatorId, testimonial.creatorType)
+
+    var action = "Account "+req.body.status+" the testimonial with the id: "+testimonial.id
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 exports.updateOutgoingTestimonialStatus = async function (req, res){
@@ -452,6 +460,9 @@ exports.updateOutgoingTestimonialStatus = async function (req, res){
     });
     
     Helper.createNotification("Testimonial", myAccount.name + " " +req.body.status + " the testimonial they wrote about you.", testimonial.targetId, testimonial.targetType)
+
+    var action = "Account "+req.body.status+" the testimonial with the id: "+testimonial.id
+    Helper.createAuditLog(action,req.type,req.id)
 }
 
 async function getProject(theId) {

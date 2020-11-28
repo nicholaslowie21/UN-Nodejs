@@ -221,6 +221,9 @@ exports.rejectInstitution = async function (req, res){
         } 
     })
 
+    var action = "Account rejected an institution request. The institution: "+institution.username+" ("+institution.id+")"
+    Helper.createAuditLog(action,"admin",req.id)
+
     return res.status(200).json({
         status: 'success',
         msg: 'You have successfully declined the institution account',
@@ -277,11 +280,14 @@ exports.verifyInstitution = async function (req, res){
         } 
     })
 
+    var action = "Account verified an institution request. The institution: "+institution.username+" ("+institution.id+")"
+    Helper.createAuditLog(action,"admin",req.id)
+
     return res.status(200).json({
         status: 'success',
         msg: 'You have successfully verified the institution account',
         data: { institution: institution }
-    }); 
+    });
 }
 
 exports.acceptUserRequest = async function (req, res){
@@ -361,11 +367,19 @@ exports.acceptUserRequest = async function (req, res){
         
     Helper.createProfileFeed(title,desc,accountId,accountType)
 
+    var action = "Account accepted a user verification request. The user: "+user.username+" ("+user.id+")"
+    Helper.createAuditLog(action,"admin",req.id)
+
+    var action = "Account verified!"
+    Helper.createAuditLog(action,"user",user.id)
+
     return res.status(200).json({
         status: 'success',
         msg: 'You have successfully accepted for a user account verification request',
         data: {}
     });
+
+    
 }
 
 exports.declineUserRequest = async function (req, res){
@@ -437,6 +451,12 @@ exports.declineUserRequest = async function (req, res){
     })
 
     Helper.createNotification("KoCoSD Admin", "Your verification request is rejected.", user.id, "user")
+
+    var action = "Account declined a user verification request. The user: "+user.username+" ("+user.id+")"
+    Helper.createAuditLog(action,"admin",req.id)
+
+    var action = "Account verification request declined."
+    Helper.createAuditLog(action,"user",user.id)
 
     return res.status(200).json({
         status: 'success',
