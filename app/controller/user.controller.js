@@ -267,7 +267,12 @@ exports.updateEmail = async function (req, res, next) {
 
 exports.currProjects = async function (req, res, next) {
     const user = await Users.findOne({ '_id': req.query.userId }, function (err, person) {
-        if (err) return handleError(err);
+        if (err)
+        return res.status(400).json({
+            status: 'error',
+            msg: 'Something went wrong! '+err,
+            data: {}
+        });
     });
 
     if(!user) 
