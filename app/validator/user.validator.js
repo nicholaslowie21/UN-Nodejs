@@ -134,7 +134,7 @@ exports.updateEmail = [
             if (err) return handleError(err);
           });
         if (user || institution)
-            return Promise.reject('email already exists. User cannot be created');
+            return Promise.reject('Email already exists.');
     })
 ]
 
