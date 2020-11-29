@@ -62,7 +62,7 @@ exports.validateAccountClaim = [
 exports.suspendProject = [
     body('role').exists().custom(async value => {
         if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
-            return Promise.reject('You are not authorised to suspend this project')
+            return Promise.reject('You are not authorised to perform this action!')
     }),
     body('targetId').exists()
 ]
