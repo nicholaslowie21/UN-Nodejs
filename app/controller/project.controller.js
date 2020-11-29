@@ -26,6 +26,7 @@ const multer = require('multer')
 const nodeCountries =  require("node-countries");
 const Helper = require('../service/helper.service')
 const sharp = require('sharp')
+const { contribution } = require('../models')
 
 var postStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -3749,6 +3750,7 @@ async function getProjectInfo(contributionItem) {
     }
 
     contributionItem.projectTitle = project.title;
+    contributionItem.projectImg = project.imgPath;
 }
 
 async function getRequestInfo(contributionItem) {
