@@ -22,7 +22,7 @@ exports.allProjects = [
 exports.suspendUser = [
     body('role').exists().custom(async value => {
         if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
-            return Promise.reject('You are not authorised to suspend this account!')
+            return Promise.reject('You are not authorised to perform this action!')
     }),
     body('targetId').exists()
 ]
