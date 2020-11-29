@@ -581,6 +581,13 @@ exports.pastProjects = async function (req, res, next) {
 }
 
 exports.membersCSVProcessing = async function (req, res, next) {
+    if(!req.file || !req.file.path)
+    return res.status(400).json({
+        status: 'error',
+        msg: 'No file uploaded!',
+        data: {}
+    });
+
     const csvFilePath = req.file.path;
 
     const institution = await Institution.findOne({ '_id': req.id }, function (err, person) {
