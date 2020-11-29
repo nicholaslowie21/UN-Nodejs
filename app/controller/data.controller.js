@@ -467,14 +467,14 @@ exports.dataByCountries = async function (req, res){
 
     for(var i = 0; i < users.length; i++) {
         var country = users[i].country
-        if(country ==='') continue
+        if(!country || country ==='') continue
 
         updateItemMap(dataItemsMap,country,1,0,0,0)
     }
 
     for(var i = 0; i < institutions.length; i++) {
         var country = institutions[i].country
-        if(country ==='') continue
+        if(!country || country ==='') continue
 
         updateItemMap(dataItemsMap,country,1,0,0,0)
     }
@@ -490,7 +490,7 @@ exports.dataByCountries = async function (req, res){
 
     for(var i = 0; i < projects.length; i++) {
         var country = projects[i].country
-        if(country ==='') continue
+        if(!country || country ==='') continue
 
         updateItemMap(dataItemsMap,country,0,1,0,0)
     }
@@ -505,8 +505,12 @@ exports.dataByCountries = async function (req, res){
     });
 
     for(var i = 0; i < contributions.length; i++) {
-        var country = contributions[i].country
-        if(country ==='') continue
+
+        var theProject = await getProject(contributions[i].projectId)
+        if(!theProject) continue
+
+        var country = theProject.country
+        if(!country || country ==='') continue
 
         updateItemMap(dataItemsMap,country,0,0,1,0)
 
