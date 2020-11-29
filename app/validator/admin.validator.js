@@ -49,8 +49,8 @@ exports.getAccountClaims = [
 
 exports.validateAccountClaim = [
     body('role').exists().custom(async value => {
-        if (value == 'user') 
-            return Promise.reject('You are not authorised to retrieve this list!')
+        if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
+            return Promise.reject('You are not authorised to perform this action!')
     }),
     body('action').exists().custom(async value => {
         if (value != 'accepted' && value != 'declined' ) 
