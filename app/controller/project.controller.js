@@ -764,7 +764,7 @@ exports.deleteProjectEvent = async function (req, res){
 
         var action = "Project deleted a milestone: "+ data.title +" ("+data.id+")" 
     
-        Helper.createAuditLog(action,"project",project.id)
+        Helper.createAuditLog(action,"project",data.projectId)
 
         return res.status(200).json({
             status: 'success',
