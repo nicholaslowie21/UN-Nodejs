@@ -21,7 +21,7 @@ exports.allProjects = [
 
 exports.suspendUser = [
     body('role').exists().custom(async value => {
-        if (value == 'user') 
+        if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
             return Promise.reject('You are not authorised to retrieve this list!')
     }),
     body('targetId').exists()
@@ -61,8 +61,8 @@ exports.validateAccountClaim = [
 
 exports.suspendProject = [
     body('role').exists().custom(async value => {
-        if (value == 'user') 
-            return Promise.reject('You are not authorised to retrieve this list!')
+        if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
+            return Promise.reject('You are not authorised to suspend this project')
     }),
     body('targetId').exists()
 ]
