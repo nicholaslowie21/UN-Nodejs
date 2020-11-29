@@ -14,8 +14,8 @@ exports.searchUsers = [
 
 exports.allProjects = [
     body('role').exists().custom(async value => {
-        if (value == 'user') 
-            return Promise.reject('You are not authorised to access this!')
+        if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
+            return Promise.reject('You are not authorised to perform this action!')
     })
 ]
 
@@ -29,8 +29,8 @@ exports.suspendUser = [
 
 exports.getAuditLogs = [
     body('role').exists().custom(async value => {
-        if (value == 'user') 
-            return Promise.reject('You are not authorised to retrieve this list!')
+        if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
+            return Promise.reject('You are not authorised to perform this action!')
     }),
     query('targetId').exists(),
     query('targetType').exists().custom(async value => {
@@ -41,8 +41,8 @@ exports.getAuditLogs = [
 
 exports.getAccountClaims = [
     body('role').exists().custom(async value => {
-        if (value == 'user') 
-            return Promise.reject('You are not authorised to retrieve this list!')
+        if (value != 'admin' && value != 'adminlead' && value != 'regionaladmin') 
+            return Promise.reject('You are not authorised to perform this action!')
     }),
     query('status').exists()
 ]
