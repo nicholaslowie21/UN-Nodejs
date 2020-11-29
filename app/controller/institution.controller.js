@@ -714,7 +714,7 @@ exports.viewInstitution = async function (req, res) {
 }
 
 exports.getFeeds = async function (req, res) {
-    const institution = await Institution.findOne({ 'username': req.query.username }, function (err, person) {
+    const institution = await Institution.findOne({ 'username': req.query.institutionId }, function (err, person) {
         if (err) return handleError(err);
     });
 
