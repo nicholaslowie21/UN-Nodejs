@@ -972,7 +972,7 @@ function checkFileType(file, cb){
     if(mimetype && extname){
       return cb(null,true);
     } else {
-      cb('Error: Images Only!');
+      cb('Error: File type invalid');
     }
 }
 
