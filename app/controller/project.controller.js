@@ -2505,7 +2505,7 @@ exports.deleteKPI = async function (req, res) {
     
     Helper.createAuditLog(action,req.type,req.id)
 
-    var action = "Project deleted a KPI: "+ kpi.title +" ("+data.id+")" 
+    var action = "Project deleted a KPI: "+ kpi.title +" ("+kpi.id+")" 
     
     Helper.createAuditLog(action,"project",project.id)
 
