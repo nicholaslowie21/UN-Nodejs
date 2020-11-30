@@ -454,11 +454,11 @@ exports.getMarketplace = async function (req, res){
 }
 
 exports.getFilteredMarketplace = async function (req, res){
-    const rewards = await Reward.find({ 'status':'open' }, function (err) {
+    const rewards = await Reward.find({ 'status':'open', 'minTier':req.query.tier }, function (err) {
             if (err)
             return res.status(500).json({
                 status: 'error',
-                msg: 'There was no such account!',
+                msg: 'Something went wrong! '+err,
                 data: {}
             });
     });
@@ -471,13 +471,6 @@ exports.getFilteredMarketplace = async function (req, res){
     });
 
     var theList = [];
-
-    var tierLevel = 0
-
-    if(req.query.minTier === 'bronze') tierLevel = 1
-    else if(req.query.minTier === 'silver') tierLevel = 2
-    else if(req.query.minTier === 'gold') tierLevel = 3
-    
 
     for(var i = 0; i < rewards.length; i++) {
         var reward = {
@@ -521,18 +514,13 @@ exports.getFilteredMarketplace = async function (req, res){
         reward.startDate = rewards[i].startDate
         reward.externalName = rewards[i].externalName
 
-        var targetTierLevel = 0
-        if(reward.minTier === 'bronze') targetTierLevel = 1
-        else if(reward.minTier === 'silver') targetTierLevel = 2
-        else if(reward.minTier === 'gold') targetTierLevel = 3
-
-        if(targetTierLevel<tierLevel) continue
-
         await getRequesterInfo(reward)
         if(reward.accountName === "" && reward.sponsorType != "external") continue
 
         theList.push(reward)
     }
+
+    theList.reverse()
 
     return res.status(200).json({
         status: 'success',

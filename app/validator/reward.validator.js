@@ -97,7 +97,7 @@ exports.filteredReward = [
 ]
 
 exports.filteredMarketplaceReward = [
-    query('minTier').exists().custom(async value => {
+    query('tier').exists().custom(async value => {
         if(value != "gold" && value != "silver" && value != "bronze")
             return Promise.reject('the tier is invalid!')
     })

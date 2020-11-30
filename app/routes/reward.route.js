@@ -21,8 +21,8 @@ router.post('/deleteReward', auth, RewardValidator.deleteReward, Helper.ifErrors
 router.post('/rewardClearing', rewardController.manualRewardClearing)
 
 router.get('/marketplace', auth, rewardController.getMarketplace)
-router.get('/marketplace/rewardDetail', auth, RewardValidator.rewardDetail, rewardController.getMarketplaceRewardDetail)
-router.get('/filter/tier/marketplace', auth, RewardValidator.filteredMarketplaceReward, rewardController.getFilteredMarketplace)
+router.get('/marketplace/rewardDetail', auth, RewardValidator.rewardDetail, Helper.ifErrors, rewardController.getMarketplaceRewardDetail)
+router.get('/filter/tier/marketplace', auth, RewardValidator.filteredMarketplaceReward, Helper.ifErrors, rewardController.getFilteredMarketplace)
 
 router.post('/redeem', auth, RewardValidator.redeemReward, Helper.ifErrors, rewardController.redeemReward)
 
