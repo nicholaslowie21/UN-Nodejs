@@ -3443,6 +3443,22 @@ exports.getResourceNeeds = async function (req, res){
 }
 
 exports.getContributions = async function (req, res){
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+
     const contributions = await Contribution.find({ 'projectId': req.query.projectId, 'status':'active' }, function (err) {
         if (err)
         return res.status(500).json({
