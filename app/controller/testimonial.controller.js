@@ -242,7 +242,6 @@ exports.requestTestimonial = async function (req, res){
 }
 
 exports.writeTestimonial = async function (req, res){
-    
     var targetAccount = await getAccount(req.body.accountId, req.body.accountType)
     if(!targetAccount)
     return res.status(400).json({
@@ -275,7 +274,7 @@ exports.writeTestimonial = async function (req, res){
         data: { }
     });
 
-    var theRequest = await Testimonial.findOne({ 'targetId': req.id, 'targetType':req.type, 
+    var theRequest = await Testimonial.findOne({ 'targetId': targetAccount.id, 'targetType':req.body.accountType, 
         'creatorId':creatorAccount.id, 'creatorType': req.body.accountType, 'projectId': req.body.projectId,
         'status': { $in: ['open','requested','pending'] }}, function (err) {
         if (err) 
