@@ -466,6 +466,22 @@ exports.deletePostPic = async function (req, res){
 }
 
 exports.getPosts = async function (req, res){
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+    
     const projectPosts = await ProjectPost.find({ 'projectId': req.query.projectId, 'status':'active' }, function (err) {
         if (err)
         return res.status(500).json({
@@ -3262,7 +3278,7 @@ exports.updateContributionRating = async function (req, res){
         msg: 'There was no such account!',
         data: {}
     });
-
+    
     const project = await Projects.findOne({ '_id': contribution.projectId }, function (err) {
         if (err)
         return res.status(500).json({
@@ -3290,7 +3306,7 @@ exports.updateContributionRating = async function (req, res){
             }
         }
     } else if (project.host === req.body.id) valid = true;
-
+    
     if(!valid)
     return res.status(400).json({
         status: 'error',
@@ -3305,11 +3321,17 @@ exports.updateContributionRating = async function (req, res){
         data: {}
     });
 
+    if(contribution.rating === req.body.theRating)
+    return res.status(400).json({
+        status: 'error',
+        msg: 'The rating is still the same.',
+        data: {}
+    });
+
     contribution.rating = req.body.theRating
-
-    contribution.save(contribution)
+    
+    await contribution.save(contribution)
     .then(data => {
-
         var action = "Account updated a contribution rating: ("+data.id+")"
         action += " for a project: "+project.title+" ("+project.id+")" 
     
