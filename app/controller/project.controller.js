@@ -3403,6 +3403,22 @@ async function updateContributionRatingEmail(contribution, projectCode) {
 }
 
 exports.getResourceNeeds = async function (req, res){
+    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
+    
     const resourceneeds = await ResourceNeed.find({ 'projectId': req.query.projectId, 'status': { $ne: 'closed'} }, function (err) {
         if (err)
         return res.status(500).json({
