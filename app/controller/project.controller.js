@@ -3594,7 +3594,11 @@ exports.getAccountContributions = async function (req, res){
         contributionItem.contributorType = contributions[i].contributorType
 
         await getNeedInfo(contributionItem)
+
+        
         await getRequestInfo(contributionItem)
+        if(contributionItem.resourceId === "") continue
+        
         await getResourceInfo(contributionItem)
 
         await getContributorInfo(contributionItem)
