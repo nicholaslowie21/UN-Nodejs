@@ -2183,18 +2183,20 @@ exports.deleteAdmin = async function (req, res) {
         });
     } else {
         tempAdmins.pull(user.id)
-        user.projects.pull(project.id)
+        if(checkRemoveProjectIdsForAdmin(project,user.id)){
+            user.projects.pull(project.id)
+
+            user.save().catch(err =>{
+                return res.status(500).json({
+                    status: 'error',
+                    msg: 'Something went wrong! Error: ' + err.message,
+                    data: {}
+                });
+            })
+        }
     }
 
     project.admins = tempAdmins
-
-    user.save().catch(err =>{
-        return res.status(500).json({
-            status: 'error',
-            msg: 'Something went wrong! Error: ' + err.message,
-            data: {}
-        });
-    })
 
     project.save(project)
     .then(data => {
@@ -4155,6 +4157,20 @@ async function checkRemoveProjectIds(project, contribution) {
     } else if (project.host=== contribution.contributor) return false
 
     const otherContribution =  await Contribution.findOne({ 'projectId':project.id, 'contributor':owner.id, 'contributorType':contribution.contributorType, 'status':'active' }, function (err) {
+        if (err) {
+            console.log("error: "+err.message)
+            return
+        }
+    });
+    if(otherContribution) return false
+
+    return true
+
+}
+
+// return false if there is still another contribution
+async function checkRemoveProjectIdsForAdmin(project, userId) {
+    const otherContribution =  await Contribution.findOne({ 'projectId':project.id, 'contributor':userId, 'contributorType':"user", 'status':'active' }, function (err) {
         if (err) {
             console.log("error: "+err.message)
             return
