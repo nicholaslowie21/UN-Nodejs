@@ -96,7 +96,7 @@ exports.editAnnouncement = async function (req, res) {
         if (err)
         return res.status(500).json({
             status: 'error',
-            msg: 'There was no such account!',
+            msg: 'There was no such announcement!',
             data: {}
         });
     });
@@ -304,7 +304,7 @@ exports.chatAccount = async function (req, res) {
         if (err)
         return res.status(500).json({
             status: 'error',
-            msg: 'There was an issue retrieving the announcement!',
+            msg: 'There was an issue retrieving the chatroom!',
             data: {}
         });
     });
@@ -372,7 +372,7 @@ exports.chatAccount = async function (req, res) {
         if (err)
         return res.status(500).json({
             status: 'error',
-            msg: 'There was an issue retrieving the announcement!',
+            msg: 'There was an issue retrieving the chats!',
             data: {}
         });
     });
@@ -465,7 +465,7 @@ exports.sendChat = async function (req, res) {
         if (err)
         return res.status(500).json({
             status: 'error',
-            msg: 'There was an issue retrieving the announcement!',
+            msg: 'There was an issue retrieving the chats!',
             data: {}
         });
     });

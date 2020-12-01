@@ -3600,7 +3600,8 @@ exports.getAccountContributions = async function (req, res){
         if(contributionItem.resourceId === "") continue
         
         await getResourceInfo(contributionItem)
-
+        if(contributionItem.resourceTitle === "") continue
+        
         await getContributorInfo(contributionItem)
         if(contributionItem.contributorName === "") continue
 
