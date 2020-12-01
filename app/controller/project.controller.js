@@ -894,6 +894,22 @@ exports.deletePostComment = async function (req, res){
 }
 
 exports.getComments = async function (req, res){
+    const theprojectPost = await ProjectPost.findOne({ '_id': req.query.postId, 'status':'active' }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!theprojectPost) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Such active project post not found!',
+        data: {}
+    });
+    
     const postComments = await PostComment.find({ 'postId': req.query.postId, 'status':'active' }, function (err) {
         if (err)
         return res.status(500).json({
