@@ -3425,7 +3425,7 @@ async function updateContributionRatingEmail(contribution, projectCode) {
 }
 
 exports.getResourceNeeds = async function (req, res){
-    const project = await Projects.findOne({ '_id': req.body.projectId }, function (err) {
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
         if (err)
         return res.status(500).json({
             status: 'error',
