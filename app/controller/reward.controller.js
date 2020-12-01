@@ -520,11 +520,18 @@ exports.getFilteredMarketplace = async function (req, res){
         theList.push(reward)
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
-        msg: ' Filterede reward marketplace list successfully retrieved',
+        msg: ' Filtered reward marketplace list successfully retrieved',
         data: { rewards: theList }
     });
 }
@@ -1161,7 +1168,14 @@ exports.getVoucher = async function (req, res){
         theList.push(voucher)
     }
     
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',

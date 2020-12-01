@@ -661,7 +661,15 @@ exports.getRoomListFiltered = async function (req, res) {
 
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
+    
     return res.status(200).json({
         status: 'success',
         msg: 'Filtered chat rooms successfully retrieved',

@@ -1711,7 +1711,14 @@ exports.getProjectListFiltered = async function (req, res) {
         if(projectItem.matchPoint>0) theList.push(projectItem)
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
     theList.sort(function(a, b){return b.matchPoint - a.matchPoint})
 
     return res.status(200).json({
@@ -1802,7 +1809,14 @@ exports.getFundingNeeds = async function (req, res) {
         theList.push(fundingItem)
     }
     
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -2648,7 +2662,14 @@ exports.getMyConsolidatedProjectReq = async function (req, res) {
         
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -2725,7 +2746,14 @@ exports.getResourceDetailProjectReq = async function (req, res) {
         
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -2791,7 +2819,14 @@ exports.getResourceDetailResourceReq = async function (req, res) {
         
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -2870,7 +2905,14 @@ exports.getProjectPageProjectReq = async function (req, res) {
         
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -2946,7 +2988,14 @@ exports.getProjectPageResourceReq = async function (req, res) {
         
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -3790,7 +3839,14 @@ exports.paidResourcesMarketplace = async function (req, res){
         theList.push(thepaidresource)
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
