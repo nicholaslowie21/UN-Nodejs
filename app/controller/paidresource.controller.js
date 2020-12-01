@@ -513,7 +513,14 @@ exports.myPurchase = async function (req, res) {
         theList.push(temp)
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -559,7 +566,14 @@ exports.sellerRequests = async function (req, res) {
         theList.push(temp)
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
@@ -614,7 +628,14 @@ exports.projectPurchase = async function (req, res) {
         theList.push(temp)
     }
 
-    theList.reverse()
+    theList.sort(function(a, b){
+        var aTime = a.updatedAt
+        var bTime = b.updatedAt
+        if(moment(aTime).isBefore(moment(bTime)) ) 
+            return 1
+        else
+            return -1      
+    })
 
     return res.status(200).json({
         status: 'success',
