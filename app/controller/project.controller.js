@@ -797,6 +797,21 @@ exports.deleteProjectEvent = async function (req, res){
 }
 
 exports.getPublicEvents = async function (req, res){
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
 
     const projectEvents = await ProjectEvent.find({ 'projectId': req.query.projectId, 'status':'active', 'eventType':'public' }, function (err) {
         if (err)
@@ -822,6 +837,21 @@ exports.getPublicEvents = async function (req, res){
 }
 
 exports.getAllEvents = async function (req, res){
+    const project = await Projects.findOne({ '_id': req.query.projectId }, function (err) {
+        if (err)
+        return res.status(500).json({
+            status: 'error',
+            msg: 'There was an issue retrieving the project!',
+            data: {}
+        });
+    });
+
+    if(!project) 
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Such project not found!',
+        data: {}
+    });
 
     const projectEvents = await ProjectEvent.find({ 'projectId': req.query.projectId, 'status':'active' }, function (err) {
         if (err)
@@ -2199,7 +2229,7 @@ exports.deleteAdmin = async function (req, res) {
         });
     } else {
         tempAdmins.pull(user.id)
-        if(checkRemoveProjectIdsForAdmin(project,user.id)){
+        if(checkRemoveProjectIdsForAdmin(project,user.id) === true){
             user.projects.pull(project.id)
 
             user.save().catch(err =>{
@@ -3563,6 +3593,14 @@ exports.getContributions = async function (req, res){
 }
 
 exports.getAccountContributions = async function (req, res){
+    const theAccount = await getAccount(req.query.accountId, req.query.accountType)
+    if(!theAccount)
+    return res.status(400).json({
+        status: 'error',
+        msg: 'Account not found!',
+        data: {}
+    });
+
     const contributions = await Contribution.find({ 'contributor': req.query.accountId, 'contributorType': req.query.accountType ,'status':'active' }, function (err) {
         if (err)
         return res.status(500).json({
@@ -4106,6 +4144,33 @@ async function getAccountInfo(theItem) {
     theItem.accountUsername = owner.username
     theItem.accountName = owner.name 
     theItem.isVerified = owner.isVerified
+}
+
+async function getAccount(theId, theType) {
+    var owner;
+
+    if(theType === "user") {
+        owner = await Users.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    } else if (theType === 'institution') {
+        owner = await Institutions.findOne({ '_id': theId }, function (err) {
+            if (err) {
+                console.log("error: "+err.message)
+                return
+            }
+        });
+    }
+
+    if(!owner) {
+        console.log("error: (getHostInfo) Such account not found!")
+        return
+    }
+
+    return owner
 }
 
 async function removeProjectIds(projectId, contribution) {
