@@ -2051,7 +2051,8 @@ exports.addAdmin = async function (req, res) {
 
     if(!tempAdmins.includes(user.id)){
         tempAdmins.push(user.id)
-        user.projects.push(project.id)
+        if(!user.projects.includes(project.id))
+            user.projects.push(project.id)
     } else {
         return res.status(400).json({
             status: 'error',
