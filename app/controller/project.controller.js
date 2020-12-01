@@ -2229,7 +2229,7 @@ exports.deleteAdmin = async function (req, res) {
         });
     } else {
         tempAdmins.pull(user.id)
-        if(checkRemoveProjectIdsForAdmin(project,user.id)){
+        if(checkRemoveProjectIdsForAdmin(project,user.id) === true){
             user.projects.pull(project.id)
 
             user.save().catch(err =>{
