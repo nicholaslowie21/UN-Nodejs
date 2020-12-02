@@ -726,7 +726,7 @@ exports.gotNewNotif = async function (req, res) {
             msg: 'There was an issue while retrieving notifications!',
             data: {}
         });
-    } else {
+    } else if (notifications.length > 0) {
         notifications.reverse()
 
         var gotNew = false;
@@ -737,6 +737,12 @@ exports.gotNewNotif = async function (req, res) {
             status: 'success',
             msg: 'New notifications successfully checked',
             data: { gotNew: gotNew }
+        });
+    } else {
+        return res.status(200).json({
+            status: 'success',
+            msg: 'New notifications successfully checked',
+            data: { gotNew: false }
         });
     }
     
