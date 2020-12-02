@@ -80,14 +80,6 @@ exports.assignRegionalAdmin = [
     body('role').exists().custom(async value => {
         if (value != 'adminlead') 
             return Promise.reject('You are not authorised to promote users!')
-    }),
-    // check if the user to be promoted is already a regional admin or higher
-    body('targetId').exists().custom(async value => {
-        let target = await Users.findOne({ '_id': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (target.role == 'regionaladmin')
-            return Promise.reject('This user is already a regional admin!')
     })
 ]
 
@@ -96,14 +88,6 @@ exports.assignAdmin = [
     body('role').exists().custom(async value => {
         if (value != 'adminlead') 
             return Promise.reject('You are not authorised to promote users!')
-    }),
-    // check if the user to be promoted is already an admin or higher
-    body('targetId').exists().custom(async value => {
-        let target = await Users.findOne({ '_id': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (target.role == 'admin')
-            return Promise.reject('This account is already an admin!')
     })
 ]
 
@@ -112,14 +96,6 @@ exports.assignAdminLead = [
     body('role').exists().custom(async value => {
         if (value != 'adminlead') 
             return Promise.reject('You are not authorised to promote users!')
-    }),
-    // check if the user to be promoted is already an admin lead
-    body('targetId').exists().custom(async value => {
-        let target = await Users.findOne({ '_id': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (target.role == 'adminlead')
-            return Promise.reject('This user is already an admin lead!')
     })
 ]
 
