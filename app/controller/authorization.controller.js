@@ -392,7 +392,7 @@ exports.postChangePasswordRequest = async function (req, res) {
 	let email = req.body.email;
 
     if(!email) 
-    return res.status(400).json({
+    return res.status(422).json({
         status: 'error',
         msg: 'Email is empty!',
         data: {}
