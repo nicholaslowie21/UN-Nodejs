@@ -269,7 +269,6 @@ exports.addUserCSV = async function (req, res, next) {
     await csvtojson().fromFile(csvFilePath).then( async function (csvData) {
         if (fs.existsSync(csvFilePath)) {
             for (const obj of csvData) {
-                
                 if(!obj.sequence || !obj.name || !obj.email || !obj.country || !obj.website || !obj.SDGs || !obj.bio) {
                     return res.status(400).json({
                         status: 'error',
