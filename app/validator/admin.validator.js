@@ -104,14 +104,6 @@ exports.assignUser = [
     body('role').exists().custom(async value => {
         if (value != 'adminlead') 
             return Promise.reject('You are not authorised to demote users!')
-    }),
-    // check if the user to be demoted is a regional admin to begin with
-    body('targetId').exists().custom(async value => {
-        let target = await Users.findOne({ '_id': value }, function (err, person) {
-            if (err) return handleError(err);
-          });
-        if (target.role == 'user')
-            return Promise.reject('This account is already a user!')
     })
 ]
 
