@@ -272,7 +272,7 @@ exports.addUserCSV = async function (req, res, next) {
                 if(!obj.sequence || !obj.name || !obj.email || !obj.country || !obj.website || !obj.SDGs || !obj.bio) {
                     return res.status(400).json({
                         status: 'error',
-                        msg: 'File format is incorrect. Please check your file!',
+                        msg: 'File format is incorrect. Please check your file! All the data uploaded up until this sequence: '+obj.sequence +".",
                         data: {}
                     });
                 }
@@ -471,7 +471,7 @@ exports.addInstitutionCSV = async function (req, res, next) {
                 if(!obj.sequence || !obj.name || !obj.email || !obj.country || !obj.website || !obj.SDGs || !obj.address || !obj.bio) {
                     return res.status(500).json({
                         status: 'error',
-                        msg: 'File format is incorrect. Please check your file!',
+                        msg: 'File format is incorrect. Please check your file! All the data uploaded up until this sequence: '+obj.sequence +".",
                         data: {}
                     });
                 }
