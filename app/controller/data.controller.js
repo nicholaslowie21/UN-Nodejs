@@ -154,6 +154,8 @@ exports.accountsChart = async function (req, res){
     var endString = req.query.year+"-12-31"
     var endDate = moment(endString).tz('Asia/Singapore')
 
+    endDate.add(1,"day")
+
     var users = await User.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
         if (err)
         return res.status(500).json({
@@ -200,6 +202,8 @@ exports.resourcesTypesNumbers = async function (req, res){
     var startDate = moment(startString).tz('Asia/Singapore')
     var endString = req.query.year+"-12-31"
     var endDate = moment(endString).tz('Asia/Singapore')
+
+    endDate.add(1,"day")
 
     var knowledges = await Knowledge.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
         if (err)
@@ -258,6 +262,7 @@ exports.contributionsNumbers = async function (req, res){
     var startDate = moment(startString).tz('Asia/Singapore')
     var endString = req.query.year+"-12-31"
     var endDate = moment(endString).tz('Asia/Singapore')
+    endDate.add(1,"day")
 
     var contributions = await Contribution.find({ 'status': 'active', 'createdAt': {$gte: startDate, $lte: endDate} }, function (err) {
         if (err)
@@ -305,6 +310,8 @@ exports.cumulativeProjects = async function (req, res){
     var endString = req.query.year+"-12-31"
     var endDate = moment(endString).tz('Asia/Singapore')
 
+    endDate.add(1,"day")
+    
     var projectsPrior = await Project.find({ createdAt: {$lt: startDate} }, function (err) {
         if (err)
         return res.status(500).json({
@@ -349,6 +356,8 @@ exports.dataBySDG = async function (req, res){
     
     var startDate = moment(req.query.startDate).tz('Asia/Singapore')
     var endDate = moment(req.query.endDate).tz('Asia/Singapore')
+
+    endDate.add(1,"day")
 
     var dataItems = await createDataBySDGItems();
 
@@ -445,6 +454,8 @@ exports.dataByCountries = async function (req, res){
     var startDate = moment(req.query.startDate).tz('Asia/Singapore')
     var endDate = moment(req.query.endDate).tz('Asia/Singapore')
 
+    endDate.add(1,"day")
+    
     let dataItemsMap = new Map()
     
     var users = await User.find({ createdAt: {$gte: startDate, $lte: endDate} }, function (err) {
