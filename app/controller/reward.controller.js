@@ -135,7 +135,7 @@ exports.requestReward = async function (req, res){
         if(account.status != "active")
         return res.status(400).json({
             status: 'error',
-            msg: 'Account is not authorized to perform project creation right now!',
+            msg: 'Account is not authorized to perform reward creation right now!',
             data: {}
         });
     } else if (req.type === "user") {
@@ -276,7 +276,7 @@ exports.cancelReward = async function (req, res){
         if(account.status != "active")
         return res.status(400).json({
             status: 'error',
-            msg: 'Account is not authorized to perform project creation right now!',
+            msg: 'Account is not authorized to perform reward creation right now!',
             data: {}
         });
     } else if (req.type === "user") {
